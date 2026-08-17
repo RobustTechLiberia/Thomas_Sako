@@ -12,18 +12,26 @@ class DefaultPage extends React.Component {
 
   handleSubmit = async (e) => {
     e.preventDefault();
+
+    // JavaScript Validation: Prevent submission if empty or only spaces
+    if (!this.state.email || this.state.email.trim() === "") {
+      console.warn("Submission blocked: Email field cannot be empty.");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:8080/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: this.state.email }),
+        body: JSON.stringify({ email: this.state.email.trim() }), // Submits clean trimmed email
       });
 
       if (response.ok) {
         console.log("Subscription email sent successfully!");
+        // Clear the input field automatically on success
+        this.setState({ email: "" });
       } else {
-        // eslint-disable-next-line no-undef
-        console.error("Failed to subscribe. Try again.", error);
+        console.error("Failed to subscribe. Try again.");
       }
     } catch (error) {
       console.error("Error submitting email:", error);

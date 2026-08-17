@@ -28,8 +28,7 @@ const handleVoteInsertion = (req, res) => {
 
     const sql =
       "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
-    const todayStr = new Date().toISOString().slice(0, 10); // Safely yields a clean "YYYY-MM-DD" string
-
+    const todayStr = new Date().toISOString().slice(0, 10);
     con.query(sql, [question, answer, todayStr], (err, result) => {
       con.end();
 
@@ -45,7 +44,6 @@ const handleVoteInsertion = (req, res) => {
   });
 };
 
-// Listen on both paths to catch the request regardless of how the router is registered in app.js
 router.post("/", express.json(), handleVoteInsertion);
 router.post("/db", express.json(), handleVoteInsertion);
 

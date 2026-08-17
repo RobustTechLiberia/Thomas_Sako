@@ -7,9 +7,13 @@ const path = require("path");
 const port = 8080;
 const app = express();
 
-// 2. Import routers now that process.env is populated
+// external routers
 const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
+const questionRouter = require("./routes/question");
+
+//question router mounted
+app.use("/question", questionRouter);
 
 app.use(express.json());
 
