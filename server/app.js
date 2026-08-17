@@ -1,9 +1,13 @@
 /* eslint-disable no-undef */
+// environment variables
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const port = 8080;
 const app = express();
+
+// 2. Import routers now that process.env is populated
 const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
 

@@ -1,6 +1,6 @@
 import React from "react";
 import profile from "../../../images/Copilot_20260816_124134.png";
-import OurTeam from "../../../components/features/component/our_team"
+import OurTeam from "../../../components/features/component/our_team";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome
 
 class AboutContent extends React.Component {
@@ -19,7 +19,7 @@ class AboutContent extends React.Component {
             </div>
 
             {/* Auto bio */}
-            <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-20 lg:mx-20 mt-5 md:mt-0 lg:mt-0 flex flex-col justify-center md:h-80 lg:h-80">
+            <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-18 lg:mx-18 mt-5 md:mt-8 lg:mt-8 flex flex-col justify-center md:h-80 lg:h-80">
               <h1 className="font-sans font-semibold capitalize text-5xl md:text-white lg:text-white text-violet-950">
                 thomas sako
               </h1>
@@ -31,22 +31,30 @@ class AboutContent extends React.Component {
               <div className="flex justify-center md:justify-start lg:justify-start md:items-start lg:items-start gap-5 mt-2">
                 {/* YouTube */}
                 <div className="p-3 rounded-full bg-transparent border-none border-white transition">
-                  <i className="fa-brands fa-youtube md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  <a href="#" className="cursor-pointer">
+                    <i className="fa-brands fa-youtube md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  </a>
                 </div>
 
                 {/* X (Twitter) */}
                 <div className="p-3 rounded-full bg-transparent border-none border-white transition">
-                  <i className="fa-brands fa-x-twitter md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  <a href="#" className="cursor-pointer">
+                    <i className="fa-brands fa-x-twitter md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  </a>
                 </div>
 
                 {/* Facebook */}
                 <div className="p-3 rounded-full bg-transparent border-none border-whit transition">
-                  <i className="fa-brands fa-facebook-f md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  <a href="#" className="cursor-pointer">
+                    <i className="fa-brands fa-facebook-f md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  </a>{" "}
                 </div>
 
                 {/* Instagram */}
                 <div className="p-3 rounded-full bg-transparent border-none border-white transition">
-                  <i className="fa-brands fa-instagram md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                  <a href="#" className="cursor-pointer">
+                    <i className="fa-brands fa-instagram md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>{" "}
+                  </a>{" "}
                 </div>
               </div>
 
@@ -58,8 +66,8 @@ class AboutContent extends React.Component {
               </p>
             </div>
           </div>
-            </div>
-            <OurTeam/>
+        </div>
+        <OurTeam />
       </>
     );
   }

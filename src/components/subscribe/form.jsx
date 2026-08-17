@@ -20,7 +20,7 @@ class DefaultPage extends React.Component {
       });
 
       if (response.ok) {
-        alert("Subscription email sent successfully!");
+        console.log("Subscription email sent successfully!");
       } else {
         // eslint-disable-next-line no-undef
         console.error("Failed to subscribe. Try again.", error);

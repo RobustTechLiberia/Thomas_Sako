@@ -129,7 +129,7 @@ class Quest1 extends React.Component {
                   type="submit"
                   value={hasVoted ? "voted" : "vote"}
                   disabled={hasVoted}
-                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted ? "bg-gray-400 cursor-not-allowed uppercase" : "bg-violet-900 cursor-pointer"}`}
+                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted ? "bg-violet-900 cursor-not-allowed uppercase" : "bg-violet-900 cursor-pointer"}`}
                 />
               </div>
             </form>
