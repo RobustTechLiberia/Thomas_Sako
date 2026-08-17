@@ -9,6 +9,11 @@ export default defineConfig({
     proxy: {
       "/subscribe": "http://localhost:8080",
       "/home": "http://localhost:8080",
+      "/db": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

@@ -5,15 +5,12 @@ const path = require("path");
 const port = 8080;
 const app = express();
 const subscribeRouter = require("./routes/subscribe");
+const databaseRouter = require("./routes/db");
 
-// subscribe router
-app.use("/", subscribeRouter);
+app.use(express.json());
 
-// frontend endpoint
 const allowedOrigins = [
-  // local endpoint
   "http://localhost:5173",
-  // production endpoint
   "https://your-frontend-domain.com",
 ];
 
@@ -29,21 +26,33 @@ app.use(
   }),
 );
 
-// JSON body parser
-app.use(express.json());
+app.use("/", subscribeRouter);
+app.use("/", databaseRouter);
 
-app.use(express.static(path.join(__dirname, "../client/dist")));
-
-// default API route
 app.get("/home", (req, res) => {
   res.send("hello, world!");
 });
 
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+app.get("/", (req, res, next) => {
+  if (
+    req.path.startsWith("/db") ||
+    req.path.startsWith("/subscribe") ||
+    req.path.startsWith("/home") ||
+    req.path.startsWith("/results")
+  ) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"), (err) => {
+    if (err) {
+      res.status(404).json({
+        error: "Client build files not compiled yet. Run npm run build.",
+      });
+    }
+  });
 });
 
-// start server
 app.listen(port, (err) => {
   if (!err) {
     console.log(`server is running on port ${port}`);
