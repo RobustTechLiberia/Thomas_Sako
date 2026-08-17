@@ -5,7 +5,13 @@ const nodemailer = require("nodemailer");
 const router = express.Router();
 
 // subscribe route
-router.get("/subscribe", (req, res) => {
+router.post("/subscribe", (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).end();
+  }
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -16,18 +22,23 @@ router.get("/subscribe", (req, res) => {
 
   const mailOptions = {
     from: "your-email@gmail.com",
-    to: "recipient@example.com",
-    subject: "Test Email",
-    text: "Hello from Nodemailer!",
+    to: email,
+    subject: "Subscription Confirmation",
+    text: `Hello ${email}, thanks for subscribing!`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
+    // handles error
     if (error) {
       console.error("Error:", error);
-      res.status(500).send("Failed to send email");
+
+      // failed
+      res.status(500).end();
     } else {
       console.log("Email sent:", info.response);
-      res.send("Subscription email sent successfully!");
+
+      // successful
+      res.status(200).end();
     }
   });
 });

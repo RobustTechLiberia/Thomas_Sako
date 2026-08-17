@@ -11,6 +11,9 @@ app.use("/", subscribeRouter);
 // frontend endpoint
 app.use(cors({ origin: "http://localhost:5173" }));
 
+// body parser JSON
+app.use(express.json());
+
 // default route
 app
   .get("/home", (req, res) => {
