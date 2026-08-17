@@ -3,24 +3,31 @@ import { Link } from "react-router-dom";
 import logo from "../../../images/Copilot_20260816_124825.png";
 
 class Nav extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isOpen: false };
+  }
+
+  toggleMenu = () => {
+    this.setState((prev) => ({ isOpen: !prev.isOpen }));
+  };
+
   render() {
     return (
       <>
-        <div className="md:h-24 lg:h-24 h-20 bg-white border-b border-b-violet-200">
-          <nav className="bg-white  w-auto z-20 top-0 inset-s-0 border-b border-none border-default">
+        <div className="md:h-24 lg:h-24 h-auto bg-white border-b border-b-violet-200 relative z-50">
+          <nav className="bg-white w-auto top-0 inset-s-0 border-none">
             <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
+              {/* Logo */}
               <Link
                 to="/"
                 className="flex items-center space-x-3 rtl:space-x-reverse"
               >
-                <img
-                  src={logo}
-                  className="md:h-20 lg:h-20 h-12"
-                  alt="Flowbite Logo"
-                />
+                <img src={logo} className="md:h-20 lg:h-20 h-12" alt="Logo" />
               </Link>
 
-              <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+              {/* Right side: Watch Live + Menu Button */}
+              <div className="flex md:order-2 bg-white space-x-3 md:space-x-0 rtl:space-x-reverse">
                 <Link
                   to="/youtube"
                   className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
@@ -28,11 +35,11 @@ class Nav extends React.Component {
                   Watch Live
                 </Link>
                 <button
-                  data-collapse-toggle="navbar-sticky"
+                  onClick={this.toggleMenu}
                   type="button"
-                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary"
+                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body md:hidden bg-white focus:outline-none focus:ring-0 active:outline-none active:ring-0"
                   aria-controls="navbar-sticky"
-                  aria-expanded="false"
+                  aria-expanded={this.state.isOpen}
                 >
                   <span className="sr-only">Open main menu</span>
                   <svg
@@ -54,15 +61,18 @@ class Nav extends React.Component {
                 </button>
               </div>
 
+              {/* Collapsible menu */}
               <div
-                className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+                className={`absolute left-0 top-full w-full md:static md:flex md:w-auto md:order-1 transition-all duration-300 ${
+                  this.state.isOpen ? "block" : "hidden"
+                }`}
                 id="navbar-sticky"
               >
-                <ul className="flex capitalize text-violet-900 flex-col p-4 md:p-0 mt-4 font-medium border border-default text-lg md:text-xl lg:text-xl rounded-base bg-neutral-secondary-soft md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-neutral-primary">
+                <ul className="flex capitalize text-violet-900 flex-col p-4 md:p-0 font-medium text-lg md:text-xl lg:text-xl rounded-none bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
                   <li>
                     <Link
                       to="/youtube"
-                      className="block py-2 px-3 text-violet-900 bg-brand rounded-sm md:bg-transparent md:text-fg-brand md:p-0"
+                      className="block py-2 px-3 text-violet-900 hover:text-violet-700 md:p-0"
                     >
                       YouTube
                     </Link>
@@ -70,41 +80,41 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/podcast"
-                      className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0"
+                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
-                      podcasts
+                      Podcasts
                     </Link>
                   </li>
                   <li>
                     <Link
                       to="/advertising"
-                      className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0"
+                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
-                      advertising
+                      Advertising
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/podcast"
-                      className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0"
+                      to="/playlist"
+                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
-                      playlist
+                      Playlist
                     </Link>
                   </li>
                   <li>
                     <Link
                       to="/about"
-                      className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0"
+                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
-                      about
+                      About
                     </Link>
                   </li>
                   <li>
                     <Link
                       to="/contact"
-                      className="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0"
+                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
-                      contact
+                      Contact
                     </Link>
                   </li>
                 </ul>
