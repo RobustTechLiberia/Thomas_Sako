@@ -10,9 +10,10 @@ const subscribeRouter = require("./routes/subscribe");
 app.use("/", subscribeRouter);
 
 // frontend endpoint
-
 const allowedOrigins = [
+  // local endpoint
   "http://localhost:5173",
+  // production endpoint
   "https://your-frontend-domain.com",
 ];
 
@@ -22,31 +23,31 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("no connection made"));
+        callback(new Error("CORS blocked: origin not allowed"));
       }
     },
   }),
 );
 
-// JSON
+// JSON body parser
 app.use(express.json());
 
-// serve react
-app.use(express.static(path.join(__dirname, "client/dist")));
-
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "client/dist/index.html"));
-});
+app.use(express.static(path.join(__dirname, "../client/dist")));
 
 // default API route
-app
-  .get("/home", (req, res) => {
-    res.send("hello, world!");
-  })
-  .listen(port, (err) => {
-    if (!err) {
-      console.log(`server is running on port ${port}`);
-    } else {
-      console.log(`server crash at ${port}`);
-    }
-  });
+app.get("/home", (req, res) => {
+  res.send("hello, world!");
+});
+
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+});
+
+// start server
+app.listen(port, (err) => {
+  if (!err) {
+    console.log(`server is running on port ${port}`);
+  } else {
+    console.log(`server crash at ${port}`);
+  }
+});
