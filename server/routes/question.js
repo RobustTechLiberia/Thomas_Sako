@@ -37,6 +37,7 @@ router.post("/submit", express.json(), (req, res) => {
     WHERE questions = ? AND user_hash = ? AND created_at > NOW() - INTERVAL 1 DAY 
     LIMIT 1
   `;
+    
 
   pool.query(checkSql, [question, userHash], (err, rows) => {
     if (err) {
