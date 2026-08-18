@@ -14,13 +14,18 @@ class Features extends React.Component {
         <div className="flex flex-wrap justify-center items-center mt-10 gap-5 md:h-96 lg:h-96 h-auto bg-white">
           {/* youtube */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
-            <Link to="/youtube">
+            {/* FIXED: Changed Link to an <a> tag for external routing */}
+            <a
+              href="https://youtu.be/G9cl0kgd8Q4?si=Dcpxf4HiSsyfqsiW"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img
                 src={youtube}
                 alt="YouTube"
                 className="w-80 object-cover hover:opacity-50 cursor-pointer"
               />
-            </Link>
+            </a>
             <p className="font-serif capitalize text-center text-xl">YouTube</p>
           </div>
 
