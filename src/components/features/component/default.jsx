@@ -38,7 +38,7 @@ class Features extends React.Component {
 
           {/* playlist */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
-            <Link to="/podcast">
+            <Link to="/playlist">
               <img
                 src={playlist}
                 alt="Playlist"

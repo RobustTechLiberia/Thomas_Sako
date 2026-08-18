@@ -13,7 +13,7 @@ class DefaultPage extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    // JavaScript Validation: Prevent submission if empty or only spaces
+    // validation
     if (!this.state.email || this.state.email.trim() === "") {
       console.warn("Submission blocked: Email field cannot be empty.");
       return;
@@ -23,7 +23,7 @@ class DefaultPage extends React.Component {
       const response = await fetch("http://localhost:8080/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: this.state.email.trim() }), // Submits clean trimmed email
+        body: JSON.stringify({ email: this.state.email.trim() }),
       });
 
       if (response.ok) {

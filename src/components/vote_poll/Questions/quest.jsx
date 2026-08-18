@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 
-class Quest1 extends React.Component {
+class Quest extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -140,4 +140,4 @@ class Quest1 extends React.Component {
   }
 }
 
-export default Quest1;
+export default Quest;
