@@ -17,26 +17,29 @@ class PlayListContent extends React.Component {
             <div className="w-full md:flex-1 bg-white">
               <iframe
                 className="w-full aspect-video rounded-none shadow-none"
-                src="https://www.youtube.com/embed/JlEipMTo-jQ?si=Ro7LE8lykFgAWNWS"
-                title="YouTube video player 1"
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/v031MdJSWqY?si=Bjn2F_cvufBeiIA-"
+                title="YouTube video player"
+                frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
               ></iframe>
               <br />
               <h3 className="text-left font-sans font-semibold text-2xl py-5">
-                Liberia: Uniting Against Deep-Rooted Corruption and Government
-                Dysfunction
+                A Message to the President of the Republic of Liberia, Joseph
+                Nyuma Boakai, Sr.
               </h3>
             </div>
 
             {/* pod 2 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
-                src="https://www.youtube.com/embed/YXfC-F7ZfG4?si=2LVTliNbZ-E51yUh"
+                src="https://www.youtube.com/embed/_fGnJJ6BZbg?si=-6K7UTVDo111faQV"
                 title="YouTube video player"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -45,18 +48,18 @@ class PlayListContent extends React.Component {
               ></iframe>
               <br />
               <h3 className="text-left font-sans font-semibold text-2xl py-5">
-                Rethinking Progress: Why Liberia’s Future Depends on
-                People-Centered Priorities
+                Discover the story behind J. Mawolo’s decision to join the
+                Liberty Show.
               </h3>
             </div>
 
             {/* pod 3 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
-                src="https://www.youtube.com/embed/UduTppjIzqY?si=neU0HXWtqAqGw4Bk"
+                src="https://www.youtube.com/embed/W-o_9744KQg?si=gCswT5_unyKzu3hb"
                 title="YouTube video player"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -65,8 +68,7 @@ class PlayListContent extends React.Component {
               ></iframe>
               <br />
               <h3 className="text-left font-sans font-semibold text-2xl py-5">
-                Why don't heritage travelers with ties to Liberia, such as
-                notable Black Americans, visit Liberia?
+                Tackling Liberia's Challenges
               </h3>
             </div>
           </div>
