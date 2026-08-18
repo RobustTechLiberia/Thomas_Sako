@@ -1,15 +1,15 @@
 import React from "react";
 
-class Pod extends React.Component {
+class PlayListContent extends React.Component {
   render() {
     return (
       <>
         {/* heading */}
         <div className=" bg-violet-200 md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
           <div className="h-auto md:h-10 lg:h-10">
-            <h1 className="text-center font-sans font-bold capitalize md:mx-0 lg:mx-0 mx-2 text-5xl md:mt-0 lg:pt-20 pt-10 md:text-4xl lg:text-4xl">
+            {/* <h1 className="text-center font-sans font-bold capitalize md:mx-0 lg:mx-0 mx-2 text-5xl md:mt-0 lg:pt-20 pt-10 md:text-4xl lg:text-4xl">
               the 1847 liberty show
-            </h1>
+            </h1> */}
           </div>
 
           <div className="flex flex-col md:flex-row justify-evenly md:pt-0 lg:pt-0 mx-0 md:mx-5 lg:mx-5 mt-32 pt-0 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
@@ -136,4 +136,4 @@ class Pod extends React.Component {
   }
 }
 
-export default Pod;
+export default PlayListContent;
