@@ -2,6 +2,7 @@ import React from "react";
 import Nav from "../component/nav";
 import PlayListNav from "../component/playlist_nav";
 import PlayListContent from "../component/playlist_content";
+import Footer from "../../footer";
 
 class PlayList extends React.Component {
   render() {
@@ -9,7 +10,8 @@ class PlayList extends React.Component {
       <>
         <Nav />
         <PlayListNav />
-        <PlayListContent/>
+        <PlayListContent />
+        <Footer />
       </>
     );
   }

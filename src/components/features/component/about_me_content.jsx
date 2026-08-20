@@ -2,22 +2,13 @@ import React from "react";
 import profile from "../../../images/Copilot_20260816_124134.png";
 import OurTeam from "../../../components/features/component/our_team";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome
+import GuestHost from "./guest_host";
 
 class AboutContent extends React.Component {
   render() {
     return (
       <>
-        {/* <div className="w-full md:h-150 lg:h-150 md:px-20 md:mt-10 lg:mt-10 lg:px-20 px-2 mt-2 h-auto bg-white overflow-hidden relative shadow-none">
-          <iframe
-            className="w-full aspect-video border-none" // Makes it act like a responsive fluid image
-            src="https://www.youtube.com/embed/G9cl0kgd8Q4?si=PKpP5gIdk8t9iS5j"
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          ></iframe>
-        </div> */}
-        <div className="bg-violet-900 md:bg-violet-950 lg:bg-violet-950 gap-5 md:gap-10 lg:gap-10 h-auto md:h-140 lg:h-140 mt-0 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
+        <div className="bg-violet-900 md:bg-violet-950 lg:bg-violet-950 gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-2 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
           <div className="flex flex-wrap justify-center items-start md:justify-start lg:justify-start h-auto md:mx-20 lg:mx-20 md:pt-6 lg:pt-6">
             <div className="w-full md:w-auto lg:w-auto flex justify-center md:justify-start lg:justify-start mt-5 md:mt-8 lg:mt-8">
               <img
@@ -27,37 +18,37 @@ class AboutContent extends React.Component {
               />
             </div>
 
-            <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-18 lg:mx-18 mt-5 md:mt-8 lg:mt-8 flex flex-col justify-center md:h-80 lg:h-80">
+            <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-18 lg:mx-18 pt-20 md:mt-8 lg:mt-8 flex flex-col justify-center md:h-80 lg:h-80">
               <h1 className="font-sans text-white font-semibold capitalize text-5xl md:text-white lg:text-white">
                 thomas sako
               </h1>
               <span className="font-serif text-lg uppercase py-3 md:text-white lg:text-white text-white">
                 host
               </span>
-
-              <div className="flex flex-wrap justify-center items-center md:justify-start lg:justify-start md:items-start lg:items-start gap-5 mt-2">
-                <div className="p-3 rounded-full bg-transparent border-none border-white transition">
+              {/* social media icons */}
+              <div className="flex flex-wrap justify-start items-start gap-8 md:justify-start lg:justify-start md:items-start lg:items-start md:gap-5 lg:gap-5">
+                <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a href="#" className="cursor-pointer">
-                    <i className="fa-brands fa-youtube md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-violet-900"></i>
+                    <i className="fa-brands fa-youtube text-xl md:text-2xl lg:text-2xl text-violet-900 md:text-white lg:text-white"></i>
                   </a>
                 </div>
 
-                <div className="p-3 rounded-full bg-transparent tex-white border-none border-white transition">
+                <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a href="#" className="cursor-pointer">
-                    <i className="fa-brands fa-x-twitter md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-white"></i>
+                    <i className="fa-brands fa-x-twitter text-xl md:text-2xl lg:text-2xl text-white md:text-white lg:text-white"></i>
                   </a>
                 </div>
 
-                <div className="p-3 rounded-full bg-transparent border-none border-whit transition">
+                <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a href="#" className="cursor-pointer">
-                    <i className="fa-brands fa-facebook-f md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-white"></i>
-                  </a>{" "}
+                    <i className="fa-brands fa-facebook-f text-xl md:text-2xl lg:text-2xl text-white md:text-white lg:text-white"></i>
+                  </a>
                 </div>
 
-                <div className="p-3 rounded-full bg-transparent border-none border-white transition">
+                <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a href="#" className="cursor-pointer">
-                    <i className="fa-brands fa-instagram md:text-2xl lg:text-2xl text-xl md:text-white lg:text-white text-white"></i>{" "}
-                  </a>{" "}
+                    <i className="fa-brands fa-instagram text-xl md:text-2xl lg:text-2xl text-white md:text-white lg:text-white"></i>
+                  </a>
                 </div>
               </div>
 
@@ -70,7 +61,10 @@ class AboutContent extends React.Component {
             </div>
           </div>
         </div>
+        {/* our team */}
         <OurTeam />
+        {/* guest host */}
+        <GuestHost />
       </>
     );
   }

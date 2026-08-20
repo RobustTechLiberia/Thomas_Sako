@@ -2,6 +2,7 @@ import React from "react";
 import Nav from "../component/nav";
 import Pod from "../component/podcast";
 import PodCastNav from "../component/podcast_nav";
+import Footer from "../../footer";
 
 class PodcastPage extends React.Component {
   render() {
@@ -10,6 +11,7 @@ class PodcastPage extends React.Component {
         <Nav />
         <PodCastNav />
         <Pod />
+        <Footer/>
       </>
     );
   }
