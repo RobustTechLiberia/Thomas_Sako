@@ -4,11 +4,11 @@ class TrendPod extends React.Component {
   render() {
     return (
       <>
-        <h1 className="text-center md:text-left lg:text-left md:mx-20 lg:mx-20 font-sans font-semibold md:text-5xl lg:text-5xl text-4xl md:my-10 lg:my-10 py-8 capitalize">
+        {/* <h1 className="text-center md:text-left lg:text-left md:mx-20 lg:mx-20 font-sans font-semibold md:text-5xl lg:text-5xl text-4xl md:my-10 lg:my-10 py-8 capitalize">
           trending stories
-        </h1>
+        </h1> */}
 
-        <div className="flex flex-col md:flex-row justify-evenly md:mt-10 lg:mt-10 mt-8 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
+        <div className="flex flex-col md:flex-row justify-evenly md:mt-32 lg:mt-32 mt-10 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
           {/* pod 1 */}
           <div className="w-full md:flex-1 bg-white">
             <iframe
@@ -60,7 +60,7 @@ class TrendPod extends React.Component {
               allowfullscreen
             ></iframe>
             <br />
-            <h3 className="text-left font-sans font-semibold text-2xl py-5">
+            <h3 className="text-left font-sans font-semibold text-2xl md:py-5 lg:py-5">
               Why don't heritage travelers with ties to Liberia, such as notable
               Black Americans, visit Liberia?
             </h3>
