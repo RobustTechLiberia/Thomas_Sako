@@ -8,7 +8,7 @@ class AboutContent extends React.Component {
   render() {
     return (
       <>
-        <div className="bg-violet-900 md:bg-violet-950 lg:bg-violet-950 gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-0 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
+        <div className="bg-violet-900 md:bg-violet-950 lg:bg-violet-950 gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
           <div className="flex flex-wrap justify-center items-start md:justify-start lg:justify-start h-auto md:mx-20 lg:mx-20 md:pt-6 lg:pt-6">
             <div className="w-full md:w-auto lg:w-auto flex justify-center md:justify-start lg:justify-start mt-5 md:mt-8 lg:mt-8">
               <img
@@ -26,7 +26,7 @@ class AboutContent extends React.Component {
                 host
               </span>
               {/* social media icons */}
-              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start md:items-start lg:items-start">
+              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start gap-8 md:items-start lg:items-start">
                 <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a href="#" className="cursor-pointer">
                     <i className="fa-brands fa-youtube text-xl md:text-2xl lg:text-2xl text-violet-900 md:text-white lg:text-white"></i>

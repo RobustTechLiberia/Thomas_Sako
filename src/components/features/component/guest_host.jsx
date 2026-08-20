@@ -9,7 +9,6 @@ class GuestHost extends React.Component {
             guest host
           </h1>
         </div>
-        
       </>
     );
   }
