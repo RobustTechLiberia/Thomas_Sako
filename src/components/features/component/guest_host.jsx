@@ -1,4 +1,5 @@
 import React from "react";
+import VoteBanner from "../component/vote_banner";
 
 class GuestHost extends React.Component {
   render() {
@@ -9,6 +10,7 @@ class GuestHost extends React.Component {
             guest host
           </h1>
         </div>
+        <VoteBanner />
       </>
     );
   }

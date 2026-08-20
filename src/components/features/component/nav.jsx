@@ -15,8 +15,9 @@ class Nav extends React.Component {
   render() {
     return (
       <>
-        <div className="md:h-24 lg:h-24 h-auto bg-white border-b border-b-violet-200 relative z-50">
-          <nav className="bg-white w-auto top-0 inset-s-0 border-none">
+        {/* Fixed navbar on laptops/desktops */}
+        <div className="md:h-24 lg:h-24 md:fixed lg:fixed w-full h-auto bg-white border-b-2 border-b-violet-200 top-0 z-50">
+          <nav className="bg-white w-auto border-none">
             <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
               {/* Logo */}
               <Link
