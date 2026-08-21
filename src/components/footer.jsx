@@ -12,7 +12,10 @@ class Footer extends React.Component {
           </div>
           <div className="w-auto flex gap-6">
             {/* YouTube */}
-            <a href="#" className="cursor-pointer">
+            <a
+              href="https://www.youtube.com/@1847Liberty"
+              className="cursor-pointer"
+            >
               <i className="fa-brands fa-youtube text-violet-950 md:text-xl lg:text-xl text-2xl"></i>
             </a>
 

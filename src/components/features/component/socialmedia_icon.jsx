@@ -15,7 +15,6 @@ class SocialIcons extends React.Component {
   }
 
   componentDidMount() {
-    // FIXED SYNTAX: Fixed the broken ternary operator and added a safe, universal absolute origin path setup
     const isLocalhost =
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1";
@@ -27,7 +26,16 @@ class SocialIcons extends React.Component {
     fetch(backendUrl)
       .then((response) => response.json())
       .then((data) => {
-        this.setState({ links: data, loading: false });
+        // FIXED PAYLOAD MISMATCH: We pull directly from data.youtube but add logical fallbacks
+        // to original env keys just in case the server transfers raw process.env properties.
+        this.setState({
+          links: {
+            youtube: data.youtube || data.YOUTUBE_CHANNEL_URL || "",
+            facebook: data.facebook || data.FACEBOOK_PAGE_URL || "",
+            x: data.x || data.X_PAGE_URL || "",
+          },
+          loading: false,
+        });
       })
       .catch((error) => {
         console.error("Error loading environmental configurations:", error);
@@ -35,20 +43,17 @@ class SocialIcons extends React.Component {
       });
   }
 
-  // FIXED ROUTING MECHANISM: Added a reliable click-handler function that enforces tab routing
   handleIconClick = (e, platformUrl) => {
     e.preventDefault();
 
-    // Fallbacks if backend doesn't resolve fast enough or fails
-    let targetUrl = platformUrl;
-    if (!targetUrl || targetUrl === "") {
-      if (e.currentTarget.id === "yt-link") targetUrl = "https://youtube.com";
-      if (e.currentTarget.id === "x-link") targetUrl = "https://twitter.com";
-      if (e.currentTarget.id === "fb-link") targetUrl = "https://facebook.com";
+    if (!platformUrl || platformUrl.trim() === "") {
+      console.warn(
+        "Social link path is empty or not yet loaded from .env configurations.",
+      );
+      return;
     }
 
-    // Force external new-window tracking protocol
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    window.open(platformUrl, "_blank", "noopener,noreferrer");
   };
 
   render() {
