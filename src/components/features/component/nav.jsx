@@ -29,12 +29,12 @@ class Nav extends React.Component {
 
               {/* Right side: Watch Live + Menu Button */}
               <div className="flex md:order-2 bg-white space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <Link
-                  to="/youtube"
+                <a
+                  href="https://www.youtube.com/@1847Liberty"
                   className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
                 >
                   Watch Live
-                </Link>
+                </a>
                 <button
                   onClick={this.toggleMenu}
                   type="button"
@@ -71,12 +71,12 @@ class Nav extends React.Component {
               >
                 <ul className="flex capitalize text-violet-900 flex-col p-4 md:p-0 font-medium text-lg md:text-xl lg:text-xl rounded-none bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
                   <li>
-                    <Link
-                      to="/youtube"
+                    <a
+                      href="https://www.youtube.com/@1847Liberty"
                       className="block py-2 px-3 text-violet-900 hover:text-violet-700 md:p-0"
                     >
                       YouTube
-                    </Link>
+                    </a>
                   </li>
                   <li>
                     <Link
