@@ -26,13 +26,13 @@ class AboutContent extends React.Component {
                 host
               </span>
               {/* social media icons */}
-              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start gap-8 md:items-start lg:items-start">
+              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start mx-10 md:mx-0 lg:mx-0 gap-8 md:items-start lg:items-start">
                 <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a
                     href="https://www.youtube.com/@1847Liberty"
                     className="cursor-pointer"
                   >
-                    <i className="fa-brands fa-youtube text-xl md:text-2xl lg:text-2xl text-violet-900 md:text-white lg:text-white"></i>
+                    <i className="fa-brands fa-youtube text-xl md:text-2xl lg:text-2xl text-white md:text-white lg:text-white"></i>
                   </a>
                 </div>
 
