@@ -11,7 +11,8 @@ class Features extends React.Component {
   render() {
     return (
       <>
-        <div className="flex flex-wrap justify-center items-center mt-10 gap-5 md:h-96 lg:h-96 h-auto bg-white">
+        {/* container */}
+        <div className="flex flex-wrap justify-center items-center mt-10 gap-5 md:min-h-96 lg:min-h-96 h-auto bg-white">
           {/* youtube */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
             <a
@@ -56,7 +57,8 @@ class Features extends React.Component {
         </div>
 
         {/* booking */}
-        <div className="flex flex-wrap justify-center items-center mt-20 gap-5 md:h-96 lg:h-96 h-auto bg-white">
+        {/* Added mb-20 to create margin below this final container */}
+        <div className="flex flex-wrap justify-center items-center mt-20 mb-20 gap-5 md:min-h-96 lg:min-h-96 h-auto bg-white">
           {/* about me */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
             <Link to="/about">
