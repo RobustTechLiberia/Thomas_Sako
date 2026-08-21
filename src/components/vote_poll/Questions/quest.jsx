@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
+import Advert from "../../features/component/Advertisement/components/advert";
 
 class Quest extends React.Component {
   constructor(props) {
@@ -134,6 +135,7 @@ class Quest extends React.Component {
               </div>
             </form>
           </div>
+          <Advert />
         </div>
       </>
     );

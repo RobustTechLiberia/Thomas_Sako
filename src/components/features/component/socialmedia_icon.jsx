@@ -5,7 +5,7 @@ class SocialIcons extends React.Component {
   render() {
     return (
       <>
-        <div className="flex flex-wrap justify-center items-center md:h-28 my-10 bg-white gap-5">
+        <div className="flex flex-wrap justify-center items-center md:h-28 lg:h-28 h-auto my-10 bg-white gap-5">
           <div className="w-auto">
             <h4 className="text-left font-serif md:text-3xl lg:text-3xl text-2xl capitalize py-5">
               Follow our social media

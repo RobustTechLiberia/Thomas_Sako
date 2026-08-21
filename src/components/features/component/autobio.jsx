@@ -23,7 +23,7 @@ class AutoBio extends React.Component {
             <div className="text-purple-950 text-8xl font-bold md:mb-4 lg:mb-4 mb-3">
               “
             </div>
-            <p className="text-gray-800 md:text-lg text-lg  font-sans leading-relaxed  lg:text-lg">
+            <p className="text-gray-800 md:text-lg text-lg  font-serif lg:text-lg">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis
               repellendus, fuga blanditiis, delectus illum quisquam reiciendis
               eos sapiente laboriosam tempore porro nemo ab amet voluptatibus!

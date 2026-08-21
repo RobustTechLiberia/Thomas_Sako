@@ -14,7 +14,6 @@ class Features extends React.Component {
         <div className="flex flex-wrap justify-center items-center mt-10 gap-5 md:h-96 lg:h-96 h-auto bg-white">
           {/* youtube */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
-            {/* FIXED: Changed Link to an <a> tag for external routing */}
             <a
               href="https://youtu.be/G9cl0kgd8Q4?si=Dcpxf4HiSsyfqsiW"
               target="_blank"

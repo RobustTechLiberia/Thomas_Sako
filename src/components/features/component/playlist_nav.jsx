@@ -5,7 +5,7 @@ class PlayListNav extends React.Component {
     return (
       <>
         <div className="flex flex-nowrap md:h-28 lg:h-28 md:mt-28 lg:mt-28 h-15 bg-violet-950 justify-start">
-          <h1 className="text-white md:mx-20 lg:mx-20 md:mt-13 lg:mt-13 py-3 mx-5 font-sans font-bold uppercase md:text-5xl lg:text-5xl text-xl">
+          <h1 className="text-white md:mx-20 lg:mx-20 md:mt-13 lg:mt-13 py-3 mx-5 font-sans font-bold uppercase md:text-5xl lg:text-5xl text-3xl">
             play list
           </h1>
         </div>
