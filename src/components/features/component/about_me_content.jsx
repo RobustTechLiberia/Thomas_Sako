@@ -8,7 +8,7 @@ class AboutContent extends React.Component {
   render() {
     return (
       <>
-        <div className="bg-gradient-to-b from-[#312252] to-[#120a21] gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
+        <div className="bg-linear-to-b from-[#312252] to-[#120a21] gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
           <div className="flex flex-wrap justify-center items-start md:justify-start lg:justify-start h-auto md:mx-20 lg:mx-20 md:pt-6 lg:pt-6">
             <div className="w-full md:w-auto lg:w-auto flex justify-center md:justify-start lg:justify-start mt-5 md:mt-8 lg:mt-8">
               <img
