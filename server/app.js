@@ -11,9 +11,13 @@ const app = express();
 const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
+const SocialRouter = require("./routes/socialmedia");
 
 //question router mounted
 app.use("/question", questionRouter);
+
+// social media router
+app.use(SocialRouter);
 
 app.use(express.json());
 
