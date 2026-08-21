@@ -16,7 +16,7 @@ class Features extends React.Component {
           {/* youtube */}
           <div className="md:w-80 lg:w-80 w-auto bg-white">
             <a
-              href="https://youtu.be/G9cl0kgd8Q4?si=Dcpxf4HiSsyfqsiW"
+              href="https://www.youtube.com/@1847Liberty"
               target="_blank"
               rel="noopener noreferrer"
             >
