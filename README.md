@@ -1,37 +1,37 @@
 # Documentation
 
-
 ## Overview
-
 This project is a multi-page portfolio clone of the official website for U.S. podcast host Michael Smerconish. The platform aggregates high-profile guest interviews, podcasts, playlists, and video content. It includes a custom time-locked polling engine and an advertisement management system.
 
+---
 
 ## Architecture
+*   **Frontend:** ReactJS, TailwindCSS, React Router
+*   **Backend:** NodeJS, ExpressJS
+*   **Database:** MySQL
 
-* Frontend: ReactJS, TailwindCSS, React Router
-* Backend: NodeJS, ExpressJS
-* Database: MySQL
+---
 
 ## Today's Poll
-Meant to have the view of our audiences
+Designed to capture and analyze the real-time opinions of our audience.
 
-* Question Expiration: checks the  timestamp every 24 hours.
-* Deduplication: prevents multiple participation attempts within the active 24-hours.
+*   **Question Expiration:** The engine automatically checks the active poll timestamp every 24 hours.
+*   **Deduplication:** Security logic prevents multiple participation or voting attempts within the active 24-hour cycle.
+
+---
 
 ## Features/Pages
+*   **Podcasts:** Dynamically fetches and plays uploaded podcast audio files sourced via the YouTube channel content workflow.
+*   **Playlists:** Aggregates and organizes thematic podcast bundles sourced directly from YouTube feeds.
+*   **YouTube:** Provides inline elements and direct user navigation to the official streaming channel.
+*   **About:** A dedicated layout detailing the host’s professional background, history, and achievements.
+*   **Booking:** Secure scheduling forms and contact endpoints for public speaking engagements and media appearances.
 
-* Podcasts: fetch uploaded podcasts from YouTube channel
-* Playlists: fetch uploaded podcasts from YouTube channel
-* YouTube: redirect to official channel
-* About: detailing host's background and achievements.
-* Booking: Contact and scheduling  for speaking engagements and media appearances
-
-## Folder Structure
-
+---
 
 ## Folder Structure
 
-```
+```text
 liberty/
 ├── frontend/                   # React Client Application
 │   ├── public/                 # Static assets
@@ -49,51 +49,53 @@ liberty/
         └── subscribe.js        # Newsletter and booking form handler
 ```
 
-
+---
 
 ## Local Development
+
 ### Prerequisites
+*   Node.js (v18+ recommended)
+*   MySQL Server Instance
+*   MySQL Workbench
 
-* Node.js (v18+ recommended)
-* MySQL Server Instance
-* MySQL Workbench
+### Setup Instructions
 
-## Setup Instructions
-
-### Frontend (Client-Side)
-
-```
+#### Frontend (Client-Side)
+```bash
 cd liberty
 npm install
 ```
 
-### Backend (Server-Side)
-
-```
+#### Backend (Server-Side)
+```bash
 cd server
 npm install
 npm run dev:all
-
 ```
+
+---
 
 ## Environment Setup
+Create a `.env` configuration file inside your `server/` directory with the following variables:
 
+```env
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_app_specific_password
+
+YOUTUBE_CHANNEL_URL=https://youtube.com
+FACEBOOK_PAGE_URL=https://facebook.com
+X_PAGE_URL=https://x.com
+INSTAGRAM_PAGE_URL=https://instagram.com
+WHATSAPP_ACCOUNT=https://whatsapp.com
+TIKTOK_PAGE_URL=https://tiktok.com
+GMAIL_ACCOUNT=your_email@example.com
 ```
-EMAIL_USER= enter your email address
 
-EMAIL_PASS= enter your app password
+---
 
-YOUTUBE_CHANNEL_URL= youtube link
-FACEBOOK_PAGE_URL= facebook link
-X_PAGE_URL= twitter link
-INSTAGRAM_PAGE_URL= instagram link
-WHATSAPP_ACCOUNT= whatsapp channel link
-TIKTOK_PAGE_URL= tiktok account
-GMAIL_ACCOUNT= enter your email address
-```
+## Database Schema
 
-
-```
+```sql
 CREATE DATABASE IF NOT EXISTS db_poll;
 USE db_poll;
 
@@ -106,14 +108,13 @@ CREATE TABLE IF NOT EXISTS poll (
 );
 
 CREATE INDEX idx_poll_questions_answers ON poll(questions, answers);
-
-
 ```
 
+---
 
-### Routes/Database
+## Routes/Database
 
-```
+```javascript
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const express = require("express");
@@ -142,8 +143,7 @@ const handleVoteInsertion = (req, res) => {
       return res.status(500).send("Database connection failed");
     }
 
-    const sql =
-      "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
+    const sql = "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
     const todayStr = new Date().toISOString().slice(0, 10);
     con.query(sql, [question, answer, todayStr], (err, result) => {
       con.end();
@@ -167,9 +167,7 @@ router.get("/results", (req, res) => {
   const { question } = req.query;
 
   if (!question) {
-    return res
-      .status(400)
-      .json({ error: "Missing 'question' query parameter" });
+    return res.status(400).json({ error: "Missing 'question' query parameter" });
   }
 
   const con = mysql.createConnection(dbConfig);
@@ -192,9 +190,7 @@ router.get("/results", (req, res) => {
 
       if (err) {
         console.error("Failed to fetch aggregate poll analytics:", err);
-        return res
-          .status(500)
-          .json({ error: "Database analytics retrieval failed" });
+        return res.status(500).json({ error: "Database analytics retrieval failed" });
       }
 
       const stats = {};
@@ -297,29 +293,16 @@ router.get("/db", (req, res) => {
 });
 
 module.exports = router;
-
 ```
 
+---
 
-#### Questions/question.json
-
-```
-[
-  {
-    "id": 1,
-    "question": "What is the current state of our nation's economy?",
-    "options": ["Good", "Bad"]
-  },
-  {
-    "id": 2,
-    "question": "Do you support renewable energy initiatives?",
-    "options": ["Yes", "No"]
-  },
-  {
-    "id": 3,
-    "question": "Should education be free for all?",
-    "options": ["Agree", "Disagree"]
-  }
-]
-
+### Questions/question.json
+```json
+{
+  "activeQuestion": "Should corporate campaign contributions be completely banned in federal elections?",
+  "options": ["Yes", "No"],
+  "lastUpdated": "2026-08-22T20:15:00.000Z",
+  "activeIpRegistry": []
+}
 ```
