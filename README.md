@@ -79,7 +79,6 @@ npm run dev:all
 ## Environment Setup
 
 ```
-```
 EMAIL_USER= enter your email address
 
 EMAIL_PASS= enter your app password
@@ -91,10 +90,8 @@ INSTAGRAM_PAGE_URL= instagram link
 WHATSAPP_ACCOUNT= whatsapp channel link
 TIKTOK_PAGE_URL= tiktok account
 GMAIL_ACCOUNT= enter your email address
-
 ```
 
-## Data Base Schema
 
 ```
 CREATE DATABASE IF NOT EXISTS db_poll;
