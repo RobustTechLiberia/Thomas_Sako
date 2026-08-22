@@ -30,21 +30,26 @@ Meant to have the view of our audiences
 
 
 ```
+## Folder Structure
+
+```text
 liberty/
 ├── frontend/                   # React Client Application
 │   ├── public/                 # Static assets
+│   │   └── question.json       # 24-hour cache file for current poll state
 │   └── src/                    # Source files
 │       ├── components/         # Reusable UI elements (Buttons, Cards, Nav)
 │       └── pages/              # Routed page-level components (Home, About, Polls)
 └── server/                     # Express Backend Application
     ├── app.js                  # Application entry point & middleware configuration
     ├── .env                    # Environment variables (DB credentials, Ports)
-    ├── active_poll.json        # 24-hour cache file for current poll state
     └── routes/                 # Express API route handlers
         ├── db.js               # Database connection pool setup & raw query wrappers
         ├── question.js         # Daily voting poll logic and file/DB sync
         ├── socialmedia.js      # YouTube API integrations and social links
         └── subscribe.js        # Newsletter and booking form handler
+```
+
 ```
 
 
