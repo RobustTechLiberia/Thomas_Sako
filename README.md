@@ -29,10 +29,9 @@ Meant to have the view of our audiences
 ## Folder Structure
 
 
-```
 ## Folder Structure
 
-```text
+```
 liberty/
 ├── frontend/                   # React Client Application
 │   ├── public/                 # Static assets
@@ -50,7 +49,6 @@ liberty/
         └── subscribe.js        # Newsletter and booking form handler
 ```
 
-```
 
 
 ## Local Development
