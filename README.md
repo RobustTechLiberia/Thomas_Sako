@@ -28,6 +28,8 @@ Meant to have the view of our audiences
 
 ## Folder Structure
 
+
+```
 liberty/
 ├── frontend/                   # React Client Application
 │   ├── public/                 # Static assets
@@ -43,6 +45,7 @@ liberty/
         ├── question.js         # Daily voting poll logic and file/DB sync
         ├── socialmedia.js      # YouTube API integrations and social links
         └── subscribe.js        # Newsletter and booking form handler
+```
 
 
 ## Local Development
