@@ -81,16 +81,11 @@ npm run dev:all
 ## Environment Setup
 
 ```
-# Email Service Configuration
-#node mailer configuration credentials
+```
 EMAIL_USER= enter your email address
-# App password
+
 EMAIL_PASS= enter your app password
 
------------------------------------
------------------------------------
-
-# Platforms link
 YOUTUBE_CHANNEL_URL= youtube link
 FACEBOOK_PAGE_URL= facebook link
 X_PAGE_URL= twitter link
