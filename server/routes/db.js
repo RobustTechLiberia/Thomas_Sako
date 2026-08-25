@@ -5,9 +5,9 @@ const mysql = require("mysql2");
 const router = express.Router();
 
 const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "password@123",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD,
   database: "db_poll",
 };
 
@@ -96,9 +96,9 @@ router.get("/results", (req, res) => {
 
 router.get("/db", (req, res) => {
   const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password@123",
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD,
   });
 
   con.connect((err) => {

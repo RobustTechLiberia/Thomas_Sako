@@ -1,308 +1,412 @@
-# Documentation
+# Liberty CMS Platform
 
-## Overview
-This project is a multi-page portfolio clone of the official website for U.S. podcast host Michael Smerconish. The platform aggregates high-profile guest interviews, podcasts, playlists, and video content. It includes a custom time-locked polling engine and an advertisement management system.
+A production-ready, independent voices platform built on React 19, Vite, Tailwind CSS, Express 5, and MySQL. Includes a full-featured CMS for managing polls, podcasts, cartoons, Mingle content, playlists, and leads.
 
----
+## Features
 
-## Architecture
-*   **Frontend:** ReactJS, TailwindCSS, React Router
-*   **Backend:** NodeJS, ExpressJS
-*   **Database:** MySQL
+### Phase 1 ✅ (Complete)
+- **CMS Authentication** - JWT-based login, password reset, role management (Admin/Editor)
+- **Poll Management** - Create, edit, publish, and archive poll questions
+- **Dashboard** - Real-time stats on active polls, subscribers, and leads
+- **Media Upload** - Cloudinary integration for image/video storage
+- **Audit Logging** - Track all CMS actions for compliance and debugging
+- **Rate Limiting** - Protection against brute force and spam attacks
 
----
+### Phases 2-7 (In Progress)
+- Podcasts & Cartoons CMS + public pages
+- Mingle Project (4 sub-sections) with full CRUD
+- Playlists & Bumpers management
+- Newsletter subscriber persistence & CSV export
+- Booking/Advertising/Contact lead system
+- Site Settings CMS (social links, badges, hero content)
+- Accessibility & SEO optimization
 
-## Today's Poll
-Designed to capture and analyze the real-time opinions of our audience.
+## Tech Stack
 
-*   **Question Expiration:** The engine automatically checks the active poll timestamp every 24 hours.
-*   **Deduplication:** Security logic prevents multiple participation or voting attempts within the active 24-hour cycle.
+### Frontend
+- **React 19** - UI framework
+- **Vite** - Build tool
+- **Tailwind CSS 4** - Styling
+- **React Router 6** - Client-side routing
 
----
+### Backend
+- **Express 5** - API server
+- **MySQL 8** - Database
+- **JWT** - Authentication
+- **bcrypt** - Password hashing
+- **Cloudinary** - Media storage
+- **SendGrid** - Email service
 
-## Features/Pages
-*   **Podcasts:** Dynamically fetches and plays uploaded podcast audio files sourced via the YouTube channel content workflow.
-*   **Playlists:** Aggregates and organizes thematic podcast bundles sourced directly from YouTube feeds.
-*   **YouTube:** Provides inline elements and direct user navigation to the official streaming channel.
-*   **About:** A dedicated layout detailing the host’s professional background, history, and achievements.
-*   **Booking:** Secure scheduling forms and contact endpoints for public speaking engagements and media appearances.
-
----
-
-## Folder Structure
-
-```text
-liberty/
-├── frontend/                   # React Client Application
-│   ├── public/                 # Static assets
-│   │   └── question.json       # 24-hour cache file for current poll state
-│   └── src/                    # Source files
-│       ├── components/         # Reusable UI elements (Buttons, Cards, Nav)
-│       └── pages/              # Routed page-level components (Home, About, Polls)
-└── server/                     # Express Backend Application
-    ├── app.js                  # Application entry point & middleware configuration
-    ├── .env                    # Environment variables (DB credentials, Ports)
-    └── routes/                 # Express API route handlers
-        ├── db.js               # Database connection pool setup & raw query wrappers
-        ├── question.js         # Daily voting poll logic and file/DB sync
-        ├── socialmedia.js      # YouTube API integrations and social links
-        └── subscribe.js        # Newsletter and booking form handler
-```
-
----
-
-## Local Development
+## Quick Start
 
 ### Prerequisites
-*   Node.js (v18+ recommended)
-*   MySQL Server Instance
-*   MySQL Workbench
+- Node.js 18+
+- MySQL 8+
+- SendGrid account (for email)
+- Cloudinary account (for media)
 
-### Setup Instructions
+### Installation
 
-#### Frontend (Client-Side)
+1. **Clone and setup**
 ```bash
-cd liberty
+cd Liberty
 npm install
+cd server 
+npm install
+cd ../admin 
+npm install
+cd ..
 ```
 
-#### Backend (Server-Side)
+2. **Configure environment**
 ```bash
-cd server
-npm install
+cp .env.example .env
+# Edit .env with your credentials
+```
+
+3. **Initialize database**
+```bash
+npm run db:init
+```
+
+4. **Start development**
+```bash
 npm run dev:all
 ```
 
----
+This starts:
+- Public site: http://localhost:5173
+- Admin CMS: http://localhost:3000
+- Server API: http://localhost:8080
 
-## Environment Setup
-Create a `.env` configuration file inside your `server/` directory with the following variables:
+## Project Structure
 
-```env
-EMAIL_USER=your_email@example.com
-EMAIL_PASS=your_app_specific_password
-
-YOUTUBE_CHANNEL_URL=https://youtube.com
-FACEBOOK_PAGE_URL=https://facebook.com
-X_PAGE_URL=https://x.com
-INSTAGRAM_PAGE_URL=https://instagram.com
-WHATSAPP_ACCOUNT=https://whatsapp.com
-TIKTOK_PAGE_URL=https://tiktok.com
-GMAIL_ACCOUNT=your_email@example.com
 ```
-
----
+liberty/
+├── src/                           # Public React app
+│   ├── pages/                     # Public pages (Home, Podcasts, etc.)
+│   ├── components/                # Reusable components
+│   ├── App.jsx                    # Public app root
+│   └── main.jsx                   # Entry point
+├── admin/                         # Admin CMS (separate Vite app)
+│   ├── src/
+│   │   ├── pages/                 # Admin pages (Login, Dashboard, Polls)
+│   │   ├── layouts/               # Admin layout (Sidebar, Header)
+│   │   ├── api.js                 # API utilities
+│   │   ├── App.jsx                # Admin app root
+│   │   └── main.jsx               # Entry point
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
+├── server/                        # Express backend
+│   ├── routes/
+│   │   ├── polls.js               # Public poll endpoints
+│   │   ├── subscribe.js           # Newsletter endpoints
+│   │   ├── socialmedia.js         # Social links endpoints
+│   │   └── admin/                 # Admin API endpoints
+│   │       ├── auth.js            # Login, password reset
+│   │       ├── users.js           # User management
+│   │       ├── dashboard.js       # Dashboard stats
+│   │       ├── pollQuestions.js   # Poll CMS
+│   │       └── media.js           # Media upload
+│   ├── middleware/
+│   │   ├── auth.js                # JWT verification
+│   │   └── rateLimit.js           # Rate limiting
+│   ├── db/
+│   │   ├── pool.js                # MySQL connection pool
+│   │   └── init.sql               # Database schema
+│   ├── scripts/
+│   │   └── initDb.js              # Database initialization
+│   ├── app.js                     # Express app setup
+│   └── package.json
+├── vite.config.js
+├── package.json
+├── .env.example
+└── README.md
+```
 
 ## Database Schema
 
-```sql
-CREATE DATABASE IF NOT EXISTS db_poll;
-USE db_poll;
+### Core Tables
+- `admin_users` - CMS user accounts with role-based access
+- `password_reset_tokens` - Secure password reset flow
+- `poll_questions` - Poll definitions with JSON options
+- `poll_votes` - Vote records with IP deduplication
+- `newsletter_subscribers` - Subscriber management
+- `podcasts` - Podcast episodes with media URLs
+- `cartoons` - Cartoon gallery with Cloudinary URLs
+- `mingle_posts` - Mingle project content (4 sections)
+- `playlists` - Audio/music playlists with embeds
+- `leads` - Form submissions (booking, advertising, contact)
+- `lead_notes` - Internal notes on leads with audit trail
+- `site_settings` - CMS-editable configuration (JSON)
+- `media_assets` - Media upload tracking
+- `audit_log` - Complete action history with IP/UA
 
-CREATE TABLE IF NOT EXISTS poll (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    questions VARCHAR(255) NULL, 
-    answers VARCHAR(255) NULL, 
-    votes INT DEFAULT 0, 
-    date VARCHAR(255) NULL
-);
+## API Reference
 
-CREATE INDEX idx_poll_questions_answers ON poll(questions, answers);
+### Public Endpoints
+
+```bash
+# Polls
+GET  /api/polls/active              # Get active poll
+POST /api/polls/:id/vote            # Submit vote (rate limited)
+GET  /api/polls/:id/results         # Get poll results
+
+# Newsletter
+POST /api/subscribe                 # Subscribe to newsletter
+GET  /api/subscribe/unsubscribe     # Unsubscribe link
 ```
+
+### Admin Endpoints (All require JWT)
+
+```bash
+# Authentication
+POST /api/admin/auth/login          # Login
+POST /api/admin/auth/logout         # Logout
+POST /api/admin/auth/request-reset  # Request password reset
+POST /api/admin/auth/reset-password # Reset password
+POST /api/admin/auth/change-password # Change password
+
+# Dashboard
+GET  /api/admin/dashboard           # Dashboard stats
+
+# Poll Questions (CRUD)
+GET  /api/admin/poll-questions      # List polls
+POST /api/admin/poll-questions      # Create poll
+GET  /api/admin/poll-questions/:id  # Get poll
+PATCH /api/admin/poll-questions/:id # Update poll
+DELETE /api/admin/poll-questions/:id # Archive poll
+POST /api/admin/poll-questions/:id/publish # Publish poll
+
+# Media
+GET  /api/admin/media               # List media
+POST /api/admin/media/upload        # Upload media
+DELETE /api/admin/media/:id         # Delete media
+
+# Users (Admin only)
+GET  /api/admin/users               # List users
+POST /api/admin/users               # Create user
+GET  /api/admin/users/:id           # Get user
+PATCH /api/admin/users/:id          # Update user
+DELETE /api/admin/users/:id         # Deactivate user
+```
+
+## Authentication
+
+### Login Flow
+1. POST email/password to `/api/admin/auth/login`
+2. Receive JWT token (valid 24 hours)
+3. Include token in Authorization header: `Bearer <token>`
+4. Token auto-refreshed on each API call
+
+### Roles
+- **Admin** - Full access: user management, settings, audit log
+- **Editor** - Content only: polls, podcasts, cartoons, leads
+
+### Password Reset
+1. Request reset via `/api/admin/auth/request-reset` (email verification)
+2. Click link in email (1-hour expiry)
+3. POST new password to `/api/admin/auth/reset-password`
+
+## Environment Variables
+
+```env
+# Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=db_poll
+
+# Server
+PORT=8080
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+
+# JWT
+JWT_SECRET=your-secret-key-change-in-production
+
+# SendGrid (Email)
+SENDGRID_API_KEY=
+SENDGRID_FROM_EMAIL=noreply@liberty.local
+
+# Cloudinary (Media)
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+## Build & Deploy
+
+### Build for Production
+```bash
+npm run build:all           # Builds both frontend and admin
+```
+
+Output:
+- `dist/` - Public site (served at `/`)
+- `admin/dist/` - Admin CMS (served at `/admin`)
+
+### Run Production Server
+```bash
+npm run build:all
+cd server
+npm install --production
+npm start
+```
+
+Server will:
+- Serve static frontend files
+- Serve admin CMS at `/admin`
+- Handle API requests at `/api`
+
+### Docker Deployment
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy all source
+COPY . .
+
+# Install dependencies
+RUN npm install && \
+    cd server && npm install --production && \
+    cd ../admin && npm install && npm run build && \
+    cd .. && npm run build
+
+# Expose port
+EXPOSE 8080
+
+# Run server
+CMD ["cd", "server", "&&", "npm", "start"]
+```
+
+## Features in Detail
+
+### Poll Engine
+- 24-hour IP+UserAgent deduplication prevents vote manipulation
+- One active poll at a time (auto-deactivates others)
+- Live vote tallies in admin dashboard
+- Results endpoint for public display
+- Rate limiting (5 votes per IP per minute)
+
+### Media Management
+- Cloudinary integration for all uploads
+- Automatic image optimization and resizing
+- Video support (up to 50MB)
+- File type/size validation
+- Media asset tracking in database
+
+### Email System
+- SendGrid integration for transactional emails
+- Password reset flow with 1-hour token expiry
+- Newsletter subscription management
+- Unsubscribe links in all emails
+- GDPR-compliant opt-in/out
+
+### Security
+- JWT authentication (24-hour expiry)
+- bcrypt password hashing (10 rounds)
+- Rate limiting on login (5 attempts per 15 min)
+- Rate limiting on voting (5 per minute per IP)
+- Parameterized SQL queries (no injection)
+- CORS validation
+- Audit logging of all admin actions
+- Soft deletes (no permanent data loss)
+
+### Audit Log
+- Tracks: actor, action, entity, timestamp, IP, user agent
+- Actions: create, update, delete, publish, login, logout
+- Searchable by date range, actor, entity type
+- Admin-only access
+- Immutable (read-only)
+
+## Development Tips
+
+### Adding a New Content Type
+1. Add table to `server/db/init.sql`
+2. Create API routes in `server/routes/admin/<type>.js`
+3. Create React pages in `admin/src/pages/<Type>.jsx`
+4. Add menu item to `admin/src/layouts/DashboardLayout.jsx`
+5. Add API functions to `admin/src/api.js`
+
+### Testing Changes
+```bash
+# Terminal 1: Server
+cd server
+npm run dev
+
+# Terminal 2: Frontend
+npm run dev
+
+# Terminal 3: Admin
+cd admin
+npm run dev
+```
+
+### Common Issues
+
+**"Connection refused" on startup**
+- Ensure MySQL is running: `mysql -u root`
+- Check DB credentials in `.env`
+- Run `npm run db:init` to create tables
+
+**"Cloudinary upload fails"**
+- Verify API credentials in `.env`
+- Check file size limits (10MB images, 50MB video)
+- Ensure file is valid media format
+
+**"Email not sending"**
+- Verify SendGrid API key in `.env`
+- Check sender email is verified in SendGrid
+- Review SendGrid dashboard for delivery status
+
+**Admin CMS not loading**
+- Clear browser cache (hard refresh: Ctrl+Shift+R)
+- Check server is running: curl http://localhost:8080/health
+- Review browser console for CORS errors
+
+## Performance
+
+### Frontend Targets
+- Lighthouse score ≥ 90 (accessibility, SEO)
+- LCP < 2.5s on 4G
+- CLS < 0.1
+- FID < 100ms
+
+### Backend Targets
+- P95 response time < 100ms
+- 99.9% uptime (single region acceptable for v1)
+- Database query < 50ms
+
+### Optimization Tips
+- Use browser DevTools Network tab to profile
+- Enable gzip compression in production
+- Implement Redis caching for dashboard stats
+- Use CDN for static assets (Cloudinary for images)
+- Database indexing on frequently queried fields
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make changes and commit: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature/my-feature`
+5. Submit a pull request
+
+## License
+
+Proprietary - All rights reserved
+
+## Support
+
+For issues or questions, please refer to:
+- GitHub Issues: [Liberty Issues](https://github.com/your-org/liberty/issues)
+- Documentation: [Liberty Docs](http://localhost:5173/docs)
+- Admin Dashboard: http://localhost:3000 (after startup)
 
 ---
 
-## Routes/Database
-
-```javascript
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
-const express = require("express");
-const mysql = require("mysql2");
-const router = express.Router();
-
-const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "password@123",
-  database: "db_poll",
-};
-
-const handleVoteInsertion = (req, res) => {
-  const { question, answer } = req.body;
-
-  if (!question || !answer) {
-    return res.status(400).json({ error: "Question and answer are required" });
-  }
-
-  const con = mysql.createConnection(dbConfig);
-
-  con.connect((err) => {
-    if (err) {
-      console.error("Connection failed:", err);
-      return res.status(500).send("Database connection failed");
-    }
-
-    const sql = "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
-    const todayStr = new Date().toISOString().slice(0, 10);
-    con.query(sql, [question, answer, todayStr], (err, result) => {
-      con.end();
-
-      if (err) {
-        console.error("Failed to insert vote into MySQL:", err);
-        return res.status(500).json({ error: "Failed to record vote" });
-      }
-
-      return res
-        .status(201)
-        .json({ message: "Vote recorded successfully!", id: result.insertId });
-    });
-  });
-};
-
-router.post("/", express.json(), handleVoteInsertion);
-router.post("/db", express.json(), handleVoteInsertion);
-
-router.get("/results", (req, res) => {
-  const { question } = req.query;
-
-  if (!question) {
-    return res.status(400).json({ error: "Missing 'question' query parameter" });
-  }
-
-  const con = mysql.createConnection(dbConfig);
-
-  con.connect((err) => {
-    if (err) {
-      console.error("Connection failed:", err);
-      return res.status(500).send("Database connection failed");
-    }
-
-    const sql = `
-      SELECT answers, COUNT(*) AS total_votes 
-      FROM poll 
-      WHERE questions = ? 
-      GROUP BY answers
-    `;
-
-    con.query(sql, [question], (err, rows) => {
-      con.end();
-
-      if (err) {
-        console.error("Failed to fetch aggregate poll analytics:", err);
-        return res.status(500).json({ error: "Database analytics retrieval failed" });
-      }
-
-      const stats = {};
-      rows.forEach((row) => {
-        stats[row.answers] = row.total_votes;
-      });
-
-      return res.status(200).json({
-        question: question,
-        votes: stats,
-      });
-    });
-  });
-});
-
-router.get("/db", (req, res) => {
-  const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password@123",
-  });
-
-  con.connect((err) => {
-    if (err) {
-      console.error("Connection failed:", err);
-      return res.status(500).send("Database connection failed");
-    }
-
-    console.log("Connected to MySQL Server!");
-
-    con.query("CREATE DATABASE IF NOT EXISTS db_poll", (err) => {
-      if (err) {
-        con.end();
-        console.error("Database creation failed:", err);
-        return res.status(500).send("Database creation failed");
-      }
-      console.log("Database db_poll created or already exists.");
-
-      con.changeUser({ database: "db_poll" }, (err) => {
-        if (err) {
-          con.end();
-          console.error("Failed to switch database:", err);
-          return res.status(500).send("Database selection failed");
-        }
-
-        const createTableSql = `CREATE TABLE IF NOT EXISTS poll (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          questions VARCHAR(255), 
-          answers VARCHAR(255), 
-          votes INT DEFAULT 0, 
-          date VARCHAR(255)
-        )`;
-
-        con.query(createTableSql, (err, result) => {
-          if (err) {
-            con.end();
-            console.error("Table creation failed:", err);
-            return res.status(500).send("verification failed");
-          }
-
-          const checkColumnSql = `SHOW COLUMNS FROM poll LIKE 'id'`;
-
-          con.query(checkColumnSql, (err, rows) => {
-            if (err) {
-              con.end();
-              console.error("Failed to verify columns:", err);
-              return res.status(500).send("verification failed");
-            }
-
-            if (rows.length === 0) {
-              console.log("table version detected.");
-
-              con.query("DROP TABLE poll", (err) => {
-                if (err) {
-                  con.end();
-                  console.error("Failed to drop old table:", err);
-                  return res.status(500).send("rebuild failed");
-                }
-
-                con.query(createTableSql, (err) => {
-                  con.end();
-                  if (err) {
-                    console.error("Failed to recreate table:", err);
-                    return res.status(500).send("Database failed");
-                  }
-                  console.log("table successful");
-                  return res.send("successfully recreated a column!");
-                });
-              });
-            } else {
-              con.end();
-              console.log("modification successfully.");
-              return res.send("Database created successfully!");
-            }
-          });
-        });
-      });
-    });
-  });
-});
-
-module.exports = router;
-```
-
----
-
-### Questions/question.json
-```json
-{
-  "activeQuestion": "Should corporate campaign contributions be completely banned in federal elections?",
-  "options": ["Yes", "No"],
-  "lastUpdated": "2026-08-22T20:15:00.000Z",
-  "activeIpRegistry": []
-}
-```
+**Status:** Phase 1 Complete ✅ | Phases 2-7 In Progress 🚀

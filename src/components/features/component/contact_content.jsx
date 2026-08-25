@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import icon1 from "../../../images/icon_1.png";
 import icon2 from "../../../images/icon_2.png";
 import icon3 from "../../../images/icon_3.png";
@@ -34,12 +35,12 @@ class Content extends React.Component {
             </div>
             {/* get started button */}
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
-              <a
-                href="#"
+              <Link
+                 to="mailto:editor@thomas.com?subject=Advertise%20with%20the%20Thomas.com%20Daily%20Newsletter!"
                 className="bg-violet-200 capitalize hover:bg-violet-400 transition-colors duration-1000 cursor-pointer text-violet-950 font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 get started
-              </a>
+              </Link>
             </div>
           </div>
 
