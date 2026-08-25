@@ -14,6 +14,13 @@ import adminUsersRouter from './routes/admin/users.js';
 import adminDashboardRouter from './routes/admin/dashboard.js';
 import adminPollQuestionsRouter from './routes/admin/pollQuestions.js';
 import adminMediaRouter from './routes/admin/media.js';
+import adminPodcastsRouter from './routes/admin/podcasts.js';
+import adminCartoonsRouter from './routes/admin/cartoons.js';
+import adminMinglePostsRouter from './routes/admin/minglePosts.js';
+import adminPlaylistsRouter from './routes/admin/playlists.js';
+import adminLeadsRouter from './routes/admin/leads.js';
+import adminSettingsRouter from './routes/admin/settings.js';
+import adminAuditLogRouter from './routes/admin/auditLog.js';
 
 dotenv.config();
 
@@ -83,6 +90,27 @@ app.use('/api/admin/poll-questions', adminPollQuestionsRouter);
 
 // Admin Media Upload
 app.use('/api/admin/media', adminMediaRouter);
+
+// Admin Podcasts
+app.use('/api/admin/podcasts', adminPodcastsRouter);
+
+// Admin Cartoons
+app.use('/api/admin/cartoons', adminCartoonsRouter);
+
+// Admin Mingle Posts
+app.use('/api/admin/mingle-posts', adminMinglePostsRouter);
+
+// Admin Playlists
+app.use('/api/admin/playlists', adminPlaylistsRouter);
+
+// Admin Leads
+app.use('/api/admin/leads', adminLeadsRouter);
+
+// Admin Settings
+app.use('/api/admin/settings', adminSettingsRouter);
+
+// Admin Audit Log
+app.use('/api/admin/audit-log', adminAuditLogRouter);
 
 // ============================================
 // STATIC FILES & SPA FALLBACK
