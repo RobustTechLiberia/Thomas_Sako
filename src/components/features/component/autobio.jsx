@@ -8,19 +8,19 @@ class AutoBio extends React.Component {
         {/* <h1 className="text-center font-sans text-5xl md:mt-10 lg:mt-20 py-10 font-semibold capitalize">
           Testimonials
         </h1> */}
-        <div className="flex flex-col md:flex-row items-center justify-center md:justify-between bg-white px-6 md:px-12 lg:px-20 py-32">
+        <div className="flex flex-col items-center justify-center bg-white px-6 py-16 md:flex-row md:justify-between md:px-12 lg:px-20 lg:py-32">
           {/* Left column: image */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-start">
             <img
               src={image}
               alt="Speaker at event"
-              className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover rounded-none shadow-none"
+              className="aspect-[4/5] w-full max-w-md object-cover rounded-none shadow-none md:max-w-120 lg:max-w-lg"
             />
           </div>
 
           {/* Right column: quote */}
           <div className="w-full md:w-1/2 md:pl-12 mt-8 md:mt-0 flex flex-col justify-center">
-            <div className="text-purple-950 text-8xl font-bold md:mb-4 lg:mb-4 mb-3">
+            <div className="mb-3 text-6xl font-bold text-purple-950 md:mb-4 md:text-8xl">
               “
             </div>
             <p className="text-gray-800 md:text-lg text-lg  font-serif lg:text-lg">

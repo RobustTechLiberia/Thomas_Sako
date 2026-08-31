@@ -105,24 +105,24 @@ class Quest extends React.Component {
 
     return (
       <>
-        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center">
-          <div className="md:h-140 lg:h-140 bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-4xl w-auto h-110 md:shadow-xl lg:shadow-xl shadow-none">
+        <div className="flex w-full flex-wrap items-center justify-center gap-8 px-4 md:justify-between md:px-10">
+          <div className="w-full max-w-4xl bg-white px-4 py-8 shadow-none sm:px-8 md:min-h-140 md:px-10 md:shadow-xl">
             <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-violet-950">
               today's poll
             </h1>
             <div className="flex flex-wrap justify-center items-center my-8">
-              <hr className="border-none bg-violet-900 md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
+              <hr className="h-1 w-3/4 max-w-80 border-none bg-violet-900" />
             </div>
 
-            <h3 className="text-center flex flex-wrap md:justify-center lg:justify-start md:items-start lg:items-center font-sans font-semibold text-3xl md:mx-20 lg:mx-20 mx-2">
+            <h3 className="mx-2 text-center font-sans text-2xl font-semibold sm:text-3xl md:mx-0 md:text-left">
               {currentQuestion.question}
             </h3>
 
-            <form className="w-auto" onSubmit={this.handleSubmit}>
+            <form className="w-full" onSubmit={this.handleSubmit}>
               {currentQuestion.options.map((opt, idx) => (
                 <div key={idx} className="md:my-3 lg:my-3">
                   <label
-                    className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${hasVoted ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                    className={`mx-0 flex items-center gap-2 font-sans text-lg font-semibold capitalize sm:text-xl md:text-2xl ${hasVoted ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                   >
                     <input
                       type="radio"
@@ -136,7 +136,7 @@ class Quest extends React.Component {
                   </label>
                 </div>
               ))}
-              <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
+              <div className="mt-10 flex flex-col gap-2">
                 <input
                   type="submit"
                   value={hasVoted ? "voted" : "vote"}

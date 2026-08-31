@@ -12,13 +12,13 @@ class Subscribe extends React.Component {
           </h1>
         </div>
         {/* paragraph */}
-        <div className="flex flex-nowrap justify-center items-center py-3">
+        <div className="flex justify-center px-4 py-3 text-center">
           <p className="font-serif capitalize md:text-md lg:text-md text-lg text-center">
             balance news, independent perspectives. delievered every morning.
           </p>
         </div>
         {/* form */}
-        <div className="flex flex-nowrap justify-center items-center bg-white">
+        <div className="flex w-full justify-center bg-white px-4">
           <UpdateForm />
         </div>
       </>

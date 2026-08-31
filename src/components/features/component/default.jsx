@@ -12,9 +12,9 @@ class Features extends React.Component {
     return (
       <>
         {/* container */}
-        <div className="flex flex-wrap justify-center items-center mt-10 gap-5 md:min-h-96 lg:min-h-96 h-auto bg-white">
+        <div className="flex flex-wrap items-center justify-center gap-5 bg-white px-4 py-10 md:min-h-96">
           {/* youtube */}
-          <div className="md:w-80 lg:w-80 w-auto bg-white">
+          <div className="w-full max-w-80 bg-white">
             <a
               href="https://www.youtube.com/@1847Liberty"
               target="_blank"
@@ -23,31 +23,31 @@ class Features extends React.Component {
               <img
                 src={youtube}
                 alt="YouTube"
-                className="w-80 object-cover hover:opacity-50 cursor-pointer"
+                className="w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </a>
             <p className="font-serif capitalize text-center text-xl">YouTube</p>
           </div>
 
           {/* podcast */}
-          <div className="md:w-80 lg:w-80 bg-white">
+          <div className="w-full max-w-80 bg-white">
             <Link to="/podcast">
               <img
                 src={podcast}
                 alt="Podcast"
-                className="w-80 object-cover hover:opacity-50 cursor-pointer"
+                className="w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </Link>
             <p className="font-serif capitalize text-center text-xl">Podcast</p>
           </div>
 
           {/* playlist */}
-          <div className="md:w-80 lg:w-80 w-auto bg-white">
+          <div className="w-full max-w-80 bg-white">
             <Link to="/playlist">
               <img
                 src={playlist}
                 alt="Playlist"
-                className="w-80 object-cover hover:opacity-50 cursor-pointer"
+                className="w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </Link>
             <p className="font-serif capitalize text-center text-xl">
@@ -58,14 +58,14 @@ class Features extends React.Component {
 
         {/* booking */}
         {/* Added mb-20 to create margin below this final container */}
-        <div className="flex flex-wrap justify-center items-center mt-20 mb-20 gap-5 md:min-h-96 lg:min-h-96 h-auto bg-white">
+        <div className="flex flex-wrap items-center justify-center gap-5 bg-white px-4 py-10 md:my-10 md:min-h-96">
           {/* about me */}
-          <div className="md:w-80 lg:w-80 w-auto bg-white">
+          <div className="w-full max-w-80 bg-white">
             <Link to="/about">
               <img
                 src={AboutMe}
                 alt="About Me"
-                className="w-80 object-cover hover:opacity-50 cursor-pointer"
+                className="w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </Link>
             <p className="font-serif capitalize text-center text-xl">
@@ -74,24 +74,24 @@ class Features extends React.Component {
           </div>
 
           {/* contact */}
-          <div className="md:w-80 lg:w-80 bg-white">
+          <div className="w-full max-w-80 bg-white">
             <Link to="/contact">
               <img
                 src={Contact}
                 alt="Contact"
-                className="w-80 object-cover hover:opacity-50 cursor-pointer"
+                className="w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </Link>
             <p className="font-serif capitalize text-center text-xl">Contact</p>
           </div>
 
           {/* book thomas */}
-          <div className="md:w-80 lg:w-80 w-auto bg-white">
+          <div className="w-full max-w-80 bg-white">
             <Link to="/book">
               <img
                 src={BookMe}
                 alt="Book Thomas"
-                className="w-80 h-80 object-cover hover:opacity-50 cursor-pointer"
+                className="aspect-square w-full object-cover hover:opacity-50 cursor-pointer"
               />
             </Link>
             <p className="font-serif capitalize text-center text-xl">

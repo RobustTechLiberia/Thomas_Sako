@@ -4,8 +4,8 @@ class OurTeam extends React.Component {
   render() {
     return (
       <>
-        <div className="md:h-180 lg:h-180 h-120 bg-violet-200 md:mt-20 lg:mt-20">
-          <h1 className="md:text-left font-sans font-black lg:text-left text-left md:text-5xl lg:text-5xl md:pt-20 lg:pt-20 pt-10 text-4xl uppercase md:mx-20 lg:mx-20 mx-8 text-violet-500">
+        <div className="min-h-120 bg-violet-200 md:mt-20 md:min-h-180">
+          <h1 className="mx-8 pt-10 text-left font-sans text-4xl font-black uppercase text-violet-500 md:mx-20 md:pt-20 md:text-5xl">
             our team
           </h1>
         </div>

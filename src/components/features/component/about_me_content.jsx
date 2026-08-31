@@ -8,9 +8,9 @@ class AboutContent extends React.Component {
   render() {
     return (
       <>
-        <div className="bg-linear-to-b from-[#312252] to-[#120a21] gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
-          <div className="flex flex-wrap justify-center items-start md:justify-start lg:justify-start h-auto md:mx-20 lg:mx-20 md:pt-6 lg:pt-6">
-            <div className="w-full md:w-auto lg:w-auto flex justify-center md:justify-start lg:justify-start mt-5 md:mt-8 lg:mt-8">
+        <div className="mx-2 my-5 bg-linear-to-b from-[#312252] to-[#120a21] md:mx-10 md:my-8 md:min-h-196">
+          <div className="flex flex-wrap items-start justify-center px-4 py-6 md:mx-20 md:justify-start md:px-0">
+            <div className="mt-5 flex w-full justify-center md:mt-8 md:w-auto md:justify-start">
               <img
                 src={profile}
                 alt="Profile"
@@ -18,7 +18,7 @@ class AboutContent extends React.Component {
               />
             </div>
 
-            <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-18 lg:mx-18 mt-5 md:mt-8 lg:mt-8 flex flex-col justify-center md:h-80 lg:h-80">
+            <div className="mt-5 flex w-full flex-col justify-center text-center md:mx-18 md:mt-8 md:h-80 md:w-md md:text-left">
               <h1 className="font-sans text-white font-semibold capitalize text-5xl md:text-white lg:text-white">
                 thomas sako
               </h1>
@@ -26,7 +26,7 @@ class AboutContent extends React.Component {
                 host
               </span>
               {/* social media icons */}
-              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start mx-10 md:mx-0 lg:mx-0 gap-8 md:items-start lg:items-start">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-8 md:justify-start">
                 <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a
                     href="https://www.youtube.com/@1847Liberty"
@@ -55,7 +55,7 @@ class AboutContent extends React.Component {
                 </div>
               </div>
 
-              <p className="md:text-white lg:text-white text-white text-left md:mb-0 lg:mb-0 mb-10 md:mx-0 lg:mx-0 mx-8 text-lg mt-4">
+              <p className="mx-0 mb-10 mt-4 text-left text-lg text-white md:mb-0">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                 Blanditiis culpa neque dolor veniam magni assumenda nesciunt
                 itaque iusto inventore sit. Adipisci iste eos, porro assumenda

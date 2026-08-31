@@ -16,22 +16,22 @@ class Nav extends React.Component {
     return (
       <>
         {/* Fixed navbar on laptops/desktops */}
-        <div className="md:h-24 lg:h-24 md:fixed lg:fixed w-full h-auto bg-white border-b-2 border-b-violet-200 top-0 z-50">
+        <div className="top-0 z-50 w-full border-b-2 border-b-violet-200 bg-white md:fixed">
           <nav className="bg-white w-auto border-none">
-            <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 p-3 sm:p-4">
               {/* Logo */}
               <Link
                 to="/"
                 className="flex items-center space-x-3 rtl:space-x-reverse"
               >
-                <img src={logo} className="md:h-20 lg:h-20 h-12" alt="Logo" />
+                <img src={logo} className="h-10 sm:h-12 md:h-20" alt="Logo" />
               </Link>
 
               {/* Right side: Watch Live + Menu Button */}
-              <div className="flex md:order-2 bg-white space-x-3 md:space-x-0 rtl:space-x-reverse">
+              <div className="flex shrink-0 items-center gap-2 bg-white md:order-2 md:gap-3">
                 <a
                   href="https://www.youtube.com/@1847Liberty"
-                  className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
+                  className="bg-violet-900 px-3 py-2 font-sans text-sm font-semibold capitalize text-white sm:px-5 sm:py-3 sm:text-base"
                 >
                   Watch Live
                 </a>
@@ -64,7 +64,7 @@ class Nav extends React.Component {
 
               {/* Collapsible menu */}
               <div
-                className={`absolute left-0 top-full w-full md:static md:flex md:w-auto md:order-1 transition-all duration-300 ${
+                className={`absolute left-0 top-full w-full border-b-2 border-violet-200 bg-white md:static md:flex md:w-auto md:order-1 md:border-0 transition-all duration-300 ${
                   this.state.isOpen ? "block" : "hidden"
                 }`}
                 id="navbar-sticky"

@@ -33,7 +33,7 @@ class Pod extends React.Component {
             {/* pod 2 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/YXfC-F7ZfG4?si=2LVTliNbZ-E51yUh"
@@ -53,7 +53,7 @@ class Pod extends React.Component {
             {/* pod 3 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/UduTppjIzqY?si=neU0HXWtqAqGw4Bk"
@@ -93,7 +93,7 @@ class Pod extends React.Component {
             {/* pod 2 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/YXfC-F7ZfG4?si=2LVTliNbZ-E51yUh"
@@ -113,7 +113,7 @@ class Pod extends React.Component {
             {/* pod 3 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
+                className="w-full aspect-video rounded-none shadow-none"
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/UduTppjIzqY?si=neU0HXWtqAqGw4Bk"

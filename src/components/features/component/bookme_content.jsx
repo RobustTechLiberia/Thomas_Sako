@@ -6,7 +6,7 @@ class BookMeContent extends React.Component {
     return (
       <>
         {/* Container stripped of restricting margins to span edge-to-edge */}
-        <div className="w-full md:h-150 lg:h-150 md:px-20 md:mt-10 lg:mt-10 lg:px-20 px-2 mt-2 h-auto bg-white overflow-hidden relative shadow-none">
+        <div className="relative mt-2 w-full overflow-hidden bg-white px-2 shadow-none md:mt-10 md:px-20">
           <iframe
             className="w-full aspect-video border-none" // Makes it act like a responsive fluid image
             src="https://www.youtube.com/embed/G9cl0kgd8Q4?si=PKpP5gIdk8t9iS5j"

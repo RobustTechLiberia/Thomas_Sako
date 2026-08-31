@@ -4,8 +4,8 @@ class GuestHost extends React.Component {
   render() {
     return (
       <>
-        <div className="md:h-180 lg:h-180 bg-white">
-          <h1 className="md:text-5xl lg:text-5xl md:mx-32 lg:mx-32 mx-10 md:mt-20 lg:mt-20 mt-10 text-4xl font-black text-violet-800 uppercase">
+        <div className="min-h-80 bg-white md:min-h-180">
+          <h1 className="mx-10 mt-10 text-4xl font-black uppercase text-violet-800 md:mx-32 md:mt-20 md:text-5xl">
             guest host
           </h1>
         </div>
