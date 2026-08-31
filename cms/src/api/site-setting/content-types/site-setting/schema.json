@@ -1,0 +1,12 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": { "singularName": "site-setting", "pluralName": "site-settings", "displayName": "Site settings", "description": "Global site identity and contact details" },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "siteName": { "type": "string", "required": true, "default": "1847 Liberty" },
+    "tagline": { "type": "string" },
+    "contactEmail": { "type": "email" },
+    "logo": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] }
+  }
+}

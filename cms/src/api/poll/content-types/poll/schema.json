@@ -1,0 +1,14 @@
+{
+  "kind": "collectionType",
+  "collectionName": "polls",
+  "info": { "singularName": "poll", "pluralName": "polls", "displayName": "Poll", "description": "Daily audience polls" },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "question": { "type": "string", "required": true },
+    "slug": { "type": "uid", "targetField": "question", "required": true },
+    "options": { "type": "json", "required": true },
+    "active": { "type": "boolean", "default": true },
+    "startsAt": { "type": "datetime" },
+    "endsAt": { "type": "datetime" }
+  }
+}

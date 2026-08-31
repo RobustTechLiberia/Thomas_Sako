@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import Advert from "../../features/component/Advertisement/components/advert";
+import { getCmsCollection } from "../../../lib/cms";
 
 class Quest extends React.Component {
   constructor(props) {
@@ -15,8 +16,18 @@ class Quest extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/questions.json")
-      .then((res) => res.json())
+    getCmsCollection(
+      "polls",
+      "?filters[active][$eq]=true&sort=startsAt:desc&pagination[pageSize]=1",
+    )
+      .then((response) => {
+        if (!response.data?.length) throw new Error("No active CMS poll.");
+        const poll = response.data[0];
+        return [{ question: poll.question, options: poll.options }];
+      })
+      // Keep the current site usable until an editor creates and publishes its
+      // first poll or public API read access is enabled in Strapi.
+      .catch(() => fetch("/questions.json").then((res) => res.json()))
       .then((data) => {
         const today = new Date();
         const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));

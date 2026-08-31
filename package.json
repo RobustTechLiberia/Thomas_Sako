@@ -7,7 +7,8 @@
     "dev": "vite",
     "dev:client": "vite",
     "dev:server": "cd server && nodemon --ignore 'frontend/*' --ignore '*.json' --ignore 'node_modules/*' app.js",
-    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:cms": "npm --prefix cms run develop",
+    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:cms\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

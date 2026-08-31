@@ -1,0 +1,19 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": { "singularName": "page", "pluralName": "pages", "displayName": "Page", "description": "Editable marketing and information pages" },
+  "options": { "draftAndPublish": true },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "slug": { "type": "uid", "targetField": "title", "required": true },
+    "route": { "type": "string", "required": true, "unique": true },
+    "navLabel": { "type": "string" },
+    "template": { "type": "enumeration", "enum": ["home", "podcast", "playlist", "about", "contact", "booking", "advertising"], "required": true },
+    "heroTitle": { "type": "string" },
+    "heroSubtitle": { "type": "text" },
+    "content": { "type": "blocks" },
+    "heroImage": { "type": "media", "multiple": false, "required": false, "allowedTypes": ["images"] },
+    "seoTitle": { "type": "string" },
+    "seoDescription": { "type": "text" }
+  }
+}

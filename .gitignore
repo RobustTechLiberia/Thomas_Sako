@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Strapi local data, secrets, builds, and uploads
+cms/.env
+cms/.tmp
+cms/build
+cms/public/uploads
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
