@@ -1,17 +1,22 @@
 {
   "name": "liberty",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:client": "vite",
-    "dev:server": "cd server && nodemon --ignore 'frontend/*' --ignore '*.json' --ignore 'node_modules/*' app.js",
+    "dev:admin": "npm --prefix admin run dev",
+    "dev:server": "npm --prefix server run dev",
     "dev:cms": "npm --prefix cms run develop",
-    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:cms\"",
+    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:admin\" \"npm run dev:cms\"",
     "build": "vite build",
+    "build:admin": "cd admin && npm run build",
+    "build:cms": "npm --prefix cms run build",
+    "build:all": "npm run build && npm run build:admin && npm run build:cms",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:init": "cd server && npm run db:init"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",

@@ -87,8 +87,9 @@ class Nav extends React.Component {
                     </Link>
                   </li>
                   <li>
+                    
                     <Link
-                      to="/advertising"
+                      to="mailto:editor@thomas.com?subject=Advertise%20with%20the%20Thomas.com%20Daily%20Newsletter!"
                       className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
                     >
                       Advertising

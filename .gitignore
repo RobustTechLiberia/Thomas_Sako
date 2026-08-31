@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
 # Strapi local data, secrets, builds, and uploads
 cms/.env
 cms/.tmp
