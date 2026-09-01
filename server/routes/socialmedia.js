@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 require("dotenv").config();
 
-router.get("/api/socialmedia", (req, res) => {
+router.get("/socialmedia", (req, res) => {
   try {
     res.json({
       youtube: process.env.YOUTUBE_CHANNEL_URL || "",

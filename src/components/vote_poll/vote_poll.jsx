@@ -6,7 +6,7 @@ class VotePoll extends React.Component {
     return (
       <>
         <div
-          className="flex flex-wrap items-center justify-center bg-white py-8 md:min-h-160 md:justify-between md:bg-violet-100 lg:bg-violet-200"
+          className="flex flex-wrap bg-white py-8 md:min-h-160 md:justify-between md:bg-violet-100 lg:bg-violet-200"
           id="poll"
         >
           <Outlet />

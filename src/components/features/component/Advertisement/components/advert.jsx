@@ -33,7 +33,7 @@ class Advert extends Component {
     return (
       <>
         {/* Container */}
-        <div className="flex flex-col justify-center items-center object-cover border w-72 h-auto mb-20 md:mb-0 lg:mb-0 border-gray-400">
+        <div className="flex flex-col justify-end items-end object-cover border w-72 h-auto mb-20 md:mb-0 lg:mb-0 border-gray-400">
           <a
             href={adverts[current].link}
             target="_blank"

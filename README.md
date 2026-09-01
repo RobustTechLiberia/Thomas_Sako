@@ -79,7 +79,8 @@ Strapi is the source of truth for the public site’s editable content. It provi
 ### First CMS start
 
 1. Run `npm run dev:cms`.
-2. Visit http://localhost:1337/admin and create the first administrator.
+2. Visit http://localhost:1337/admin and sign in with the local bootstrap administrator:
+   `1847liberty@1847liberty.local` and password `1847@liberty`.
 3. Open **Content Manager** and add or edit content.
 4. In **Settings → Users & Permissions plugin → Roles → Public**, grant the minimum required `find` and `findOne` permissions for public content.
 
@@ -97,7 +98,7 @@ Copy the CMS template and replace every placeholder secret before deployment:
 cp cms/.env.example cms/.env
 ```
 
-Set `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `JWT_SECRET`, and `CLIENT_URL`. `cms/.env`, Strapi’s local database, build output, and uploads are ignored by Git.
+Set `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `JWT_SECRET`, `CLIENT_URL`, and the `DEFAULT_ADMIN_*` values. The bootstrap account is created only if it does not already exist. Change its password immediately outside local development. `cms/.env`, Strapi’s local database, build output, and uploads are ignored by Git.
 
 ### Express API
 

@@ -43,7 +43,7 @@ class DefaultPage extends React.Component {
       <>
         <form
           onSubmit={this.handleSubmit}
-          className="flex w-full max-w-xl flex-col gap-2 bg-white sm:flex-row sm:items-center"
+          className="flex md:w-full lg:w-full max-w-xl flex-col gap-2 bg-white sm:flex-row sm:items-center"
         >
           <input
             type="email"
@@ -52,12 +52,12 @@ class DefaultPage extends React.Component {
             placeholder="Email"
             value={this.state.email}
             onChange={this.handleChange}
-            className="w-full border border-gray-800 bg-white px-5 py-3 text-gray-800 sm:border-r-0"
+            className="md:w-full lg:w-full w-auto border border-gray-800 bg-white px-5 py-3 text-gray-800 sm:border-r-0"
             required
           />
           <button
             type="submit"
-            className="w-full border-none bg-violet-900 px-5 py-3 text-xl capitalize text-white cursor-pointer sm:w-auto"
+            className="w-auto border-none bg-violet-900 px-5 py-3 text-xl capitalize text-white cursor-pointer sm:w-auto"
           >
             subscribe
           </button>
