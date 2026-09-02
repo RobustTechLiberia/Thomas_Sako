@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "question": "What is the current state of our nation's economy?",
+    "options": ["Good", "Bad"]
+  },
+  {
+    "id": 2,
+    "question": "Do you support renewable energy initiatives?",
+    "options": ["Yes", "No"]
+  },
+  {
+    "id": 3,
+    "question": "Should education be free for all?",
+    "options": ["Agree", "Disagree"]
+  }
+]
