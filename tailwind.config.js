@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        anton: ["Anton", "sans-serif"],
+        arimo: ["Arimo", "sans-serif"]
       },
     },
   },
