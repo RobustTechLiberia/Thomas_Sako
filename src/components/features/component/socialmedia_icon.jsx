@@ -9,6 +9,10 @@ class SocialIcons extends React.Component {
         youtube: "",
         facebook: "",
         x: "",
+        instagram: "",
+        whatsapp: "",
+        tiktok: "",
+        gmail: "",
       },
       loading: true,
     };
@@ -19,12 +23,18 @@ class SocialIcons extends React.Component {
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1";
 
+    // Updated port from 5000 to 8080 to match your Express server configuration
     const backendUrl = isLocalhost
-      ? "http://localhost:5000/api/socialmedia"
+      ? "http://localhost:8080/api/socialmedia"
       : "/api/socialmedia";
 
     fetch(backendUrl)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         // FIXED PAYLOAD MISMATCH: We pull directly from data.youtube but add logical fallbacks
         // to original env keys just in case the server transfers raw process.env properties.
@@ -33,6 +43,10 @@ class SocialIcons extends React.Component {
             youtube: data.youtube || data.YOUTUBE_CHANNEL_URL || "",
             facebook: data.facebook || data.FACEBOOK_PAGE_URL || "",
             x: data.x || data.X_PAGE_URL || "",
+            instagram: data.instagram || data.INSTAGRAM_PAGE_URL || "",
+            whatsapp: data.whatsapp || data.WHATSAPP_ACCOUNT || "",
+            tiktok: data.tiktok || data.TIKTOK_PAGE_URL || "",
+            gmail: data.gmail || data.GMAIL_ACCOUNT || "",
           },
           loading: false,
         });
@@ -47,9 +61,7 @@ class SocialIcons extends React.Component {
     e.preventDefault();
 
     if (!platformUrl || platformUrl.trim() === "") {
-      console.warn(
-        "Social link path is empty or not yet loaded from .env configurations.",
-      );
+      console.warn("Social link path is empty or not yet loaded");
       return;
     }
 
@@ -61,7 +73,6 @@ class SocialIcons extends React.Component {
 
     return (
       <>
-        {/* Fixed invalid rigid heights to make container fully responsive */}
         <div className="flex flex-wrap justify-center items-center my-10 px-4 bg-white gap-5">
           <div className="w-auto">
             <h4 className="text-left font-serif md:text-3xl lg:text-3xl text-2xl capitalize py-5">
@@ -98,6 +109,36 @@ class SocialIcons extends React.Component {
               className="cursor-pointer"
             >
               <i className="fa-brands fa-facebook-f text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+            </a>
+
+            {/* Instagram */}
+            <a
+              id="insta-link"
+              href={links.instagram || ""}
+              onClick={(e) => this.handleIconClick(e, links.instagram)}
+              className="cursor-pointer"
+            >
+              <i className="fa-brands fa-instagram text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+            </a>
+
+            {/* TikTok */}
+            <a
+              id="tiktok-link"
+              href={links.tiktok || ""}
+              onClick={(e) => this.handleIconClick(e, links.tiktok)}
+              className="cursor-pointer"
+            >
+              <i className="fa-brands fa-tiktok text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+            </a>
+
+            {/* WhatsApp */}
+            <a
+              id="whatsapp-link"
+              href={links.whatsapp || "#"}
+              onClick={(e) => this.handleIconClick(e, links.whatsapp)}
+              className="cursor-pointer"
+            >
+              <i className="fa-brands fa-whatsapp text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
           </div>
         </div>
