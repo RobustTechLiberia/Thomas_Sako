@@ -5,10 +5,10 @@ const mysql = require("mysql2");
 const router = express.Router();
 
 const dbConfig = {
-  host: "localhost",
-  user: "root",
-  password: "password@123",
-  database: "db_poll",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_DATABASE,
 };
 
 const handleVoteInsertion = (req, res) => {
