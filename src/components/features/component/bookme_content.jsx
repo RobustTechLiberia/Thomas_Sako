@@ -16,6 +16,26 @@ class BookMeContent extends React.Component {
             allowFullScreen
           ></iframe>
         </div>
+        {/* tabs */}
+        <div className="flex flex-wrap justify-end items-end md:mx-20 text-violet-900 text-md py-8 lg:mx-20 ">
+
+
+<div class="font-medium text-center  border-b-none border-default">
+    <ul class="flex flex-wrap -mb-px">
+        <li class="me-2">
+            <a href="#" class="inline-block p-4 border-b border-transparent rounded-t-base hover:text-fg-brand hover:border-brand">About</a>
+        </li>
+        <li class="me-2">
+            <a href="#" class="inline-block p-4 text-fg-brand border-b-none border-brand rounded-t-base active" aria-current="page">Resume</a>
+        </li>
+        
+        <li>
+            <a class="inline-block p-4 text-fg-disabled rounded-t-base cursor-not-allowed dark:text-body">Podcasts</a>
+        </li>
+    </ul>
+</div>
+
+          </div>
         <TrendPod />
       </>
     );
