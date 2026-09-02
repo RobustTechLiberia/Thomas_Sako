@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 class VoteBanner extends React.Component {
   render() {
@@ -9,14 +10,13 @@ class VoteBanner extends React.Component {
             vote on today's Daily Poll
           </h1>
 
-          {/* vote button */}
           <div className="md:flex md:flex-col md:justify-center md:items-center lg:flex lg:flex-col lg:justify-center flex flex-wrap justify-center items-center">
-            <a
-              href="#"
+            <Link
+              to="/"
               className="py-4 font-semibold border-none bg-green-700 px-10 text-xl rounded text-white font-sans lowercase"
             >
               vote now
-            </a>
+            </Link>
           </div>
         </div>
       </>

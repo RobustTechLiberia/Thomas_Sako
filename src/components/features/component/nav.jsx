@@ -33,7 +33,7 @@ class Nav extends React.Component {
                   to="/youtube"
                   className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
                 >
-                  Watch Live
+                  Donate
                 </Link>
                 <button
                   onClick={this.toggleMenu}
