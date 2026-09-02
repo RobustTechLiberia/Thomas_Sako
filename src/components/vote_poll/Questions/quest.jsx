@@ -95,7 +95,7 @@ class Quest extends React.Component {
     return (
       <>
         <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center">
-          <div className="md:h-140 lg:h-140 bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-auto h-110 md:shadow-xl lg:shadow-xl shadow-none">
+          <div className="md:h-140 lg:h-140 bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none">
             <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-violet-950">
               today's poll
             </h1>
