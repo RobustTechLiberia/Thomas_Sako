@@ -15,7 +15,7 @@ class Nav extends React.Component {
   render() {
     return (
       <>
-        {/* Fixed navbar on laptops/desktops */}
+        {/* nav bar */}
         <div className="md:h-24 lg:h-24 md:fixed lg:fixed w-full h-auto bg-white border-b-2 border-b-violet-200 top-0 z-50">
           <nav className="bg-white w-auto border-none">
             <div className="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -27,7 +27,7 @@ class Nav extends React.Component {
                 <img src={logo} className="md:h-20 lg:h-20 h-12" alt="Logo" />
               </Link>
 
-              {/* Right side: Watch Live + Menu Button */}
+              {/* Menu Button */}
               <div className="flex md:order-2 bg-white space-x-3 md:space-x-0 rtl:space-x-reverse">
                 <Link
                   to="/youtube"
