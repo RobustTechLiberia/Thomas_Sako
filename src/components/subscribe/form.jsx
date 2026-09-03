@@ -52,7 +52,7 @@ class DefaultPage extends React.Component {
             placeholder="Email"
             value={this.state.email}
             onChange={this.handleChange}
-            className="border border-gray-800 py-3 border-r-0 bg-white text-gray-800 md:w-xl lg:w-xl sm:w-28 px-5"
+            className="border border-gray-800 py-3 border-r-0 bg-white text-gray-800 md:w-xl lg:w-xl w-28 px-5"
             required
           />
           <button
