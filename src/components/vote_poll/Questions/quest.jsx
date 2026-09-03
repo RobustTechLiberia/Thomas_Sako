@@ -89,12 +89,17 @@ class Quest extends React.Component {
       });
   };
 
+  // Handler to route the user to the form results page
+  handleSeeResults = () => {
+    window.location.href = "/results"; // Update this string to your actual results path if different
+  };
+
   render() {
     const { currentQuestion, selectedOption, hasVoted } = this.state;
 
     return (
       <>
-        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center">
+        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center md:gap-0 lg:gap-0 gap-20">
           <div className="md:h-140 lg:h-140 bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none">
             <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-violet-950">
               today's poll
@@ -134,6 +139,18 @@ class Quest extends React.Component {
                 />
               </div>
             </form>
+            <div
+              onClick={this.handleSeeResults}
+              className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto cursor-pointer"
+            >
+              <div className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5">
+                <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
+                  see past results
+                </p>
+              </div>
+              {/* col 2 */}
+              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-900 py-5"></div>
+            </div>
           </div>
           <Advert />
         </div>
