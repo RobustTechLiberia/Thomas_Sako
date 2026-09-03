@@ -11,7 +11,7 @@ class Header extends React.Component {
           <img
             src={heading}
             alt="Heading"
-            className="h-auto md:h-56 lg:h-56 md:w-auto lg:w-auto w-64 object-contain"
+            className=" md:h-56 lg:h-56 md:w-auto lg:w-auto w-52 h-auto sm:h-auto sm:w-52 object-cover"
           />
 
           {/* profile picture*/}
