@@ -83,6 +83,8 @@ class Quest extends React.Component {
         this.setState({
           hasVoted: true,
         });
+        // Route to the results page following a successful submission
+        window.location.href = "/results";
       })
       .catch((err) => {
         console.error("Submission failed:", err);
@@ -142,7 +144,7 @@ class Quest extends React.Component {
             </form>
             <div
               onClick={this.handleSeeResults}
-              className="flex flex-wrap justify-start h-auto md:mt-30 lg:mt-30 mt-8 bg-green-200 text-white w-auto cursor-pointer"
+              className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto cursor-pointer"
             >
               <div className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5">
                 <a href="/results" onClick={this.handleSeeResults}>
