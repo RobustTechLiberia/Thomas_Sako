@@ -29,12 +29,14 @@ class Nav extends React.Component {
 
               {/* Menu Button */}
               <div className="flex md:order-2 bg-white space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <Link
-                  to="/youtube"
+                <a
+                  href="https://cash.app/$TSarko"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
                 >
                   Donate
-                </Link>
+                </a>
                 <button
                   onClick={this.toggleMenu}
                   type="button"
@@ -64,8 +66,8 @@ class Nav extends React.Component {
 
               {/* Collapsible menu */}
               <div
-                className={`absolute left-0 top-full w-full md:static md:flex md:w-auto md:order-1 transition-all duration-300 ${
-                  this.state.isOpen ? "block" : "hidden"
+                className={`w-full md:flex md:w-auto md:order-1 transition-all duration-300 ${
+                  this.state.isOpen ? "block mt-4 md:mt-0" : "hidden"
                 }`}
                 id="navbar-sticky"
               >
