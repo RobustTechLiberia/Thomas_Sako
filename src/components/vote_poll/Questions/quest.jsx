@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
 import Advert from "../../features/component/Advertisement/components/advert";
+// Sass CSS
+import "../../../../App.scss";
 
 class Quest extends React.Component {
   constructor(props) {
@@ -18,6 +20,8 @@ class Quest extends React.Component {
     fetch("/questions.json")
       .then((res) => res.json())
       .then((data) => {
+        if (!data || data.length === 0) return;
+
         const today = new Date();
         const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
         const questionIndex = dayIndex % data.length;
@@ -100,8 +104,11 @@ class Quest extends React.Component {
 
     return (
       <>
-        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center md:gap-0 lg:gap-0 gap-20">
-          <div className="md:h-140 lg:h-140 bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none">
+        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center md:gap-0 lg:gap-0 gap-10">
+          <div
+            className="md:h-140 lg:h-140 bg-right bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none"
+            id="quest"
+          >
             <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-violet-950">
               today's poll
             </h1>
@@ -114,7 +121,7 @@ class Quest extends React.Component {
             </h3>
 
             <form className="w-auto" onSubmit={this.handleSubmit}>
-              {currentQuestion.options.map((opt, idx) => (
+              {currentQuestion?.options?.map((opt, idx) => (
                 <div key={idx} className="md:my-3 lg:my-3">
                   <label
                     className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${hasVoted ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
@@ -140,7 +147,7 @@ class Quest extends React.Component {
                 />
               </div>
             </form>
-            <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
+            {/* <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
               <div
                 onClick={this.handleSeeResults}
                 className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
@@ -151,9 +158,9 @@ class Quest extends React.Component {
                   </p>
                 </a>
               </div>
-              {/* col 2 */}
+              
               <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
-            </div>
+            </div> */}
           </div>
           <Advert />
         </div>

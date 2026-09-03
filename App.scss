@@ -1,3 +1,26 @@
-$bg-img:url('../');
+// variables
 
-#
+$bg-img: url('./src/images/daily-poll-illustration.svg');
+$bg-repeat: no-repeat;
+$bg-hght: 20px;
+$bg-marg: 20px;
+$bg-opacity: 0.10; 
+
+// CSS
+
+#quest {
+    position: relative; 
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: $bg-img;
+        background-repeat: $bg-repeat;
+        opacity: $bg-opacity;
+        z-index: -0; 
+    
+    }
+}
