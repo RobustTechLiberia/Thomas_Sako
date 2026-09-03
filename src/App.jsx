@@ -10,6 +10,7 @@ import Contact from "./components/features/pages/contact";
 import Advert from "./components/features/pages/advertising";
 import "./App.css";
 import PlayList from "./components/features/pages/playlist_page";
+import Results from "./components/vote_poll/Questions/Result/results";
 
 class App extends React.Component {
   render() {
@@ -28,6 +29,7 @@ class App extends React.Component {
         <Route path="/contact" element={<Contact />} />
         <Route path="/book" element={<BookMe />} />
         <Route path="/advertising" element={<Advert />} />
+        <Route path="/results" element={<Results />} />
       </Routes>
     );
   }
