@@ -90,7 +90,8 @@ class Quest extends React.Component {
   };
 
   // Handler to route the user to the form results page
-  handleSeeResults = () => {
+  handleSeeResults = (e) => {
+    e.preventDefault(); // Prevents standard tag navigation to allow smooth routing
     window.location.href = "/results"; // Update this string to your actual results path if different
   };
 
@@ -141,15 +142,17 @@ class Quest extends React.Component {
             </form>
             <div
               onClick={this.handleSeeResults}
-              className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto cursor-pointer"
+              className="flex flex-wrap justify-start h-auto md:mt-30 lg:mt-30 mt-8 bg-green-200 text-white w-auto cursor-pointer"
             >
               <div className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5">
-                <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
-                  see past results
-                </p>
+                <a href="/results" onClick={this.handleSeeResults}>
+                  <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
+                    see past results
+                  </p>
+                </a>
               </div>
               {/* col 2 */}
-              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-900 py-5"></div>
+              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
             </div>
           </div>
           <Advert />
