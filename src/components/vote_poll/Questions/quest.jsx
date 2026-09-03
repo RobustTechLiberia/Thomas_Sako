@@ -83,7 +83,6 @@ class Quest extends React.Component {
         this.setState({
           hasVoted: true,
         });
-        // Route to the results page following a successful submission
         window.location.href = "/results";
       })
       .catch((err) => {
@@ -91,10 +90,9 @@ class Quest extends React.Component {
       });
   };
 
-  // Handler to route the user to the form results page
   handleSeeResults = (e) => {
-    e.preventDefault(); // Prevents standard tag navigation to allow smooth routing
-    window.location.href = "/results"; // Update this string to your actual results path if different
+    e.preventDefault();
+    window.location.href = "/results";
   };
 
   render() {
@@ -142,11 +140,11 @@ class Quest extends React.Component {
                 />
               </div>
             </form>
-            <div
-              onClick={this.handleSeeResults}
-              className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto cursor-pointer"
-            >
-              <div className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5">
+            <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
+              <div
+                onClick={this.handleSeeResults}
+                className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
+              >
                 <a href="/results" onClick={this.handleSeeResults}>
                   <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
                     see past results
