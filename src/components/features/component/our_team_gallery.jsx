@@ -10,45 +10,45 @@ class OurTeamGallery extends React.Component {
               src="path/to/image1.jpg"
               alt="Team mate 1"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full hover:bg-green-200 cursor-pointer"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-violet-800"></div>
           </div>
           <div className="w-80 bg-gray-50 h-80">
             <img
               src="path/to/image1.jpg"
               alt="Team mate 2"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full hover:bg-green-200  hover:bg-blend-overlay cursor-pointer"
             />
-            <div className="md:mt-20 mt-20 lg:mt-20 h-28 bg-violet-600"></div>
+            <div className="md:mt-0 mt-0 lg:mt-0 h-28 bg-violet-600"></div>
           </div>
           <div className="w-80 bg-gray-200 h-80">
             <img
               src="path/to/image1.jpg"
               alt="Team mate 3"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full  hover:bg-green-200  hover:bg-blend-overlay cursor-pointer"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-violet-800"></div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
             <img
               src="path/to/image4.jpg"
               alt="Team mate 4"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full  hover:bg-green-200  hover:bg-blend-overlay cursor-pointer"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-600"></div>
+            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-violet-600"></div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
             <img
               src="path/to/image5.jpg"
               alt="Team mate 5"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full  hover:bg-green-200  hover:bg-blend-overlay cursor-pointer"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-violet-800"></div>
           </div>
         </div>
       </>
