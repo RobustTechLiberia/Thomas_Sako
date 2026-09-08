@@ -7,6 +7,27 @@ const path = require("path");
 const port = 8080;
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://your-frontend-domain.com",
+];
+
+// Enable CORS for allowed origins before handling routes
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS blocked: origin not allowed"));
+      }
+    },
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+
 // external routers
 const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
@@ -18,25 +39,6 @@ app.use("/question", questionRouter);
 
 // social media router
 app.use(SocialRouter);
-
-app.use(express.json());
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://your-frontend-domain.com",
-];
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS blocked: origin not allowed"));
-      }
-    },
-  }),
-);
 
 app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
