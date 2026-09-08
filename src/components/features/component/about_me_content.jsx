@@ -8,7 +8,7 @@ class AboutContent extends React.Component {
   render() {
     return (
       <>
-        <div className="bg-gradient-to-b from-[#312252] to-[#120a21] gap-5 md:gap-10 lg:gap-10 h-auto md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
+        <div className="bg-gradient-to-b from-[#312252] to-[#120a21] gap-5 md:gap-10 lg:gap-10 h-200 md:h-196 lg:h-196 mt-5 mb-5 md:mt-8 lg:mt-8 mx-2 md:mx-10 lg:mx-10">
           <div className="flex flex-wrap justify-center items-start md:justify-start lg:justify-start h-auto md:mx-20 lg:mx-20 md:pt-6 lg:pt-6">
             <div className="w-full md:w-auto lg:w-auto flex justify-center md:justify-start lg:justify-start mt-5 md:mt-8 lg:mt-8">
               <img
@@ -20,13 +20,13 @@ class AboutContent extends React.Component {
 
             <div className="w-full md:w-md lg:w-md text-center md:text-left md:mx-18 lg:mx-18 mt-5 md:mt-8 lg:mt-8 flex flex-col justify-center md:h-80 lg:h-80">
               <h1 className="font-sans text-white font-semibold capitalize text-5xl md:text-white lg:text-white">
-                thomas sako
+                thomas sarko
               </h1>
               <span className="font-serif text-lg uppercase py-3 md:text-white lg:text-white text-white">
                 host
               </span>
               {/* social media icons */}
-              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start mx-10 md:mx-0 lg:mx-0 gap-8 md:items-start lg:items-start">
+              <div className="flex flex-wrap justify-start md:justify-start lg:justify-start mx-10 md:mx-0 lg:mx-0 md:gap-8 lg:gap-8 gap-5 md:items-start lg:items-start">
                 <div className="p-3 rounded-full bg-transparent border-none transition">
                   <a
                     href="https://www.youtube.com/@1847Liberty"
