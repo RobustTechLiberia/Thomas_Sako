@@ -1,172 +1,128 @@
-/* eslint-disable no-unused-vars */
-import React from "react";
-import Advert from "../../features/component/Advertisement/components/advert";
-// Sass CSS
-import "../../../../App.scss";
+/* eslint-disable no-undef */
+const express = require("express");
+const mysql = require("mysql2/promise");
+const crypto = require("crypto");
+const router = express.Router();
 
-class Quest extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      questions: [],
-      currentQuestion: { question: "", options: [] },
-      selectedOption: "",
-      statusMessage: "",
-      hasVoted: false,
-    };
+const dbConfig = {
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "password@123",
+  database: "db_poll",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+};
+
+// Use promise-based pool for clean async/await execution
+const pool = mysql.createPool(dbConfig);
+
+const getSanitizedIp = (req) => {
+  const forwarded = req.headers["x-forwarded-for"];
+  let rawIp = forwarded
+    ? forwarded.split(",")[0].trim()
+    : req.socket.remoteAddress || "";
+
+  if (rawIp.startsWith("::ffff:")) {
+    rawIp = rawIp.replace("::ffff:", "");
   }
 
-  componentDidMount() {
-    fetch("/questions.json")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data || data.length === 0) return;
+  return rawIp.replace(/[^a-fA-F0-9:.]/g, "");
+};
 
-        const today = new Date();
-        const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
-        const questionIndex = dayIndex % data.length;
-        const activeQuestion = data[questionIndex];
+router.post("/db", express.json(), async (req, res) => {
+  const { question, answer } = req.body;
 
-        const voteTimestamp = localStorage.getItem(
-          `vote_time_${activeQuestion.question}`,
-        );
-        let alreadyVoted = false;
-
-        if (voteTimestamp) {
-          const timePassed = Date.now() - parseInt(voteTimestamp, 10);
-          if (timePassed < 24 * 60 * 60 * 1000) {
-            alreadyVoted = true;
-          } else {
-            localStorage.removeItem(`vote_time_${activeQuestion.question}`);
-          }
-        }
-
-        this.setState({
-          questions: data,
-          currentQuestion: activeQuestion,
-          hasVoted: alreadyVoted,
-        });
-      })
-      .catch((err) => console.error("Error loading questions:", err));
+  if (!question || !answer) {
+    return res
+      .status(400)
+      .json({ error: "Question and answer fields are required." });
   }
 
-  handleOptionChange = (e) => {
-    if (this.state.hasVoted) return;
-    this.setState({ selectedOption: e.target.value, statusMessage: "" });
-  };
+  // Sanitize IP address formatting (handling potential multi-proxy comma strings)
+  const userIp = getSanitizedIp(req);
+  const userAgent = req.headers["user-agent"] || "";
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { currentQuestion, selectedOption, hasVoted } = this.state;
+  const userHash = crypto
+    .createHash("sha256")
+    .update(`${userIp}-${userAgent}`)
+    .digest("hex");
 
-    if (!selectedOption || hasVoted) {
-      return;
+  const checkSql = `
+    SELECT created_at FROM poll 
+    WHERE questions = ? AND user_hash = ? AND created_at > NOW() - INTERVAL 1 DAY 
+    LIMIT 1
+  `;
+
+  try {
+    const [rows] = await pool.execute(checkSql, [question, userHash]);
+
+    if (rows.length > 0) {
+      const timeVoted = new Date(rows[0].created_at);
+      const timeAllowed = new Date(timeVoted.getTime() + 24 * 60 * 60 * 1000);
+
+      return res.status(429).json({
+        error: "Submission locked.",
+        message: `You have already voted on this question. You can vote again at: ${timeAllowed.toLocaleString()}`,
+      });
     }
 
-    const payload = {
-      question: currentQuestion.question,
-      answer: selectedOption,
-    };
+    const insertSql =
+      "INSERT INTO poll (questions, answers, user_hash) VALUES (?, ?, ?)";
 
-    fetch("/db", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Server error logging vote.");
-        return res.json();
-      })
-      .then((data) => {
-        localStorage.setItem(
-          `vote_time_${currentQuestion.question}`,
-          Date.now().toString(),
-        );
-        this.setState({
-          hasVoted: true,
-        });
-        window.location.href = "/results";
-      })
-      .catch((err) => {
-        console.error("Submission failed:", err);
-      });
-  };
+    const [result] = await pool.execute(insertSql, [
+      question,
+      answer,
+      userHash,
+    ]);
 
-  handleSeeResults = (e) => {
-    e.preventDefault();
-    window.location.href = "/results";
-  };
-
-  render() {
-    const { currentQuestion, selectedOption, hasVoted } = this.state;
-
-    return (
-      <>
-        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center md:gap-0 lg:gap-0 gap-10">
-          <div
-            className="md:h-140 lg:h-140 bg-right bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none"
-            id="quest"
-          >
-            <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-violet-950">
-              today's poll
-            </h1>
-            <div className="flex flex-wrap justify-center items-center my-8">
-              <hr className="border-none bg-violet-900 md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
-            </div>
-
-            <h3 className="text-center flex flex-wrap md:justify-center lg:justify-start md:items-start lg:items-center font-sans font-semibold text-3xl md:mx-20 lg:mx-20 mx-2">
-              {currentQuestion.question}
-            </h3>
-
-            <form className="w-auto" onSubmit={this.handleSubmit}>
-              {currentQuestion?.options?.map((opt, idx) => (
-                <div key={idx} className="md:my-3 lg:my-3">
-                  <label
-                    className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${hasVoted ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="answer"
-                      value={opt}
-                      checked={selectedOption === opt}
-                      onChange={this.handleOptionChange}
-                      disabled={hasVoted}
-                    />{" "}
-                    {opt}
-                  </label>
-                </div>
-              ))}
-              <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
-                <input
-                  type="submit"
-                  value={hasVoted ? "voted" : "vote"}
-                  disabled={hasVoted}
-                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted ? "bg-violet-900 cursor-not-allowed uppercase" : "bg-violet-900 cursor-pointer"}`}
-                />
-              </div>
-            </form>
-            {/* <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
-              <div
-                onClick={this.handleSeeResults}
-                className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
-              >
-                <a href="/results" onClick={this.handleSeeResults}>
-                  <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
-                    see past results
-                  </p>
-                </a>
-              </div>
-              
-              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
-            </div> */}
-          </div>
-          <Advert />
-        </div>
-      </>
-    );
+    return res.status(201).json({
+      message: "Vote recorded successfully!",
+      id: result.insertId,
+    });
+  } catch (err) {
+    console.error("Database operation failed:", err);
+    return res
+      .status(500)
+      .json({ error: "Failed to process form submission." });
   }
-}
+});
 
-export default Quest;
+router.get("/results", async (req, res) => {
+  const { question } = req.query;
+
+  if (!question) {
+    return res
+      .status(400)
+      .json({ error: "Missing 'question' query parameter." });
+  }
+
+  // Changed SUM(votes) to COUNT(*) to properly tally row entries per answer
+  const sql = `
+    SELECT answers, COUNT(*) AS total_votes 
+    FROM poll 
+    WHERE questions = ? 
+    GROUP BY answers
+  `;
+
+  try {
+    const [rows] = await pool.execute(sql, [question]);
+
+    const stats = {};
+    rows.forEach((row) => {
+      stats[row.answers] = parseInt(row.total_votes, 10) || 0;
+    });
+
+    return res.status(200).json({
+      question: question,
+      votes: stats,
+    });
+  } catch (err) {
+    console.error("Failed to fetch aggregate poll analytics:", err);
+    return res
+      .status(500)
+      .json({ error: "Database analytics retrieval failed." });
+  }
+});
+
+module.exports = router;
