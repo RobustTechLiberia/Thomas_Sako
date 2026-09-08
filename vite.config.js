@@ -37,9 +37,17 @@ export default defineConfig(({ mode }) => {
         workbox: {
           navigateFallback: "/index.html",
           navigateFallbackDenylist: [/^\/subscribe/, /^\/db/],
+          maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
         },
       }),
     ],
+    build: {
+      rollupOptions: {
+        checks: {
+          pluginTimings: false,
+        },
+      },
+    },
     base: env.VITE_BASE_PATH || "/",
     server: {
       proxy: {
