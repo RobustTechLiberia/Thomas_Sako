@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+*.err
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -9,29 +10,16 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-ssr
-*.local
 
-# Environment variables / secrets
+# Environment variables / secrets — never commit these
 .env
 .env.*
 !.env.example
-server/.env
-server/.env.*
-!server/.env.example
 
-# Server runtime artifacts
-server/uploads/
-server/boot.log
-server/boot.err
-server/_boot_*.log
-server/_dbinspect.mjs
-
-# Strapi local data, secrets, builds, and uploads
-cms/.env
-cms/.tmp
-cms/build
-cms/public/uploads
+# Runtime artifacts
+uploads/
+boot.*
+_db*.mjs
 
 # Editor directories and files
 .vscode/*

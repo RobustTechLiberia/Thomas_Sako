@@ -292,7 +292,54 @@ restores in a disposable copy before trusting a backup.
 
 ---
 
-## 12. Deploying on the Windows server instead
+## 12. Option B: Fly.io — one-command container deploy
+
+Serverless platforms (Vercel/Netlify/Railway) don't fit this project (live
+SSE poll streams, local disk uploads, MySQL). Fly.io runs the exact same
+single-unit container this repo already deploys to, for bills under **$5/mo
+(waived)** — effectively free tier. Files included:
+
+- `Dockerfile` — multi-stage: installs deps with `npm ci`, builds both SPAs,
+  then runs only the Express server (`node server/index.js`).
+- `.dockerignore` — keeps node_modules, dists, `.env` and uploads out of the
+  image context.
+- `fly.toml` — one Machine, 256 MB, `force_https`, always-on
+  (`min_machines_running = 1`), health check on `/health`, and a persistent
+  volume for `/app/server/uploads`.
+- `server/.env.fly.example` — Fly/Aiven-friendly template (MySQL via TLS).
+
+**Prerequisites:** a Fly account (`flyctl auth login`), and a MySQL reachable
+from the app (e.g. **Aiven MySQL free tier** — TLS-only, which this repo now
+supports via `DB_SSL=1`).
+
+```bash
+# 1. Create the app + uploads volume (region must match fly.toml)
+fly apps create APP_NAME
+fly volumes create liberty_uploads --size 1 --region iad
+
+# 2. Fill the template, then load it as Fly secrets (keeps them out of the image)
+notepad server/.env.fly.example
+fly secrets import < server/.env.fly.example
+
+# 3. Set the app name from your fly.toml, then deploy
+fly deploy      # builds the Dockerfile, starts the Machine
+
+# 4. Verify
+fly logs --app APP_NAME
+curl -s https://APP_NAME.fly.dev/health
+```
+
+Notes:
+- `PUBLIC_URL`/`CLIENT_URL` in the secrets are your `https://APP_NAME.fly.dev`
+  origin (or a custom domain added via `fly certs add`); content links in
+  emails point there.
+- Media uploads are written to the `liberty_uploads` volume and survive
+  redeploys/restarts.
+- Updating: `fly deploy` rebuilds from the Dockerfile — nothing else to do.
+
+---
+
+## 13. Deploying on the Windows server instead
 
 This project is developed on Windows; it deploys just as cleanly there.
 
@@ -347,3 +394,93 @@ Troubleshooting:
   (in-memory limiter resets on restart).
 - Emails not sent → check SMTP vars and that `EMAIL_USER` is a login address;
   verify with `systemctl status` logs.
+
+## 14. Option C: Vercel + Aiven MySQL (no credit card)
+
+The cheapest zero-card hosting: **Vercel Hobby** serves the two built SPAs as
+static files and runs the same Express API as a serverless function, talking to
+a **free-tier Aiven MySQL** over public TLS. Your normal setup serves and runs
+everything from one Express process; Vercel splits that into:
+
+- static: `dist/` (public site) + `dist/admin/` (CMS) from `outputDirectory`
+- dynamic: `api/index.js` — imports `server/app.js` and exports it (`export
+  default app`), routes `vercel.json` map any `/api/*` request to it.
+
+### What is already wired in this repo
+
+- `vercel.json` — `buildCommand: node scripts/vercel-build.mjs`,
+  `outputDirectory: dist`, rewrites for `/api/*`, `/admin/*`, SPA fallback.
+- `scripts/vercel-build.mjs` — runs schema migrations + seeds one time at build
+  time (against the Production env Vercel injects), installs `server/` and
+  `admin/` deps, builds both SPAs, assembles `dist/admin`.
+- `api/index.js` — the serverless entry point.
+- `package.json` — the server's runtime deps are duplicated at the root so
+  Vercel's function bundler can resolve `express`, `mysql2`, `bcrypt`, etc.
+  (`npm run vercel:build` runs the build locally on the same machine).
+- `server/config/env.js` + `server/db/pool.js` — TLS settings `DB_SSL`,
+  `DB_SSL_CA` (Aiven CA pasted inline as an env var — serverless-safe),
+  `DB_SSL_CA_PATH`, `DB_SSL_VERIFY`.
+
+### 14.1 Create the Aiven MySQL (free)
+
+1. Sign up at https://console.aiven.io (no credit card required).
+2. Project → **Create service** → **MySQL** → **Free plan** (snap), name e.g.
+   `liberty-cms`, pick a region near you, **Create service**.
+3. Open **Service settings** and download **CA Certificate** (`ca.pem`).
+4. **Connection information** gives you the service URI in the form
+   `mysql://avnadmin:PASSWORD@HOST:PORTnet/defaultdb` — you need `HOST`
+   (e.g. `liberty-cms-...aivencloud.com`), `PORT`, user `avnadmin`, the
+   password, and database `defaultdb`.
+5. Optional: under **Authentication**, set an IP allowlist to `0.0.0.0/0` (or
+   leave open) so Vercel's functions can reach it over public TLS.
+
+### 14.2 Create the Vercel project
+
+1. Import this repo into Vercel (Hobby plan, no card). Framework auto-detect
+   is overridden by `vercel.json`, so no preset is required.
+2. Add these environment variables (Project → Settings → Environment
+   Variables → **Production**, and Preview if you want):
+
+| Variable | Value |
+| --- | --- |
+| `NODE_ENV` | `production` |
+| `PUBLIC_URL` | `https://<your-project>.vercel.app` |
+| `CLIENT_URL` | `https://<your-project>.vercel.app` |
+| `DB_HOST` | Aiven `HOST` from step 14.1 |
+| `DB_PORT` | Aiven `PORT` |
+| `DB_USER` | `avnadmin` |
+| `DB_PASSWORD` | the Aiven password |
+| `DB_NAME` | `defaultdb` |
+| `DB_SSL` | `1` |
+| `DB_SSL_CA` | the full PEM text of `ca.pem` (multiline works) |
+| `DB_SSL_VERIFY` | `1` — set to `0` only if TLS handshake fails on first deploy |
+| `DB_CONNECTION_LIMIT` | `3` (serverless pools must be small) |
+| `JWT_SECRET` | a long random string |
+| `ADMIN_INITIAL_EMAIL` / `_PASSWORD` / `_NAME` | initial admin account |
+| `ADMIN_FORCE_RESET` | `0` |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USER` / `EMAIL_PASS` | SMTP (optional) |
+| `EMAIL_NOTIFY_TO` | contact form inbox (optional) |
+| `YOUTUBE_API_KEY` / `YOUTUBE_CHANNEL_ID` / social links | optional |
+
+   No `.env` file is ever sent to Vercel — it only reads these project vars
+   (`.gitignore` excludes it from the repo import).
+
+3. **Deploy** (or `npx vercel --prod` from the CLI after `vercel login`).
+   The build applies migrations + seeds to Aiven once, then Vercel serves the
+   site. Verify: `curl https://<your-project>.vercel.app/health` →
+   `{"status":"ok",...}`.
+
+### 14.3 Known free-tier limits
+
+- **Live poll results (SSE):** `/api/polls/stream` uses a long-lived HTTP
+  connection; serverless functions cap execution time and share no in-memory
+  hub across instances, so the realtime feed is unreliable on Vercel. The poll
+  list/form still works; voters just don't see live tallies until reload.
+  A connector fallback (periodic polling in the UI) can be added later in
+  `src/components/vote_poll/Questions/quest.jsx`.
+- **CMS media uploads:** `server/uploads/` is local disk on your server; the
+  Vercel function filesystem is ephemeral, so uploads will error. Keep media
+  managed from a normal (Linux/Windows) deployment, or move uploads to an
+  object store later.
+- **Cold starts + rate limiters:** login throttling and the SSE hub are
+  in-memory — they reset with every cold start.
