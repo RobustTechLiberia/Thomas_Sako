@@ -20,6 +20,13 @@ server/.env
 server/.env.*
 !server/.env.example
 
+# Server runtime artifacts
+server/uploads/
+server/boot.log
+server/boot.err
+server/_boot_*.log
+server/_dbinspect.mjs
+
 # Strapi local data, secrets, builds, and uploads
 cms/.env
 cms/.tmp

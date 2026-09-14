@@ -7,7 +7,7 @@ class Subscribe extends React.Component {
       <>
         <div className="flex flex-wrap justify-center items-center  bg-white">
           {/* heading */}
-          <h1 className="text-center font-sans font-semibold md:text-5xl lg:text-5xl text-4xl md:mx-0 lg:mx-0 mx-1">
+          <h1 className="text-center font-sans font-semibold md:text-5xl lg:text-5xl text-3xl sm:text-4xl md:mx-0 lg:mx-0 mx-1">
             Sign up for daily updates
           </h1>
         </div>

@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------------
+# 1847 Liberty on Fly.io — single Machine, one Docker image.
+#
+# First run (replace APP_NAME, pick a region near your DB):
+#   fly apps create APP_NAME
+#   fly volumes create liberty_uploads --size 1 --region iad
+#   fly secrets import < server/.env.fly.example   # after filling values
+#   fly deploy
+# -----------------------------------------------------------------------------
+
+app = "liberty-cms"
+
+# Pick a region where your MySQL lives (or nearest to your audience).
+primary_region = "iad"
+
+[build]
+  # Default: build the Dockerfile in this directory.
+
+[env]
+  NODE_ENV = "production"
+
+# Long-lived HTTP serving (SSE poll results need the app to stay awake).
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.checks]
+    [http_service.checks.http]
+      path = "/health"
+      interval = "15s"
+      timeout = "5s"
+
+# CMS media uploads — persists across redeploys/restarts (create first with
+# `fly volumes create liberty_uploads --size 1 --region <primary_region>`).
+[mounts]
+  source = "liberty_uploads"
+  destination = "/app/server/uploads"
+
+[vm]
+  size = "shared-cpu-1x"
+  memory = "256mb"

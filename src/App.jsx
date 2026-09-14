@@ -10,6 +10,8 @@ import Contact from "./components/features/pages/contact";
 import Advert from "./components/features/pages/advertising";
 import "./App.css";
 import PlayList from "./components/features/pages/playlist_page";
+import CartoonsPage from "./components/features/pages/cartoons_page";
+import MinglePage from "./components/features/pages/mingle_page";
 
 class App extends React.Component {
   render() {
@@ -28,6 +30,8 @@ class App extends React.Component {
         <Route path="/contact" element={<Contact />} />
         <Route path="/book" element={<BookMe />} />
         <Route path="/advertising" element={<Advert />} />
+        <Route path="/cartoons" element={<CartoonsPage />} />
+        <Route path="/mingle" element={<MinglePage />} />
       </Routes>
     );
   }

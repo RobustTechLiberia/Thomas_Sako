@@ -36,7 +36,7 @@ class Content extends React.Component {
             {/* get started button */}
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <Link
-                 to="mailto:editor@thomas.com?subject=Advertise%20with%20the%20Thomas.com%20Daily%20Newsletter!"
+                  to="/advertising"
                 className="bg-violet-200 capitalize hover:bg-violet-400 transition-colors duration-1000 cursor-pointer text-violet-950 font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 get started
@@ -66,7 +66,7 @@ class Content extends React.Component {
             {/* apply today button */}
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
-                href="#"
+                href="mailto:editor@thomas.com?subject=Write%20for%20TSako.com"
                 className="bg-green-800 capitalize hover:bg-green-500 transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 apply today
@@ -100,12 +100,12 @@ class Content extends React.Component {
             </div>
             {/* book now button */}
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
-              <a
-                href="#"
+              <Link
+                to="/book"
                 className="bg-violet-400 hover:bg-violet-500 transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 Book now
-              </a>
+              </Link>
             </div>
           </div>
         </div>

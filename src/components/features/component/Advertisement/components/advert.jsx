@@ -1,57 +1,65 @@
 import { Component } from "react";
-import advert1 from "../../../../../images/Advertising-2.png";
-import advert2 from "../../../../../images/Advertising-2.png";
-import advert3 from "../../../../../images/Advertising-2.png";
-import advert4 from "../../../../../images/Advertising-2.png";
-import advert5 from "../../../../../images/Advertising-2.png";
 
+/**
+ * Sidebar advertisement shown beside the poll. Adverts come from
+ * /api/content/settings; the server filters out inactive/expired ads and
+ * orders them by the CMS `order` field. Renders nothing when no ad is live.
+ */
 class Advert extends Component {
-  state = { current: 0 };
+  state = { adverts: [], current: 0 };
 
   componentDidMount() {
-    this.interval = setInterval(() => {
-      this.setState((prev) => ({ current: (prev.current + 1) % 5 }));
-    }, 300000); // auto-slide every 5 minutes
+    this.load();
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (this.interval) clearInterval(this.interval);
   }
 
-  render() {
-    // Images with their respective links
-    const adverts = [
-      { src: advert1, link: "https://site1.com" },
-      { src: advert2, link: "https://site2.com" },
-      { src: advert3, link: "https://site3.com" },
-      { src: advert4, link: "https://site4.com" },
-      { src: advert5, link: "https://site5.com" },
-    ];
+  load = async () => {
+    try {
+      const res = await fetch("/api/content/settings");
+      if (!res.ok) return;
+      const data = await res.json();
+      const adverts = Array.isArray(data.adverts) ? data.adverts : [];
+      if (!adverts.length) return;
+      this.setState({ adverts });
+      if (adverts.length > 1) {
+        this.interval = setInterval(() => {
+          this.setState((prev) => ({ current: (prev.current + 1) % adverts.length }));
+        }, 15000);
+      }
+    } catch {
+      /* render nothing on failure */
+    }
+  };
 
-    const { current } = this.state;
+  render() {
+    const { adverts, current } = this.state;
+    if (!adverts.length) return null;
+    const advert = adverts[current];
 
     return (
-      <>
-        {/* Container */}
-        <div className="flex flex-col justify-end items-end object-cover border w-72 h-auto mb-20 md:mb-0 lg:mb-0 border-gray-400">
-          <a
-            href={adverts[current].link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src={adverts[current].src}
-              alt={`advert-${current}`}
-              className="w-72 h-72 object-cover"
-            />
-          </a>
-          <div className="flex flex-col justify-center items-center w-full bg-violet-950">
-            <h1 className="text-center text-white font-semibold text-lg px-5 py-5 uppercase">
-              advertisement
-            </h1>
-          </div>
+      <div className="flex w-full max-w-4xl flex-col border border-gray-400 bg-white lg:w-72 lg:max-w-none lg:shrink-0">
+        <a
+          href={advert.link || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full lg:flex-1"
+          aria-label={advert.title || "advertisement"}
+        >
+          <img
+            src={advert.image}
+            alt={advert.title || "advertisement"}
+            className="aspect-[4/3] w-full object-cover lg:h-full lg:aspect-auto"
+          />
+        </a>
+        <div className="flex w-full flex-col items-center justify-center bg-violet-950 px-6 py-4 lg:py-5">
+          <h1 className="text-center font-semibold text-lg uppercase text-white">
+            advertisement
+          </h1>
         </div>
-      </>
+      </div>
     );
   }
 }

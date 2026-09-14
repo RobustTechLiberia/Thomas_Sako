@@ -15,30 +15,21 @@ class SocialIcons extends React.Component {
   }
 
   componentDidMount() {
-    const isLocalhost =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1";
-
-    const backendUrl = isLocalhost
-      ? "http://localhost:5000/api/socialmedia"
-      : "/api/socialmedia";
-
-    fetch(backendUrl)
+    // Relative path so it works in dev (Vite proxy) and production.
+    fetch("/api/social")
       .then((response) => response.json())
       .then((data) => {
-        // FIXED PAYLOAD MISMATCH: We pull directly from data.youtube but add logical fallbacks
-        // to original env keys just in case the server transfers raw process.env properties.
         this.setState({
           links: {
-            youtube: data.youtube || data.YOUTUBE_CHANNEL_URL || "",
-            facebook: data.facebook || data.FACEBOOK_PAGE_URL || "",
-            x: data.x || data.X_PAGE_URL || "",
+            youtube: data.youtube || "",
+            facebook: data.facebook || "",
+            x: data.x || data.twitter || "",
           },
           loading: false,
         });
       })
       .catch((error) => {
-        console.error("Error loading environmental configurations:", error);
+        console.error("Error loading social configuration:", error);
         this.setState({ loading: false });
       });
   }

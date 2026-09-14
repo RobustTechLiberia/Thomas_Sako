@@ -14,8 +14,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/poll": "http://localhost:8080",
+      "/results": "http://localhost:8080",
+      "/socialmedia": "http://localhost:8080",
       "/api": {
-        target: "http://localhost:1337",
+        target: "http://localhost:8080",
         changeOrigin: true,
       },
     },

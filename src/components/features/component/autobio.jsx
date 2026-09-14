@@ -14,7 +14,7 @@ class AutoBio extends React.Component {
             <img
               src={image}
               alt="Speaker at event"
-              className="aspect-[4/5] w-full max-w-md object-cover rounded-none shadow-none md:max-w-120 lg:max-w-lg"
+              className="aspect-[4/5] w-full max-w-md object-cover rounded-lg shadow-none md:max-w-120 lg:max-w-lg"
             />
           </div>
 

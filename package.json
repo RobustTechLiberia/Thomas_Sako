@@ -6,17 +6,16 @@
   "scripts": {
     "dev": "vite",
     "dev:client": "vite",
-    "dev:admin": "npm --prefix admin run dev",
     "dev:server": "npm --prefix server run dev",
-    "dev:cms": "npm --prefix cms run develop",
-    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:admin\" \"npm run dev:cms\"",
+    "dev:admin": "npm --prefix admin run dev",
+    "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\" \"npm run dev:admin\"",
     "build": "vite build",
-    "build:admin": "cd admin && npm run build",
-    "build:cms": "npm --prefix cms run build",
-    "build:all": "npm run build && npm run build:admin && npm run build:cms",
+    "build:admin": "npm --prefix admin run build",
+    "build:all": "npm run build && npm run build:admin",
     "lint": "eslint .",
     "preview": "vite preview",
-    "db:init": "cd server && npm run db:init"
+    "db:init": "npm --prefix server run db:setup",
+    "start": "npm --prefix server run start"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",
