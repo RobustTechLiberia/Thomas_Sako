@@ -7,7 +7,7 @@
     "sitemap": "node generate-sitemap.js",
     "dev": "vite",
     "dev:client": "vite",
-    "dev:server": "cd server && nodemon --ignore 'frontend/*' --ignore '*.json' --ignore 'node_modules/*' app.js",
+    "dev:server": "cd server && nodemon --ignore 'frontend/*' --ignore '*.json' --ignore 'node_modules/*' app.cjs",
     "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "build": "npm run sitemap && vite build",
     "vercel-build": "npm run build",

@@ -1,9 +1,9 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "app.cjs",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.cjs",
     "dev:server": "nodemon app.js",
     "dev:client": "vite",
     "dev:all": "concurrently \"npm run dev:client\" \"npm run dev:server\""
