@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/app.js",
+      "src": "server/app.cjs",
       "use": "@vercel/node"
     },
     {
@@ -19,7 +19,7 @@
     },
     {
       "src": "/(question|home|db|subscribe)(.*)",
-      "dest": "server/app.js"
+      "dest": "server/app.cjs"
     },
     {
       "src": "/(.*)",
