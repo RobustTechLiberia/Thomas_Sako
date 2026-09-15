@@ -8,7 +8,7 @@ const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
+  database: process.env.DB_DATABASE || "db_poll", // Added database fallback safely
 };
 
 const handleVoteInsertion = (req, res) => {
@@ -79,27 +79,19 @@ router.get("/results", (req, res) => {
         return res
           .status(500)
           .json({ error: "Database analytics retrieval failed" });
-      }
-
-      const stats = {};
-      rows.forEach((row) => {
-        stats[row.answers] = row.total_votes;
-      });
-
-      return res.status(200).json({
-        question: question,
-        votes: stats,
-      });
     });
   });
 });
 
 router.get("/db", (req, res) => {
-  const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password@123",
-  });
+  // Use environment configurations without hardcoded values
+  const setupConfig = {
+    host: dbConfig.host,
+    user: dbConfig.user,
+    password: dbConfig.password,
+  };
+
+  const con = mysql.createConnection(setupConfig);
 
   con.connect((err) => {
     if (err) {
@@ -109,15 +101,15 @@ router.get("/db", (req, res) => {
 
     console.log("Connected to MySQL Server!");
 
-    con.query("CREATE DATABASE IF NOT EXISTS db_poll", (err) => {
+    con.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database}`, (err) => {
       if (err) {
         con.end();
         console.error("Database creation failed:", err);
         return res.status(500).send("Database creation failed");
       }
-      console.log("Database db_poll created or already exists.");
+      console.log(`Database ${dbConfig.database} created or already exists.`);
 
-      con.changeUser({ database: "db_poll" }, (err) => {
+      con.changeUser({ database: dbConfig.database }, (err) => {
         if (err) {
           con.end();
           console.error("Failed to switch database:", err);
