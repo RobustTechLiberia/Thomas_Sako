@@ -5,9 +5,9 @@ const crypto = require("crypto");
 const router = express.Router();
 
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "password@123",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   database: "db_poll",
   waitForConnections: true,
   connectionLimit: 10,
