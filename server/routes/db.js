@@ -8,7 +8,8 @@ const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE || "db_poll", // Added database fallback safely
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT // Added database fallback safely
 };
 
 const handleVoteInsertion = (req, res) => {
