@@ -15,11 +15,23 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/question(.*)",
+      "dest": "/server/app.cjs"
     },
     {
-      "src": "/(question|home|db|subscribe)(.*)",
-      "dest": "server/app.cjs"
+      "src": "/home(.*)",
+      "dest": "/server/app.cjs"
+    },
+    {
+      "src": "/db(.*)",
+      "dest": "/server/app.cjs"
+    },
+    {
+      "src": "/subscribe(.*)",
+      "dest": "/server/app.cjs"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
