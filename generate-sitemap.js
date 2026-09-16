@@ -14,7 +14,7 @@ const links = [
 // replace with site domain
 
 const stream = new SitemapStream({
-  hostname: "https://your-future-domain.com",
+  hostname: "https://47liberty.com",
 });
 
 streamToPromise(Readable.from(links).pipe(stream))
