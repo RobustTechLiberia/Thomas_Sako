@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-// environment variables
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -10,41 +9,40 @@ const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
 const SocialRouter = require("./routes/socialmedia");
 
-// express json middleware
+// Body parser middleware
 app.use(express.json());
 
-// question router mounted
-app.use("/question", questionRouter);
-
-// social media router
-app.use(SocialRouter);
-
-// external endpoints
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://your-frontend-domain.com",
-];
-
+// Dynamic CORS configuration for Vercel deployment
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin
+      if (!origin) return callback(null, true);
+
+      // Allow local development and vercel app domain automatically
+      const isAllowed =
+        origin.includes("localhost") || origin.endsWith(".vercel.app");
+
+      if (isAllowed) {
         callback(null, true);
       } else {
         callback(new Error("CORS blocked: origin not allowed"));
       }
     },
+    credentials: true,
   }),
 );
 
+// Mount routers
+app.use("/question", questionRouter);
+app.use(SocialRouter);
 app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
 
-// default route
+// Default route
 app.get("/home", (req, res) => {
-  res.send("hello, world!");
+  res.status(200).send("hello, world!");
 });
 
-// export as module
-
+// Export handler for Vercel Serverless Function
 module.exports = app;
