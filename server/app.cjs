@@ -45,4 +45,6 @@ app.get("/home", (req, res) => {
   res.send("hello, world!");
 });
 
+// export as module
+
 module.exports = app;
