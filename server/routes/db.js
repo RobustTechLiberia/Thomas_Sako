@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-
 const express = require("express");
 const mysql = require("mysql2");
 const fs = require("fs");
@@ -9,7 +8,7 @@ const path = require("path");
 const router = express.Router();
 
 const getSslConfig = () => {
-  const certPath = path.join(__dirname, "ca.pem");
+  const certPath = path.join(__dirname, "../ca.pem");
   if (fs.existsSync(certPath)) {
     return { ca: fs.readFileSync(certPath) };
   }
