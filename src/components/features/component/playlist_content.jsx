@@ -5,10 +5,10 @@ class PlayListContent extends React.Component {
     return (
       <>
         {/* heading */}
-        <div className=" bg-violet-200 md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
+        <div className=" bg-[#95b2f2] md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
           <div className="h-auto md:h-10 lg:h-10"></div>
 
-          <div className="flex flex-col md:flex-row justify-evenly md:pt-0 lg:pt-0 mx-0 md:mx-5 lg:mx-5 mt-32 pt-0 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
+          <div className="flex flex-col md:flex-row justify-evenly md:pt-8 lg:pt-8 mx-0 md:mx-5 lg:mx-5 mt-32 pt-0 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
             {/* pod 1 */}
             <div className="w-full md:flex-1 bg-white">
               <iframe
@@ -23,7 +23,7 @@ class PlayListContent extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
                 A Message to the President of the Republic of Liberia, Joseph
                 Nyuma Boakai, Sr.
               </h3>
@@ -43,7 +43,7 @@ class PlayListContent extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left font-sans text-[#253C6D] font-semibold text-2xl py-5">
                 Discover the story behind J. Mawolo’s decision to join the
                 Liberty Show.
               </h3>
@@ -63,7 +63,7 @@ class PlayListContent extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left font-sans text-[#253C6D] font-semibold text-2xl py-5">
                 Tackling Liberia's Challenges
               </h3>
             </div>
@@ -82,7 +82,7 @@ class PlayListContent extends React.Component {
                 allowFullScreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
                 Liberia: Uniting Against Deep-Rooted Corruption and Government
                 Dysfunction
               </h3>
@@ -102,7 +102,7 @@ class PlayListContent extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
                 Rethinking Progress: Why Liberia’s Future Depends on
                 People-Centered Priorities
               </h3>
@@ -122,7 +122,7 @@ class PlayListContent extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
                 Why don't heritage travelers with ties to Liberia, such as
                 notable Black Americans, visit Liberia?
               </h3>

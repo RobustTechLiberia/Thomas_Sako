@@ -33,7 +33,7 @@ class Nav extends React.Component {
                   href="https://cash.app/$TSarko"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-violet-900 text-white font-sans font-semibold capitalize py-3 px-5"
+                  className="bg-[#253C6D] text-white font-sans font-semibold capitalize py-3 px-5"
                 >
                   Donate
                 </a>
@@ -71,11 +71,11 @@ class Nav extends React.Component {
                 }`}
                 id="navbar-sticky"
               >
-                <ul className="flex capitalize text-violet-900 flex-col p-4 md:p-0 font-medium text-lg md:text-xl lg:text-xl rounded-none bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
+                <ul className="flex capitalize text-[#253C6D] flex-col p-4 md:p-0 font-medium text-lg md:text-xl lg:text-xl rounded-none bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
                   <li>
                     <Link
                       to="/youtube"
-                      className="block py-2 px-3 text-violet-900 hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-#253C6D md:p-0"
                     >
                       YouTube
                     </Link>
@@ -83,7 +83,7 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/podcast"
-                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-[#253C6D] md:p-0"
                     >
                       Podcasts
                     </Link>
@@ -91,7 +91,7 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/advertising"
-                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-[#253C6D] md:p-0"
                     >
                       Advertising
                     </Link>
@@ -99,7 +99,7 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/playlist"
-                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-[#253C6D] md:p-0"
                     >
                       Playlist
                     </Link>
@@ -107,7 +107,7 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/about"
-                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-[#253C6D] md:p-0"
                     >
                       About
                     </Link>
@@ -115,7 +115,7 @@ class Nav extends React.Component {
                   <li>
                     <Link
                       to="/contact"
-                      className="block py-2 px-3 text-heading hover:text-violet-700 md:p-0"
+                      className="block py-2 px-3 text-[#253C6D] hover:text-[#253C6D] md:p-0"
                     >
                       Contact
                     </Link>

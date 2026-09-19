@@ -11,7 +11,7 @@ class Content extends React.Component {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center items-stretch md:gap-10 lg:gap-10 gap-8 md:mt-20 lg:mt-20 mt-10 mx-auto max-w-7xl px-4 bg-white">
           {/* card 1 */}
           {/* Removed fixed h-120 and h-80, changed border-b-10 to border-b-8 to fit standard Tailwind */}
-          <div className="w-full max-w-sm border-b-violet-300 border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
+          <div className="w-full max-w-sm border-b-[#30497D] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
             <div>
               {/* font-awesome icon */}
               {/* Fixed invalid w-19 to w-20 */}
@@ -23,7 +23,7 @@ class Content extends React.Component {
                 />
               </div>
               <div className="w-auto h-auto bg-white">
-                <h1 className="text-left font-sans font-semibold text-4xl capitalize mx-10 py-3">
+                <h1 className="text-left text-[#253C6D] font-sans font-semibold text-4xl capitalize mx-10 py-3">
                   advertising inquiries
                 </h1>
                 <p className="font-serif text-lg mx-10 py-2">
@@ -36,7 +36,7 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
-                className="bg-violet-200 capitalize hover:bg-violet-400 transition-colors duration-1000 cursor-pointer text-violet-950 font-semibold text-lg py-3 px-10 rounded inline-block text-center"
+                className="bg-[#455B8A] capitalize hover:bg-[#455B8A] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 get started
               </a>
@@ -45,7 +45,7 @@ class Content extends React.Component {
 
           {/* card 2 */}
           {/* Removed fixed h-120 and h-96, changed border-b-10 to border-b-8 */}
-          <div className="w-full max-w-sm border-b-green-300 border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
+          <div className="w-full max-w-sm border-b-[#455B8A] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
             <div>
               {/* font-awesome icon */}
               {/* Fixed invalid w-19 to w-20 */}
@@ -53,7 +53,7 @@ class Content extends React.Component {
                 <img src={icon2} className="w-20" alt="Write for Us Icon" />
               </div>
               <div className="w-auto h-auto bg-white">
-                <h1 className="text-left font-sans font-semibold text-4xl capitalize mx-10 py-3">
+                <h1 className="text-left text-[#253C6D] font-sans font-semibold text-4xl capitalize mx-10 py-3">
                   write for TSako.com
                 </h1>
                 <p className="font-serif text-lg mx-10 py-2">
@@ -66,7 +66,7 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
-                className="bg-green-800 capitalize hover:bg-green-500 transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
+                className="bg-[#455B8A] capitalize hover:bg-[#253C6D] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 apply today
               </a>
@@ -88,7 +88,7 @@ class Content extends React.Component {
                 />
               </div>
               <div className="w-auto h-auto bg-white">
-                <h1 className="text-left font-sans font-semibold text-4xl capitalize mx-10 py-3">
+                <h1 className="text-left text-[#253C6D] font-sans font-semibold text-4xl capitalize mx-10 py-3">
                   engage thomas to speak
                 </h1>
                 <p className="font-serif text-lg mx-10 py-2">
@@ -101,7 +101,7 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
-                className="bg-violet-400 hover:bg-violet-500 transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
+                className="bg-[#253C6D] hover:bg-[#455B8A] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 Book now
               </a>
