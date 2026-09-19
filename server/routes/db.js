@@ -8,10 +8,11 @@ const path = require("path");
 const router = express.Router();
 
 const getSslConfig = () => {
-  const certPath = path.join(__dirname, "../ca.pem");
-  if (fs.existsSync(certPath)) {
+  const rootCertPath = path.join(process.cwd(), "ca.pem");
+
+  if (fs.existsSync(rootCertPath)) {
     return {
-      ca: fs.readFileSync(certPath),
+      ca: fs.readFileSync(rootCertPath),
       rejectUnauthorized: true,
     };
   }
