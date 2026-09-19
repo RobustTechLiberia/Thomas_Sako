@@ -7,20 +7,16 @@ const path = require("path");
 
 const router = express.Router();
 
-/**
- * Dynamically resolves SSL configuration based on present files or variables.
- */
 const getSslConfig = () => {
   const certPath = path.join(__dirname, "../ca.pem");
   if (fs.existsSync(certPath)) {
-    return { ca: fs.readFileSync(certPath) };
+    return { ca: fs.readFileSync(certPath), rejectUnauthorized: true };
   }
   if (process.env.DB_SSL_CA) {
-    return { ca: process.env.DB_SSL_CA };
+    return { ca: process.env.DB_SSL_CA, rejectUnauthorized: true };
   }
 
-  // Fallback default: permits self-signed certs safely on hosted database nodes
-  return { rejectUnauthorized: false };
+  return { rejectUnauthorized: true };
 };
 
 const dbConfig = {
@@ -35,7 +31,6 @@ const dbConfig = {
   ssl: getSslConfig(),
 };
 
-// Main pool configuration used by your standard endpoint routers
 const pool = mysql.createPool(dbConfig);
 
 const handleVoteInsertion = (req, res) => {
@@ -69,19 +64,9 @@ const handleVoteInsertion = (req, res) => {
   });
 };
 
-/**
- * POST /
- */
 router.post("/", express.json(), handleVoteInsertion);
-
-/**
- * POST /db
- */
 router.post("/db", express.json(), handleVoteInsertion);
 
-/**
- * GET /results?question=...
- */
 router.get("/results", (req, res) => {
   const { question } = req.query;
 
@@ -116,12 +101,6 @@ router.get("/results", (req, res) => {
   });
 });
 
-/**
- * GET /db
- *
- * Safely handles Database creation, table checking, and isolates SSL contexts
- * to prevent handshakes from dropping during runtime user-switching.
- */
 router.get("/db", (req, res) => {
   const databaseName = dbConfig.database;
 
@@ -135,7 +114,6 @@ router.get("/db", (req, res) => {
     return res.status(400).json({ error: "Invalid database name" });
   }
 
-  // Configuration for establishing an administrative connection without a selected database
   const setupConfig = {
     host: dbConfig.host,
     user: dbConfig.user,
@@ -158,7 +136,6 @@ router.get("/db", (req, res) => {
     const createDatabaseSql = `CREATE DATABASE IF NOT EXISTS \`${databaseName}\``;
 
     setupConnection.query(createDatabaseSql, (err) => {
-      // Always cleanly close the root connection right away
       setupConnection.end();
 
       if (err) {
@@ -169,8 +146,6 @@ router.get("/db", (req, res) => {
         });
       }
 
-      // Establish a fresh new connection mapped precisely to your created database schema
-      // This maintains accurate SSL state across the security layer
       const dbSpecificConnection = mysql.createConnection({
         ...setupConfig,
         database: databaseName,
