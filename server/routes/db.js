@@ -10,10 +10,18 @@ const router = express.Router();
 const getSslConfig = () => {
   const certPath = path.join(__dirname, "../ca.pem");
   if (fs.existsSync(certPath)) {
-    return { ca: fs.readFileSync(certPath), rejectUnauthorized: true };
+    return {
+      ca: fs.readFileSync(certPath),
+      rejectUnauthorized: true,
+    };
   }
+
   if (process.env.DB_SSL_CA) {
-    return { ca: process.env.DB_SSL_CA, rejectUnauthorized: true };
+    const cleanCert = process.env.DB_SSL_CA.replace(/\\n/g, "\n");
+    return {
+      ca: cleanCert,
+      rejectUnauthorized: true,
+    };
   }
 
   return { rejectUnauthorized: true };
