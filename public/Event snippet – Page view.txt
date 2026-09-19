@@ -1,0 +1,4 @@
+<!-- Event snippet for Page view conversion page -->
+<script>
+  gtag('event', 'conversion', {'send_to': 'AW-18461936515/P9nbCJeov_0cEIOXq-NE'});
+</script>
