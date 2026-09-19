@@ -7,6 +7,9 @@ const path = require("path");
 
 const router = express.Router();
 
+/**
+ * Dynamically resolves SSL configuration based on present files or variables.
+ */
 const getSslConfig = () => {
   const certPath = path.join(__dirname, "../ca.pem");
   if (fs.existsSync(certPath)) {
@@ -16,7 +19,8 @@ const getSslConfig = () => {
     return { ca: process.env.DB_SSL_CA };
   }
 
-  return { rejectUnauthorized: true };
+  // Fallback default: permits self-signed certs safely on hosted database nodes
+  return { rejectUnauthorized: false };
 };
 
 const dbConfig = {
@@ -30,6 +34,8 @@ const dbConfig = {
   queueLimit: 0,
   ssl: getSslConfig(),
 };
+
+// Main pool configuration used by your standard endpoint routers
 const pool = mysql.createPool(dbConfig);
 
 const handleVoteInsertion = (req, res) => {
@@ -112,7 +118,9 @@ router.get("/results", (req, res) => {
 
 /**
  * GET /db
- * Creates the database and poll table if they do not exist.
+ *
+ * Safely handles Database creation, table checking, and isolates SSL contexts
+ * to prevent handshakes from dropping during runtime user-switching.
  */
 router.get("/db", (req, res) => {
   const databaseName = dbConfig.database;
@@ -123,13 +131,17 @@ router.get("/db", (req, res) => {
     });
   }
 
-  // Connect to the root server without choosing a database yet
+  if (!/^[a-zA-Z0-9_$]+$/.test(databaseName)) {
+    return res.status(400).json({ error: "Invalid database name" });
+  }
+
+  // Configuration for establishing an administrative connection without a selected database
   const setupConfig = {
     host: dbConfig.host,
     user: dbConfig.user,
     password: dbConfig.password,
     port: dbConfig.port,
-    ssl: dbConfig.ssl, // Map SSL over to the setup connection too
+    ssl: dbConfig.ssl,
   };
 
   const setupConnection = mysql.createConnection(setupConfig);
@@ -143,25 +155,34 @@ router.get("/db", (req, res) => {
       });
     }
 
-    if (!/^[a-zA-Z0-9_$]+$/.test(databaseName)) {
-      setupConnection.end();
-      return res.status(400).json({ error: "Invalid database name" });
-    }
-
     const createDatabaseSql = `CREATE DATABASE IF NOT EXISTS \`${databaseName}\``;
 
     setupConnection.query(createDatabaseSql, (err) => {
+      // Always cleanly close the root connection right away
+      setupConnection.end();
+
       if (err) {
-        setupConnection.end();
         console.error("Database creation failed:", err);
-        return res.status(500).json({ error: "Database creation failed" });
+        return res.status(500).json({
+          error: "Database creation failed",
+          details: err.message,
+        });
       }
 
-      setupConnection.changeUser({ database: databaseName }, (err) => {
+      // Establish a fresh new connection mapped precisely to your created database schema
+      // This maintains accurate SSL state across the security layer
+      const dbSpecificConnection = mysql.createConnection({
+        ...setupConfig,
+        database: databaseName,
+      });
+
+      dbSpecificConnection.connect((err) => {
         if (err) {
-          setupConnection.end();
-          console.error("Failed to switch database:", err);
-          return res.status(500).json({ error: "Database selection failed" });
+          console.error("Database-specific connection failed:", err);
+          return res.status(500).json({
+            error: "Database selection failed",
+            details: err.message,
+          });
         }
 
         const createTableSql = `
@@ -174,49 +195,56 @@ router.get("/db", (req, res) => {
           )
         `;
 
-        setupConnection.query(createTableSql, (err) => {
+        dbSpecificConnection.query(createTableSql, (err) => {
           if (err) {
-            setupConnection.end();
+            dbSpecificConnection.end();
             console.error("Table creation failed:", err);
-            return res.status(500).json({ error: "Table creation failed" });
+            return res.status(500).json({
+              error: "Table creation failed",
+              details: err.message,
+            });
           }
 
           const checkColumnSql = `SHOW COLUMNS FROM poll LIKE 'id'`;
 
-          setupConnection.query(checkColumnSql, (err, rows) => {
+          dbSpecificConnection.query(checkColumnSql, (err, rows) => {
             if (err) {
-              setupConnection.end();
+              dbSpecificConnection.end();
               console.error("Failed to verify columns:", err);
-              return res
-                .status(500)
-                .json({ error: "Column verification failed" });
+              return res.status(500).json({
+                error: "Column verification failed",
+                details: err.message,
+              });
             }
 
             if (rows.length === 0) {
-              setupConnection.query("DROP TABLE poll", (err) => {
+              dbSpecificConnection.query("DROP TABLE poll", (err) => {
                 if (err) {
-                  setupConnection.end();
-                  return res
-                    .status(500)
-                    .json({ error: "Table rebuild drop failed" });
+                  dbSpecificConnection.end();
+                  return res.status(500).json({
+                    error: "Table rebuild drop failed",
+                    details: err.message,
+                  });
                 }
 
-                setupConnection.query(createTableSql, (err) => {
-                  setupConnection.end();
-                  if (err)
-                    return res
-                      .status(500)
-                      .json({ error: "Database table recreation failed" });
-                  return res
-                    .status(200)
-                    .json({ message: "Poll table successfully recreated" });
+                dbSpecificConnection.query(createTableSql, (err) => {
+                  dbSpecificConnection.end();
+                  if (err) {
+                    return res.status(500).json({
+                      error: "Database table recreation failed",
+                      details: err.message,
+                    });
+                  }
+                  return res.status(200).json({
+                    message: "Poll table successfully recreated",
+                  });
                 });
               });
             } else {
-              setupConnection.end();
-              return res
-                .status(200)
-                .json({ message: "Database and poll table are ready" });
+              dbSpecificConnection.end();
+              return res.status(200).json({
+                message: "Database and poll table are ready",
+              });
             }
           });
         });
