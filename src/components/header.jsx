@@ -6,7 +6,7 @@ class Header extends React.Component {
   render() {
     return (
       <>
-        <div className="bg-violet-950 flex flex-wrap md:items-center md:justify-center lg:justify-center lg:items-center justify-between items-start gap-4 h-28 md:h-auto lg:h-auto">
+        <div className="bg-[#253C6D] flex flex-wrap md:items-center md:justify-center lg:justify-center lg:items-center justify-between items-start gap-4 h-28 md:h-auto lg:h-auto">
           {/* header */}
           <img
             src={heading}

@@ -12,7 +12,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-32 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#253C6D]"></div>
           </div>
           <div className="w-80 bg-gray-50 h-80">
             <img
@@ -21,7 +21,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-32 object-cover w-full"
             />
-            <div className="md:mt-20 mt-20 lg:mt-20 h-28 bg-violet-600"></div>
+            <div className="md:mt-20 mt-20 lg:mt-20 h-28 bg-[#30497D]"></div>
           </div>
           <div className="w-80 bg-gray-200 h-80">
             <img
@@ -30,7 +30,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-32 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#253C6D]"></div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
             <img
@@ -39,7 +39,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-32 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-600"></div>
+            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#30497D]"></div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
             <img
@@ -48,7 +48,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-32 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-violet-800"></div>
+            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#253C6D]"></div>
           </div>
         </div>
       </>

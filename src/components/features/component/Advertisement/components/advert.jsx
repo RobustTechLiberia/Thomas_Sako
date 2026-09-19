@@ -12,7 +12,7 @@ class Advert extends React.Component {
             srcset=""
             className="w-auto h-auto object-cover"
           />
-          <div className="flex flex-col justify-center items-center w-full bg-violet-950">
+          <div className="flex flex-col justify-center items-center w-full bg-[#253C6D]">
             <h1 className="text-center text-white font-semibold text-lg px-5 py-5 uppercase">
               advertisement
             </h1>

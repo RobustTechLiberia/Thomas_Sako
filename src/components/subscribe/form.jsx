@@ -57,7 +57,7 @@ class DefaultPage extends React.Component {
           />
           <button
             type="submit"
-            className="bg-violet-900 cursor-pointer text-white text-xl capitalize py-3 px-5 border-none"
+            className="bg-[#253C6D] cursor-pointer text-white text-xl capitalize py-3 px-5 border-none"
           >
             subscribe
           </button>
