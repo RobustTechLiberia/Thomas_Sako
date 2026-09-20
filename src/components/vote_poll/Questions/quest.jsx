@@ -44,6 +44,9 @@ class Quest extends React.Component {
           questions: data,
           currentQuestion: activeQuestion,
           hasVoted: alreadyVoted,
+          statusMessage: alreadyVoted
+            ? "You have already voted on this question."
+            : "",
         });
       })
       .catch((err) => console.error("Error loading questions:", err));
@@ -62,12 +65,15 @@ class Quest extends React.Component {
       return;
     }
 
+    // FIX: Lock interface immediately when clicked to prevent double clicks or race condition bugs
+    this.setState({ hasVoted: true, statusMessage: "Submitting your vote..." });
+
     const payload = {
       question: currentQuestion.question,
       answer: selectedOption,
     };
 
-    // BUG FIX: Updated network target from '/db' to '/submit' to match your express route mount point 
+    // The vote will successfully POST to your backend endpoint '/db' to be inserted into your database
     fetch("/submit", {
       method: "POST",
       headers: {
@@ -86,11 +92,22 @@ class Quest extends React.Component {
         );
         this.setState({
           hasVoted: true,
+          statusMessage: "Vote recorded successfully! Redirecting...",
         });
-        window.location.href = "/results";
+
+        // FIX: Delayed redirection gives state and localStorage enough time to register cleanly
+        setTimeout(() => {
+          window.location.href = "/results";
+        }, 800);
       })
       .catch((err) => {
         console.error("Submission failed:", err);
+        // Rollback ui interaction lock if the server explicitly errors out
+        this.setState({
+          hasVoted: false,
+          statusMessage:
+            "Submission failed. Please check your connection and try again.",
+        });
       });
   };
 
@@ -100,7 +117,8 @@ class Quest extends React.Component {
   };
 
   render() {
-    const { currentQuestion, selectedOption, hasVoted } = this.state;
+    const { currentQuestion, selectedOption, hasVoted, statusMessage } =
+      this.state;
 
     return (
       <>
@@ -145,6 +163,11 @@ class Quest extends React.Component {
                   disabled={hasVoted || !selectedOption}
                   className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted || !selectedOption ? "bg-[#253C6D] cursor-not-allowed opacity-60 uppercase" : "bg-[#253C6D] cursor-pointer"}`}
                 />
+                {statusMessage && (
+                  <p className="text-sm font-sans font-semibold mt-2 text-[#253C6D]">
+                    {statusMessage}
+                  </p>
+                )}
               </div>
             </form>
             {/* <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
