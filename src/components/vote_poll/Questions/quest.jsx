@@ -67,8 +67,8 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
-    // The vote will successfully POST to your backend endpoint '/db' to be inserted into your database
-    fetch("/db", {
+    // BUG FIX: Updated network target from '/db' to '/submit' to match your express route mount point 
+    fetch("/submit", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -142,8 +142,8 @@ class Quest extends React.Component {
                 <input
                   type="submit"
                   value={hasVoted ? "voted" : "vote"}
-                  disabled={hasVoted}
-                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted ? "bg-[#253C6D] cursor-not-allowed uppercase" : "bg-[#253C6D] cursor-pointer"}`}
+                  disabled={hasVoted || !selectedOption}
+                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted || !selectedOption ? "bg-[#253C6D] cursor-not-allowed opacity-60 uppercase" : "bg-[#253C6D] cursor-pointer"}`}
                 />
               </div>
             </form>

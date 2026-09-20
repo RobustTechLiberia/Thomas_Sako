@@ -227,7 +227,7 @@ router.get("/db", (req, res) => {
             } else {
               dbSpecificConnection.end();
               return res.status(200).json({
-                message: "Database and poll table are ready",
+                message: "Database connection successful",
               });
             }
           });
