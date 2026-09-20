@@ -8,16 +8,16 @@ const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  databse: process.env.DB_DATABASE,
+  database: process.env.DB_DATABASE,
   port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 };
 
-const pool = mysql.createPool(dbConfig);
+const pool = mysql.createPool(dbConfig).promise();
 
-router.post("/submit", express.json(), (req, res) => {
+router.post("/submit", express.json(), async (req, res) => {
   const { question, answer } = req.body;
 
   if (!question || !answer) {
@@ -26,7 +26,9 @@ router.post("/submit", express.json(), (req, res) => {
       .json({ error: "Question and answer fields are required." });
   }
 
-  const userIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const userIp =
+    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
+    req.socket.remoteAddress;
   const userAgent = req.headers["user-agent"] || "";
   const userHash = crypto
     .createHash("sha256")
@@ -38,13 +40,9 @@ router.post("/submit", express.json(), (req, res) => {
     WHERE questions = ? AND user_hash = ? AND created_at > NOW() - INTERVAL 1 DAY 
     LIMIT 1
   `;
-    
 
-  pool.query(checkSql, [question, userHash], (err, rows) => {
-    if (err) {
-      console.error("Server validation rate-limit error:", err);
-      return res.status(500).json({ error: "Internal validation failure." });
-    }
+  try {
+    const [rows] = await pool.query(checkSql, [question, userHash]);
 
     if (rows.length > 0) {
       const timeVoted = new Date(rows[0].created_at);
@@ -59,23 +57,24 @@ router.post("/submit", express.json(), (req, res) => {
     const insertSql =
       "INSERT INTO poll (questions, answers, user_hash) VALUES (?, ?, ?)";
 
-    pool.query(insertSql, [question, answer, userHash], (err, result) => {
-      if (err) {
-        console.error("Failed to insert vote into MySQL:", err);
-        return res
-          .status(500)
-          .json({ error: "Failed to process form submission." });
-      }
+    const [result] = await pool.query(insertSql, [question, answer, userHash]);
 
-      return res.status(201).json({
-        message: "Vote recorded successfully!",
-        id: result.insertId,
-      });
+    return res.status(201).json({
+      message: "Vote recorded successfully!",
+      id: result.insertId,
     });
-  });
+  } catch (err) {
+    console.error(
+      "Database interaction error during submission processing:",
+      err,
+    );
+    return res
+      .status(500)
+      .json({ error: "Failed to process form submission." });
+  }
 });
 
-router.get("/results", (req, res) => {
+router.get("/results", async (req, res) => {
   const { question } = req.query;
 
   if (!question) {
@@ -85,19 +84,14 @@ router.get("/results", (req, res) => {
   }
 
   const sql = `
-    SELECT answers, SUM(votes) AS total_votes 
+    SELECT answers, COUNT(*) AS total_votes 
     FROM poll 
     WHERE questions = ? 
     GROUP BY answers
   `;
 
-  pool.query(sql, [question], (err, rows) => {
-    if (err) {
-      console.error("Failed to fetch aggregate poll analytics:", err);
-      return res
-        .status(500)
-        .json({ error: "Database analytics retrieval failed." });
-    }
+  try {
+    const [rows] = await pool.query(sql, [question]);
 
     const stats = {};
     rows.forEach((row) => {
@@ -108,7 +102,12 @@ router.get("/results", (req, res) => {
       question: question,
       votes: stats,
     });
-  });
+  } catch (err) {
+    console.error("Failed to fetch aggregate poll analytics:", err);
+    return res
+      .status(500)
+      .json({ error: "Database analytics retrieval failed." });
+  }
 });
 
 module.exports = router;

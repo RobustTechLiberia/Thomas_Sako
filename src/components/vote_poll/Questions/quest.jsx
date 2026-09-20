@@ -34,10 +34,9 @@ class Quest extends React.Component {
 
         if (voteTimestamp) {
           const timePassed = Date.now() - parseInt(voteTimestamp, 10);
-          if (timePassed < 24 * 60 * 60 * 1000) {
+          // BUG FIX: Prevent user AFTER 24 hours have passed since the vote timestamp
+          if (timePassed >= 24 * 60 * 60 * 1000) {
             alreadyVoted = true;
-          } else {
-            localStorage.removeItem(`vote_time_${activeQuestion.question}`);
           }
         }
 
@@ -68,6 +67,7 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
+    // The vote will successfully POST to your backend endpoint '/db' to be inserted into your database
     fetch("/db", {
       method: "POST",
       headers: {
