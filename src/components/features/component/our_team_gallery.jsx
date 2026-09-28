@@ -63,7 +63,7 @@ class OurTeamGallery extends React.Component {
               srcset=""
               className="h-64 object-cover w-full"
             />
-            <div className="md:mt-0 mt-0 lg:mt-0 text-white text-lg text-center capitalize py-3 bg-[#BC0202]">
+            <div className="md:mt-0 mt-0 lg:mt-0 text-white text-lg text-center capitalize py-3 bg-[#830000]">
               christain t harris <br />{" "}
               <span className="font-bold">senior backend developer</span>
             </div>
