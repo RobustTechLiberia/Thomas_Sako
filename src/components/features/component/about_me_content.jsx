@@ -3,6 +3,7 @@ import profile from "../../../images/Copilot_20260816_124134.png";
 import OurTeam from "../../../components/features/component/our_team";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import GuestHost from "./guest_host";
+import Portfolio from "./portfolio";
 
 class AboutContent extends React.Component {
   constructor(props) {
@@ -26,7 +27,7 @@ class AboutContent extends React.Component {
     return (
       <>
         {/* Banner Container */}
-        <div className="bg-gradient-to-b from-[#830000] to-[#BC0202] my-5 md:my-8 mx-2 md:mx-10 rounded-none p-6 md:p-12">
+        <div className="bg-gradient-to-b from-[#830000] to-[#BC0202] my-5 md:my-8 md:h-150 h-auto mx-2 md:mx-10 rounded-none p-6 md:p-12">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 max-w-6xl mx-auto">
             {/* Profile Image */}
             <div className="flex-shrink-0">
@@ -55,7 +56,7 @@ class AboutContent extends React.Component {
                   aria-label="YouTube Channel"
                   className="p-3 rounded-full hover:bg-white/10 transition"
                 >
-                  <i className="fa-brands fa-youtube text-2xl"></i>
+                  <i className="fa-brands fa-linkedin text-2xl"></i>
                 </a>
 
                 <a
@@ -74,13 +75,13 @@ class AboutContent extends React.Component {
                   <i className="fa-brands fa-facebook-f text-2xl"></i>
                 </a>
 
-                <a
+                {/* <a
                   href="#instagram"
                   aria-label="Instagram"
                   className="p-3 rounded-full hover:bg-white/10 transition"
                 >
                   <i className="fa-brands fa-instagram text-2xl"></i>
-                </a>
+                </a> */}
               </div>
 
               {/* Biography */}
@@ -120,7 +121,8 @@ class AboutContent extends React.Component {
             </div>
           </div>
         </div>
-
+        {/* portfolio */}
+        <Portfolio />
         {/* Supporting Components */}
         <OurTeam />
         <GuestHost />
