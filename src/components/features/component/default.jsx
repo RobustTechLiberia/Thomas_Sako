@@ -4,7 +4,7 @@ import youtube from "../../../images/Copilot_20260816_123052.png";
 import podcast from "../../../images/Copilot_20260816_123356.png";
 import playlist from "../../../images/Copilot_20260816_122807.png";
 import AboutMe from "../../../images/Copilot_20260816_123803.png";
-import Contact from "../../../images/Contact-2.png";
+import Contact from "../../../images/Gemini_Generated_Image_dor3swdor3swdor3.jpeg";
 import BookMe from "../../../images/Copilot_20260816_124134.png";
 
 class Features extends React.Component {
