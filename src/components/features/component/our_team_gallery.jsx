@@ -6,7 +6,7 @@ class OurTeamGallery extends React.Component {
   render() {
     return (
       <>
-        <div className="flex flex-wrap justify-center items-center md:justify-start md:mt-10 lg:mt-10 mt-8 lg:justify-start md:items-start lg:items-start gap-10 md:gap-0 md:mx-10 lg:mx-10 lg:gap-0 h-auto  mb-20">
+        <div className="flex flex-wrap justify-center items-center md:justify-start md:mt-10 lg:mt-10 mt-8 lg:justify-start md:items-start lg:items-start gap-10 md:gap-0 md:mx-10 lg:mx-10 lg:gap-0 h-auto  pb-20">
           <div className="w-80 bg-gray-100 h-80">
             <img
               src={team_member_1}

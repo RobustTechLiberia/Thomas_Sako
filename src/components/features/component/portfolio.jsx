@@ -5,6 +5,7 @@ import img3 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.42 PM.jpeg";
 import img4 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.54 PM.jpeg";
 import img5 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.59 PM.jpeg";
 import img6 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.59 PM (1).jpeg";
+import Poem from "../component/poem";
 
 class Portfolio extends React.Component {
   render() {
@@ -16,7 +17,7 @@ class Portfolio extends React.Component {
         </h1> */}
 
         {/* Main Gallery Container */}
-        <div className="bg-white py-20">
+        <div className="bg-white my-20">
           <div className="flex flex-wrap justify-center items-center md:gap-0 gap-3 max-w-7xl mx-auto px-4">
             {/* Gallery Image Item 1 */}
             <div className="w-full sm:w-80 h-64 bg-[#830000] rounded-none overflow-hidden">
@@ -73,6 +74,8 @@ class Portfolio extends React.Component {
             </div>
           </div>
         </div>
+        {/* poem */}
+        <Poem />
       </>
     );
   }
