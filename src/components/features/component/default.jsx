@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom"; // import Link for routing
-import youtube from "../../../images/Copilot_20260816_123052.png";
-import podcast from "../../../images/Copilot_20260816_123356.png";
-import playlist from "../../../images/Copilot_20260816_122807.png";
-import AboutMe from "../../../images/Copilot_20260816_123803.png";
+import youtube from "../../../images/Gemini_Generated_Image_1k81yo1k81yo1k81.jpeg";
+import podcast from "../../../images/Gemini_Generated_Image_r1su2or1su2or1su.jpeg";
+import playlist from "../../../images/Gemini_Generated_Image_ghwxdtghwxdtghwx.jpeg";
+import AboutMe from "../../../images/Gemini_Generated_Image_bu4r9ubu4r9ubu4r.jpeg";
 import Contact from "../../../images/Gemini_Generated_Image_dor3swdor3swdor3.jpeg";
-import BookMe from "../../../images/Copilot_20260816_124134.png";
+import BookMe from "../../../images/Gemini_Generated_Image_vzxbvsvzxbvsvzxb.jpeg";
 
 class Features extends React.Component {
   render() {
