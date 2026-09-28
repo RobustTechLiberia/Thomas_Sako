@@ -54,7 +54,7 @@ class Content extends React.Component {
               </div>
               <div className="w-auto h-auto bg-white">
                 <h1 className="text-left text-[#830000] font-sans font-semibold text-4xl capitalize mx-10 py-3">
-                  write for TSako.com
+                  write for 47liberty.com
                 </h1>
                 <p className="font-serif text-lg mx-10 py-2">
                   Nothing but well formed opinion <br />
