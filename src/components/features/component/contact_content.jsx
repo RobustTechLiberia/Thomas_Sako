@@ -8,7 +8,7 @@ class Content extends React.Component {
     return (
       <>
         {/* Changed from flex-wrap to an adaptive grid layout and removed rigid h-132 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center items-stretch md:gap-10 lg:gap-10 gap-8 md:mt-20 lg:mt-20 mt-10 mx-auto max-w-7xl px-4 bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center items-stretch md:gap-10 lg:gap-10 gap-8 md:my-20 lg:my-20 mt-10 md:mx-auto  md:w-auto px-4 bg-white">
           {/* card 1 */}
           {/* Removed fixed h-120 and h-80, changed border-b-10 to border-b-8 to fit standard Tailwind */}
           <div className="w-full max-w-sm border-b-[#830000] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">

@@ -32,6 +32,11 @@ class Poem extends React.Component {
                 you please stop the chirping and let me pronounce My attempt to
                 help you express yourselves As I refer you to the most powerful
                 tools on the shelves?
+                <br />
+                <br />
+                <i>
+                  Author: <b>Thomas M. Sarko</b>
+                </i>
               </p>
             </div>
           </div>
