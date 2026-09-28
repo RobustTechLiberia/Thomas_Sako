@@ -20,7 +20,7 @@ class TrendPod extends React.Component {
               allowFullScreen
             ></iframe>
             <br />
-            <h3 className="text-left font-sans font-semibold text-2xl py-5">
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl py-5">
               Liberia: Uniting Against Deep-Rooted Corruption and Government
               Dysfunction
             </h3>
@@ -40,7 +40,7 @@ class TrendPod extends React.Component {
               allowfullscreen
             ></iframe>
             <br />
-            <h3 className="text-left font-sans font-semibold text-2xl py-5">
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl py-5">
               Rethinking Progress: Why Liberia’s Future Depends on
               People-Centered Priorities
             </h3>
@@ -60,7 +60,7 @@ class TrendPod extends React.Component {
               allowfullscreen
             ></iframe>
             <br />
-            <h3 className="text-left font-sans font-semibold text-2xl md:py-5 lg:py-5">
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl md:py-5 lg:py-5">
               Why don't heritage travelers with ties to Liberia, such as notable
               Black Americans, visit Liberia?
             </h3>

@@ -127,11 +127,11 @@ class Quest extends React.Component {
             className="md:h-140 lg:h-140 bg-right bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none"
             id="quest"
           >
-            <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-[#253C6D]">
+            <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-[#830000]">
               today's poll
             </h1>
             <div className="flex flex-wrap justify-center items-center my-8">
-              <hr className="border-none bg-[#253C6D] md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
+              <hr className="border-none bg-[#830000] md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
             </div>
 
             <h3 className="text-center flex flex-wrap md:justify-center lg:justify-start md:items-start lg:items-center font-sans font-semibold text-3xl md:mx-20 lg:mx-20 mx-2">
@@ -161,10 +161,10 @@ class Quest extends React.Component {
                   type="submit"
                   value={hasVoted ? "voted" : "vote"}
                   disabled={hasVoted || !selectedOption}
-                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted || !selectedOption ? "bg-[#253C6D] cursor-not-allowed opacity-60 uppercase" : "bg-[#253C6D] cursor-pointer"}`}
+                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted || !selectedOption ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase" : "bg-[#830000] cursor-pointer"}`}
                 />
                 {statusMessage && (
-                  <p className="text-sm font-sans font-semibold mt-2 text-[#253C6D]">
+                  <p className="text-sm font-sans font-semibold mt-2 text-[#830000]">
                     {statusMessage}
                   </p>
                 )}

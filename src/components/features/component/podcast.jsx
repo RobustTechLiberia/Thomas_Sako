@@ -5,9 +5,9 @@ class Pod extends React.Component {
     return (
       <>
         {/* heading */}
-        <div className=" bg-[#95b2f2] md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
+        <div className=" bg-[#F67D31] md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
           <div className="h-auto md:h-10 lg:h-10">
-            <h1 className="text-center text-[#253C6D] font-sans font-bold capitalize md:mx-0 lg:mx-0 mx-2 text-5xl md:mt-0 lg:pt-20 pt-10 md:text-4xl lg:text-4xl">
+            <h1 className="text-center text-[#830000] font-sans font-bold capitalize md:mx-0 lg:mx-0 mx-2 text-5xl md:mt-0 lg:pt-20 pt-10 md:text-4xl lg:text-4xl">
               liberty show
             </h1>
           </div>
@@ -24,7 +24,7 @@ class Pod extends React.Component {
                 allowFullScreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Liberia: Uniting Against Deep-Rooted Corruption and Government
                 Dysfunction
               </h3>
@@ -44,7 +44,7 @@ class Pod extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Rethinking Progress: Why Liberia’s Future Depends on
                 People-Centered Priorities
               </h3>
@@ -64,7 +64,7 @@ class Pod extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Why don't heritage travelers with ties to Liberia, such as
                 notable Black Americans, visit Liberia?
               </h3>
@@ -84,7 +84,7 @@ class Pod extends React.Component {
                 allowFullScreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Liberia: Uniting Against Deep-Rooted Corruption and Government
                 Dysfunction
               </h3>
@@ -104,7 +104,7 @@ class Pod extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Rethinking Progress: Why Liberia’s Future Depends on
                 People-Centered Priorities
               </h3>
@@ -124,7 +124,7 @@ class Pod extends React.Component {
                 allowfullscreen
               ></iframe>
               <br />
-              <h3 className="text-left text-[#253C6D] font-sans font-semibold text-2xl py-5">
+              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
                 Why don't heritage travelers with ties to Liberia, such as
                 notable Black Americans, visit Liberia?
               </h3>

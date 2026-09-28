@@ -5,9 +5,9 @@ class AutoBio extends React.Component {
   render() {
     return (
       <>
-        {/* <h1 className="text-center font-sans text-5xl md:mt-10 lg:mt-20 py-10 font-semibold capitalize">
+        <h1 className="text-center font-sans text-[#830000] text-5xl md:mt-10 lg:mt-20 py-10 font-semibold capitalize">
           Testimonials
-        </h1> */}
+        </h1>
         <div className="flex flex-col md:flex-row items-center justify-center md:justify-between bg-white px-6 md:px-12 lg:px-20 py-32">
           {/* Left column: image */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-start">
@@ -20,7 +20,7 @@ class AutoBio extends React.Component {
 
           {/* Right column: quote */}
           <div className="w-full md:w-1/2 md:pl-12 mt-8 md:mt-0 flex flex-col justify-center">
-            <div className="text-purple-950 text-8xl font-bold md:mb-4 lg:mb-4 mb-3">
+            <div className="text-[#830000] text-8xl font-bold md:mb-4 lg:mb-4 mb-3">
               “
             </div>
             <p className="text-gray-800 md:text-lg text-lg  font-serif lg:text-lg">

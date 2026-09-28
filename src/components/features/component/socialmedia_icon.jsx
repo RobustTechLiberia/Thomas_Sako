@@ -88,7 +88,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.youtube)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-youtube text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-youtube text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
 
             {/* X (Twitter) */}
@@ -98,7 +98,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.x)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-x-twitter text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-x-twitter text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
 
             {/* Facebook */}
@@ -108,7 +108,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.facebook)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-facebook-f text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-facebook-f text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
 
             {/* Instagram */}
@@ -118,7 +118,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.instagram)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-instagram text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-instagram text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
 
             {/* TikTok */}
@@ -128,7 +128,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.tiktok)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-tiktok text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-tiktok text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
 
             {/* WhatsApp */}
@@ -138,7 +138,7 @@ class SocialIcons extends React.Component {
               onClick={(e) => this.handleIconClick(e, links.whatsapp)}
               className="cursor-pointer"
             >
-              <i className="fa-brands fa-whatsapp text-violet-900 md:text-3xl lg:text-3xl text-2xl"></i>
+              <i className="fa-brands fa-whatsapp text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
             </a>
           </div>
         </div>
