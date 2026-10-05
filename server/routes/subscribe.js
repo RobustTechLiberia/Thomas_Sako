@@ -64,10 +64,10 @@ router.post("/subscribe", async (req, res) => {
     console.log("Subscription confirmation sent:", info.messageId);
     return res.status(200).json({ message: "Subscription confirmed." });
   } catch (error) {
-    // Do not expose the mail provider's operational details to visitors.
+
     console.error("Subscription email delivery failed:", error);
     return res.status(502).json({
-      error: "We could not send the confirmation email. Please try again.",
+
     });
   }
 });

@@ -7,8 +7,9 @@ const router = express.Router();
 const requiredDatabaseVariables = ["DB_HOST", "DB_USER", "DB_DATABASE"];
 
 const isDatabaseConfigured = () =>
-  requiredDatabaseVariables.every((variable) => Boolean(process.env[variable])) &&
-  Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
+  requiredDatabaseVariables.every((variable) =>
+    Boolean(process.env[variable]),
+  ) && Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
 
 const getSslConfig = () => {
   if (process.env.DB_SSL_CA) {
@@ -41,8 +42,6 @@ const getSslConfig = () => {
     }
   }
 
-  // `process.cwd()` differs between local Node, Vercel functions and other
-  // hosts. Resolve the checked-in CA relative to this module instead.
   const certificatePath = path.resolve(__dirname, "../../ca.pem");
 
   if (fs.existsSync(certificatePath)) {
@@ -110,7 +109,8 @@ router.post("/submit", express.json(), async (req, res) => {
   if (hasVoteCookie(req, voteCookieName)) {
     return res.status(429).json({
       error: "Submission locked.",
-      message: "You have already voted on this question. Please try the next daily poll.",
+      message:
+        "You have already voted on this question. Please try the next daily poll.",
     });
   }
 
