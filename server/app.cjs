@@ -30,18 +30,18 @@ app.use(
       // FIXED: Switched .endsWith to a regex match to fully support Vercel wildcard preview domains
       const isAllowed =
         origin.includes("localhost") ||
-        /\.vercel\.app\$/.test(origin) || 
+        /\.vercel\.app\$/.test(origin) ||
         configuredOrigins.includes(origin);
 
       if (isAllowed) {
         callback(null, true);
       } else {
         // Return null instead of breaking execution loops on unhandled rejections
-        callback(null, false); 
+        callback(null, false);
       }
     },
     credentials: true,
-    optionsSuccessStatus: 200 // Forces older legacy browsers to correctly process pre-flights
+    optionsSuccessStatus: 200, // Forces older legacy browsers to correctly process pre-flights
   }),
 );
 
@@ -67,7 +67,7 @@ app.get("/home", (req, res) => {
 // Central error pipeline
 app.use((err, req, res, next) => {
   console.error("Unhandled API error:", err);
-  
+
   // Safe validation guard to verify if headers have already fired off
   if (res.headersSent) {
     return next(err);
@@ -75,7 +75,7 @@ app.use((err, req, res, next) => {
 
   res.status(err.status || 500).json({
     error: "The service is temporarily unavailable. Please try again later.",
-    message: err.message || "Internal Server Error"
+    message: err.message || "Internal Server Error",
   });
 });
 
