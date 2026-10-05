@@ -2,10 +2,16 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+router.use(express.json());
 
-// Subscription confirmation endpoint.
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+\$/;
+
 router.post("/subscribe", async (req, res) => {
+
+  if (!req.body || !req.body.email) {
+    return res.status(400).json({ error: "Email field is required." });
+  }
+
   const { email } = req.body;
 
   if (
@@ -33,6 +39,8 @@ router.post("/subscribe", async (req, res) => {
     },
   });
 
+  const youtubeUrl = process.env.YOUTUBE_CHANNEL_URL || "#";
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: cleanEmail,
@@ -46,7 +54,7 @@ router.post("/subscribe", async (req, res) => {
           <p style="font-size: 14px; color: #666666;">
             We host live sessions covering the latest insights and trends. Follow our YouTube channel and turn on notifications so you never miss a live stream.
           </p>
-          <a href="${process.env.YOUTUBE_CHANNEL_URL}" style="background-color: #cc0000; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; margin-top: 10px;">
+          <a href="${youtubeUrl}" style="background-color: #cc0000; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; margin-top: 10px;">
             Subscribe on YouTube
           </a>
         </div>
@@ -64,10 +72,11 @@ router.post("/subscribe", async (req, res) => {
     console.log("Subscription confirmation sent:", info.messageId);
     return res.status(200).json({ message: "Subscription confirmed." });
   } catch (error) {
-
     console.error("Subscription email delivery failed:", error);
+    
     return res.status(502).json({
-
+      error: "Failed to send confirmation email. Please try again later.",
+      details: error.message
     });
   }
 });
