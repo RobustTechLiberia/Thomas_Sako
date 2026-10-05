@@ -13,6 +13,13 @@ const getSslConfig = () => {
     };
   }
 
+  if (process.env.DB_SSL_CA_FILE?.includes("BEGIN CERTIFICATE")) {
+    return {
+      ca: process.env.DB_SSL_CA_FILE.replace(/\\n/g, "\n"),
+      rejectUnauthorized: true,
+    };
+  }
+
   const configuredCertificatePath = process.env.DB_SSL_CA_FILE
     ? path.resolve(__dirname, "..", process.env.DB_SSL_CA_FILE)
     : null;

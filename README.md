@@ -46,6 +46,13 @@ npm run lint
 npm run build
 ```
 
+For a new Aiven database, run the idempotent schema migration once after adding
+the database variables:
+
+```
+npm run db:migrate
+```
+
 After deployment, submit a vote from the deployed site and confirm a new row is
 written to the existing `poll` table. The API returns a clear JSON error if the
 database configuration or connection is unavailable.

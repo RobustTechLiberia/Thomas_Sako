@@ -14,6 +14,15 @@ const getSslConfig = () => {
   }
 
   if (process.env.DB_SSL_CA_FILE) {
+    // Accept a PEM placed in the legacy *_FILE variable as well. This keeps
+    // existing deployments working while DB_SSL_CA remains the preferred name.
+    if (process.env.DB_SSL_CA_FILE.includes("BEGIN CERTIFICATE")) {
+      return {
+        ca: process.env.DB_SSL_CA_FILE.replace(/\\n/g, "\n"),
+        rejectUnauthorized: true,
+      };
+    }
+
     const configuredCertificatePath = path.resolve(
       __dirname,
       "..",
