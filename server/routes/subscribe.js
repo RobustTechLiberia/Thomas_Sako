@@ -75,8 +75,7 @@ router.post("/subscribe", async (req, res) => {
     console.error("Subscription email delivery failed:", error);
     
     return res.status(502).json({
-      error: "Failed to send confirmation email. Please try again later.",
-      details: error.message
+      error: "Failed to send confirmation email. Please try again later."
     });
   }
 });
