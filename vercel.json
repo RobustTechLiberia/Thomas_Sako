@@ -18,7 +18,7 @@
       "handle": "filesystem"
     },
     {
-      "src": "/(question|home|db|subscribe)(.*)",
+      "src": "/(question|home|db|subscribe|api)(?:/.*)?",
       "dest": "server/app.cjs"
     },
     {

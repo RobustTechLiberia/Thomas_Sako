@@ -20,7 +20,10 @@ class DefaultPage extends React.Component {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/subscribe", {
+      // Same-origin requests work locally through Vite's proxy and in every
+      // production deployment. A hard-coded localhost URL cannot work once
+      // the site is deployed.
+      const response = await fetch("/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: this.state.email.trim() }),

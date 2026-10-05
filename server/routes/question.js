@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const express = require("express");
 const mysql = require("mysql2");
 const crypto = require("crypto");
@@ -7,17 +6,33 @@ const path = require("path");
 const router = express.Router();
 
 const getSslConfig = () => {
-  const certificatePath = path.join(process.cwd(), "ca.pem");
-
-  if (fs.existsSync(certificatePath)) {
-    return { ca: fs.readFileSync(certificatePath), rejectUnauthorized: true };
-  }
-
   if (process.env.DB_SSL_CA) {
     return {
       ca: process.env.DB_SSL_CA.replace(/\\n/g, "\n"),
       rejectUnauthorized: true,
     };
+  }
+
+  if (process.env.DB_SSL_CA_FILE) {
+    const configuredCertificatePath = path.resolve(
+      __dirname,
+      "..",
+      process.env.DB_SSL_CA_FILE,
+    );
+    if (fs.existsSync(configuredCertificatePath)) {
+      return {
+        ca: fs.readFileSync(configuredCertificatePath),
+        rejectUnauthorized: true,
+      };
+    }
+  }
+
+  // `process.cwd()` differs between local Node, Vercel functions and other
+  // hosts. Resolve the checked-in CA relative to this module instead.
+  const certificatePath = path.resolve(__dirname, "../../ca.pem");
+
+  if (fs.existsSync(certificatePath)) {
+    return { ca: fs.readFileSync(certificatePath), rejectUnauthorized: true };
   }
 
   return undefined;
@@ -56,13 +71,20 @@ const hasVoteCookie = (req, cookieName) =>
 router.post("/submit", express.json(), async (req, res) => {
   const { question, answer } = req.body;
 
-  if (!question || !answer) {
+  if (
+    typeof question !== "string" ||
+    typeof answer !== "string" ||
+    !question.trim() ||
+    !answer.trim()
+  ) {
     return res
       .status(400)
       .json({ error: "Question and answer fields are required." });
   }
 
-  const voteCookieName = getVoteCookieName(question);
+  const normalizedQuestion = question.trim();
+  const normalizedAnswer = answer.trim();
+  const voteCookieName = getVoteCookieName(normalizedQuestion);
   if (hasVoteCookie(req, voteCookieName)) {
     return res.status(429).json({
       error: "Submission locked.",
@@ -76,7 +98,11 @@ router.post("/submit", express.json(), async (req, res) => {
       "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
     const voteDate = new Date().toISOString().slice(0, 10);
 
-    const [result] = await pool.query(insertSql, [question, answer, voteDate]);
+    const [result] = await pool.query(insertSql, [
+      normalizedQuestion,
+      normalizedAnswer,
+      voteDate,
+    ]);
 
     res.setHeader(
       "Set-Cookie",

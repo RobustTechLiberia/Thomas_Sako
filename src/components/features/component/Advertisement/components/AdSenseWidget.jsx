@@ -7,7 +7,7 @@ class AdSenseWidgetClass extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.location?.key !== prevProps.location?.key) {
+    if (this.props.adKey !== prevProps.adKey) {
       this.loadAd();
     }
   }
@@ -32,7 +32,7 @@ class AdSenseWidgetClass extends Component {
         style={{ overflow: "hidden", minHeight: "250px", margin: "20px 0" }}
       >
         <ins
-          key={this.props.location?.key || "static-ad"}
+          key={this.props.adKey || "static-ad"}
           className="adsbygoogle"
           style={{ display: "block" }}
           data-ad-client={client}
@@ -46,10 +46,6 @@ class AdSenseWidgetClass extends Component {
 }
 
 export default function AdSenseWidget(props) {
-  try {
-    const location = useLocation();
-    return <AdSenseWidgetClass {...props} location={location} />;
-  } catch (e) {
-    return <AdSenseWidgetClass {...props} location={null} />;
-  }
+  const location = useLocation();
+  return <AdSenseWidgetClass {...props} adKey={location.key} />;
 }

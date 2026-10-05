@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 const express = require("express");
 const mysql = require("mysql2");
 const fs = require("fs");
@@ -8,7 +6,24 @@ const path = require("path");
 const router = express.Router();
 
 const getSslConfig = () => {
-  const rootCertPath = path.join(process.cwd(), "ca.pem");
+  if (process.env.DB_SSL_CA) {
+    return {
+      ca: process.env.DB_SSL_CA.replace(/\\n/g, "\n"),
+      rejectUnauthorized: true,
+    };
+  }
+
+  const configuredCertificatePath = process.env.DB_SSL_CA_FILE
+    ? path.resolve(__dirname, "..", process.env.DB_SSL_CA_FILE)
+    : null;
+  if (configuredCertificatePath && fs.existsSync(configuredCertificatePath)) {
+    return {
+      ca: fs.readFileSync(configuredCertificatePath),
+      rejectUnauthorized: true,
+    };
+  }
+
+  const rootCertPath = path.resolve(__dirname, "../../ca.pem");
 
   if (fs.existsSync(rootCertPath)) {
     return {
@@ -17,15 +32,7 @@ const getSslConfig = () => {
     };
   }
 
-  if (process.env.DB_SSL_CA) {
-    const cleanCert = process.env.DB_SSL_CA.replace(/\\n/g, "\n");
-    return {
-      ca: cleanCert,
-      rejectUnauthorized: true,
-    };
-  }
-
-  return { rejectUnauthorized: true };
+  return undefined;
 };
 
 const dbConfig = {
