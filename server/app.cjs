@@ -42,4 +42,13 @@ app.get("/home", (req, res) => {
   res.status(200).send("hello, world!");
 });
 
+// Vercel imports this app directly. Running the file locally starts the API
+// server used by Vite's development proxy.
+if (require.main === module) {
+  const port = parseInt(process.env.PORT || "8080", 10);
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+}
+
 module.exports = app;

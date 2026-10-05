@@ -2,20 +2,56 @@
 const express = require("express");
 const mysql = require("mysql2");
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const router = express.Router();
+
+const getSslConfig = () => {
+  const certificatePath = path.join(process.cwd(), "ca.pem");
+
+  if (fs.existsSync(certificatePath)) {
+    return { ca: fs.readFileSync(certificatePath), rejectUnauthorized: true };
+  }
+
+  if (process.env.DB_SSL_CA) {
+    return {
+      ca: process.env.DB_SSL_CA.replace(/\\n/g, "\n"),
+      rejectUnauthorized: true,
+    };
+  }
+
+  return undefined;
+};
 
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS || process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  ssl: getSslConfig(),
 };
 
 const pool = mysql.createPool(dbConfig).promise();
+const voteWindowSeconds = 24 * 60 * 60;
+
+const getVoteCookieName = (question) => {
+  const questionKey = crypto
+    .createHash("sha256")
+    .update(question)
+    .digest("hex")
+    .slice(0, 20);
+
+  return `poll_vote_${questionKey}`;
+};
+
+const hasVoteCookie = (req, cookieName) =>
+  (req.headers.cookie || "")
+    .split(";")
+    .some((cookie) => cookie.trim().startsWith(`${cookieName}=`));
 
 router.post("/submit", express.json(), async (req, res) => {
   const { question, answer } = req.body;
@@ -26,38 +62,26 @@ router.post("/submit", express.json(), async (req, res) => {
       .json({ error: "Question and answer fields are required." });
   }
 
-  const userIp =
-    req.headers["x-forwarded-for"]?.split(",")[0].trim() ||
-    req.socket.remoteAddress;
-  const userAgent = req.headers["user-agent"] || "";
-  const userHash = crypto
-    .createHash("sha256")
-    .update(`${userIp}-${userAgent}`)
-    .digest("hex");
-
-  const checkSql = `
-    SELECT created_at FROM poll 
-    WHERE questions = ? AND user_hash = ? AND created_at > NOW() - INTERVAL 1 DAY 
-    LIMIT 1
-  `;
+  const voteCookieName = getVoteCookieName(question);
+  if (hasVoteCookie(req, voteCookieName)) {
+    return res.status(429).json({
+      error: "Submission locked.",
+      message: "You have already voted on this question. Please try the next daily poll.",
+    });
+  }
 
   try {
-    const [rows] = await pool.query(checkSql, [question, userHash]);
-
-    if (rows.length > 0) {
-      const timeVoted = new Date(rows[0].created_at);
-      const timeAllowed = new Date(timeVoted.getTime() + 24 * 60 * 60 * 1000);
-
-      return res.status(429).json({
-        error: "Submission locked.",
-        message: `You have already voted on this question. You can vote again at: ${timeAllowed.toLocaleString()}`,
-      });
-    }
-
+    // Use the existing poll table and its existing columns; no schema changes are needed.
     const insertSql =
-      "INSERT INTO poll (questions, answers, user_hash) VALUES (?, ?, ?)";
+      "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
+    const voteDate = new Date().toISOString().slice(0, 10);
 
-    const [result] = await pool.query(insertSql, [question, answer, userHash]);
+    const [result] = await pool.query(insertSql, [question, answer, voteDate]);
+
+    res.setHeader(
+      "Set-Cookie",
+      `${voteCookieName}=1; Max-Age=${voteWindowSeconds}; Path=/; HttpOnly; SameSite=Lax`,
+    );
 
     return res.status(201).json({
       message: "Vote recorded successfully!",

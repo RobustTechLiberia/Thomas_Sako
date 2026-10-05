@@ -13,30 +13,33 @@ class Quest extends React.Component {
       selectedOption: "",
       statusMessage: "",
       hasVoted: false,
+      isLoading: true,
     };
   }
 
   componentDidMount() {
-    fetch("/questions.json")
+    fetch(`${import.meta.env.BASE_URL}questions.json`)
       .then((res) => res.json())
       .then((data) => {
-        if (!data || data.length === 0) return;
+        if (!Array.isArray(data) || data.length === 0) {
+          throw new Error("No poll questions are available.");
+        }
 
         const today = new Date();
         const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
         const questionIndex = dayIndex % data.length;
         const activeQuestion = data[questionIndex];
 
-        const voteTimestamp = localStorage.getItem(
-          `vote_time_${activeQuestion.question}`,
-        );
+        const voteTimestamp = localStorage.getItem(`vote_time_${activeQuestion.id}`);
         let alreadyVoted = false;
 
         if (voteTimestamp) {
           const timePassed = Date.now() - parseInt(voteTimestamp, 10);
-          // BUG FIX: Prevent user AFTER 24 hours have passed since the vote timestamp
-          if (timePassed >= 24 * 60 * 60 * 1000) {
+          // A voter may submit this question only once during its 24-hour window.
+          if (timePassed < 24 * 60 * 60 * 1000) {
             alreadyVoted = true;
+          } else {
+            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
           }
         }
 
@@ -44,12 +47,19 @@ class Quest extends React.Component {
           questions: data,
           currentQuestion: activeQuestion,
           hasVoted: alreadyVoted,
+          isLoading: false,
           statusMessage: alreadyVoted
             ? "You have already voted on this question."
             : "",
         });
       })
-      .catch((err) => console.error("Error loading questions:", err));
+      .catch((err) => {
+        console.error("Error loading questions:", err);
+        this.setState({
+          isLoading: false,
+          statusMessage: "Unable to load today's poll. Please try again later.",
+        });
+      });
   }
 
   handleOptionChange = (e) => {
@@ -73,8 +83,7 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
-    // The vote will successfully POST to your backend endpoint '/db' to be inserted into your database
-    fetch("/submit", {
+    fetch("/question/submit", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +96,7 @@ class Quest extends React.Component {
       })
       .then((data) => {
         localStorage.setItem(
-          `vote_time_${currentQuestion.question}`,
+          `vote_time_${currentQuestion.id}`,
           Date.now().toString(),
         );
         this.setState({
@@ -97,7 +106,7 @@ class Quest extends React.Component {
 
         // FIX: Delayed redirection gives state and localStorage enough time to register cleanly
         setTimeout(() => {
-          window.location.href = "/results";
+          window.location.href = `${import.meta.env.BASE_URL}results`;
         }, 800);
       })
       .catch((err) => {
@@ -113,11 +122,11 @@ class Quest extends React.Component {
 
   handleSeeResults = (e) => {
     e.preventDefault();
-    window.location.href = "/results";
+    window.location.href = `${import.meta.env.BASE_URL}results`;
   };
 
   render() {
-    const { currentQuestion, selectedOption, hasVoted, statusMessage } =
+    const { currentQuestion, selectedOption, hasVoted, statusMessage, isLoading } =
       this.state;
 
     return (
@@ -150,7 +159,7 @@ class Quest extends React.Component {
                       value={opt}
                       checked={selectedOption === opt}
                       onChange={this.handleOptionChange}
-                      disabled={hasVoted}
+                      disabled={hasVoted || isLoading}
                     />{" "}
                     {opt}
                   </label>
@@ -159,9 +168,9 @@ class Quest extends React.Component {
               <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
                 <input
                   type="submit"
-                  value={hasVoted ? "voted" : "vote"}
-                  disabled={hasVoted || !selectedOption}
-                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${hasVoted || !selectedOption ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase" : "bg-[#830000] cursor-pointer"}`}
+                  value={isLoading ? "loading..." : hasVoted ? "voted" : "vote"}
+                  disabled={isLoading || hasVoted || !selectedOption}
+                  className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${isLoading || hasVoted || !selectedOption ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase" : "bg-[#830000] cursor-pointer"}`}
                 />
                 {statusMessage && (
                   <p className="text-sm font-sans font-semibold mt-2 text-[#830000]">
