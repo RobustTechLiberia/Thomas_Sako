@@ -1,4 +1,5 @@
 import React from "react";
+import { apiUrl, getApiError } from "../../lib/api";
 
 class DefaultPage extends React.Component {
   constructor(props) {
@@ -22,12 +23,10 @@ class DefaultPage extends React.Component {
     this.setState({ isSubmitting: true, statusMessage: "" });
 
     try {
-      // Same-origin requests work locally through Vite's proxy and in every
-      // production deployment. A hard-coded localhost URL cannot work once
-      // the site is deployed.
-      const response = await fetch("/subscribe", {
+      const response = await fetch(apiUrl("/subscribe"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: this.state.email.trim() }),
       });
 
@@ -38,10 +37,12 @@ class DefaultPage extends React.Component {
           statusMessage: "Thanks! Please check your inbox for confirmation.",
         });
       } else {
-        const data = await response.json().catch(() => ({}));
         this.setState({
           isSubmitting: false,
-          statusMessage: data.error || "Unable to subscribe. Please try again.",
+          statusMessage: await getApiError(
+            response,
+            "Unable to subscribe. Please try again.",
+          ),
         });
       }
     } catch (error) {

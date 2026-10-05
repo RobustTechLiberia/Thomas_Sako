@@ -59,6 +59,15 @@ app.get("/home", (req, res) => {
   res.status(200).send("hello, world!");
 });
 
+// Keep API failures JSON so the frontend can present a useful message instead
+// of Express's default HTML error response.
+app.use((err, req, res, next) => {
+  console.error("Unhandled API error:", err);
+  res.status(err.status || 500).json({
+    error: "The service is temporarily unavailable. Please try again later.",
+  });
+});
+
 // Vercel imports this app directly. Running the file locally starts the API
 // server used by Vite's development proxy.
 if (require.main === module) {

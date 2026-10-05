@@ -4,6 +4,11 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const router = express.Router();
+const requiredDatabaseVariables = ["DB_HOST", "DB_USER", "DB_DATABASE"];
+
+const isDatabaseConfigured = () =>
+  requiredDatabaseVariables.every((variable) => Boolean(process.env[variable])) &&
+  Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
 
 const getSslConfig = () => {
   if (process.env.DB_SSL_CA) {
@@ -93,6 +98,14 @@ router.post("/submit", express.json(), async (req, res) => {
 
   const normalizedQuestion = question.trim();
   const normalizedAnswer = answer.trim();
+
+  if (!isDatabaseConfigured()) {
+    console.error("Vote database is not configured.");
+    return res.status(503).json({
+      error: "Voting is temporarily unavailable. Please try again later.",
+    });
+  }
+
   const voteCookieName = getVoteCookieName(normalizedQuestion);
   if (hasVoteCookie(req, voteCookieName)) {
     return res.status(429).json({

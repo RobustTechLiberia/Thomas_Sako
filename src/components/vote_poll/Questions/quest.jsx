@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React from "react";
+import { Navigate } from "react-router-dom";
 import Advert from "../../features/component/Advertisement/components/advert";
+import { apiUrl, getApiError } from "../../../lib/api";
 // Sass CSS
 import "../../../../App.scss";
 
@@ -14,6 +16,7 @@ class Quest extends React.Component {
       statusMessage: "",
       hasVoted: false,
       isLoading: true,
+      shouldRedirectToResults: false,
     };
   }
 
@@ -67,7 +70,7 @@ class Quest extends React.Component {
     this.setState({ selectedOption: e.target.value, statusMessage: "" });
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = async (e) => {
     e.preventDefault();
     const { currentQuestion, selectedOption, hasVoted } = this.state;
 
@@ -83,51 +86,59 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
-    fetch("/question/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Server error logging vote.");
-        return res.json();
-      })
-      .then((data) => {
-        localStorage.setItem(
-          `vote_time_${currentQuestion.id}`,
-          Date.now().toString(),
-        );
-        this.setState({
-          hasVoted: true,
-          statusMessage: "Vote recorded successfully! Redirecting...",
-        });
-
-        // FIX: Delayed redirection gives state and localStorage enough time to register cleanly
-        setTimeout(() => {
-          window.location.href = `${import.meta.env.BASE_URL}results`;
-        }, 800);
-      })
-      .catch((err) => {
-        console.error("Submission failed:", err);
-        // Rollback ui interaction lock if the server explicitly errors out
-        this.setState({
-          hasVoted: false,
-          statusMessage:
-            "Submission failed. Please check your connection and try again.",
-        });
+    try {
+      const response = await fetch(apiUrl("/question/submit"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        throw new Error(
+          await getApiError(
+            response,
+            "We could not record your vote. Please try again.",
+          ),
+        );
+      }
+
+      localStorage.setItem(
+        `vote_time_${currentQuestion.id}`,
+        Date.now().toString(),
+      );
+      this.setState({
+        hasVoted: true,
+        statusMessage: "Vote recorded successfully! Redirecting...",
+        shouldRedirectToResults: true,
+      });
+    } catch (err) {
+      console.error("Submission failed:", err);
+      this.setState({
+        hasVoted: false,
+        statusMessage: err.message || "Submission failed. Please try again.",
+      });
+    }
   };
 
   handleSeeResults = (e) => {
     e.preventDefault();
-    window.location.href = `${import.meta.env.BASE_URL}results`;
+    this.setState({ shouldRedirectToResults: true });
   };
 
   render() {
-    const { currentQuestion, selectedOption, hasVoted, statusMessage, isLoading } =
-      this.state;
+    const {
+      currentQuestion,
+      selectedOption,
+      hasVoted,
+      statusMessage,
+      isLoading,
+      shouldRedirectToResults,
+    } = this.state;
+
+    if (shouldRedirectToResults) {
+      return <Navigate to="/results" replace />;
+    }
 
     return (
       <>
