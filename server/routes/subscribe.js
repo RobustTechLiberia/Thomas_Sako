@@ -2,17 +2,28 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 
-// subscribe route
-router.post("/subscribe", (req, res) => {
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Subscription confirmation endpoint.
+router.post("/subscribe", async (req, res) => {
   const { email } = req.body;
 
-  // validation
-  if (!email || typeof email !== "string" || email.trim() === "") {
-    console.warn("Subscription blocked: Missing or invalid email field.");
-    return res.status(400).end();
+  if (
+    typeof email !== "string" ||
+    !emailPattern.test(email.trim()) ||
+    email.trim().length > 254
+  ) {
+    return res.status(400).json({ error: "Enter a valid email address." });
   }
 
   const cleanEmail = email.trim();
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("Subscription email is not configured.");
+    return res.status(503).json({
+      error: "The subscription service is temporarily unavailable.",
+    });
+  }
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -48,18 +59,17 @@ router.post("/subscribe", (req, res) => {
     `,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    // handles error
-    if (error) {
-      console.error("Error:", error);
-      // failed
-      res.status(500).end();
-    } else {
-      console.log("Email sent:", info.response);
-      // successful
-      res.status(200).end();
-    }
-  });
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Subscription confirmation sent:", info.messageId);
+    return res.status(200).json({ message: "Subscription confirmed." });
+  } catch (error) {
+    // Do not expose the mail provider's operational details to visitors.
+    console.error("Subscription email delivery failed:", error);
+    return res.status(502).json({
+      error: "We could not send the confirmation email. Please try again.",
+    });
+  }
 });
 
 module.exports = router;
