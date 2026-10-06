@@ -1,17 +1,25 @@
+
 /* eslint-disable no-unused-vars */
+
 import React from "react";
 import { Navigate } from "react-router-dom";
 import Advert from "../../features/component/Advertisement/components/advert";
 import { apiUrl, getApiError } from "../../../lib/api";
+
 // Sass CSS
 import "../../../../App.scss";
 
 class Quest extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       questions: [],
-      currentQuestion: { id: null, question: "", options: [] },
+      currentQuestion: {
+        id: null,
+        question: "",
+        options: [],
+      },
       selectedOption: "",
       hasVoted: false,
       isLoading: true,
@@ -26,6 +34,7 @@ class Quest extends React.Component {
         if (!res.ok) {
           throw new Error("Failed to load questions resource.");
         }
+
         return res.json();
       })
       .then((data) => {
@@ -34,8 +43,13 @@ class Quest extends React.Component {
         }
 
         const today = new Date();
-        const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+
+        const dayIndex = Math.floor(
+          today.getTime() / (1000 * 60 * 60 * 24),
+        );
+
         const questionIndex = dayIndex % data.length;
+
         const activeQuestion = data[questionIndex] || {
           question: "",
           options: [],
@@ -44,15 +58,20 @@ class Quest extends React.Component {
         const voteTimestamp = localStorage.getItem(
           `vote_time_${activeQuestion.id}`,
         );
+
         let alreadyVoted = false;
 
         if (voteTimestamp) {
-          const timePassed = Date.now() - parseInt(voteTimestamp, 10);
+          const timePassed =
+            Date.now() - parseInt(voteTimestamp, 10);
+
           // A voter may submit this question only once during its 24-hour window.
           if (timePassed < 24 * 60 * 60 * 1000) {
             alreadyVoted = true;
           } else {
-            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
+            localStorage.removeItem(
+              `vote_time_${activeQuestion.id}`,
+            );
           }
         }
 
@@ -65,6 +84,7 @@ class Quest extends React.Component {
       })
       .catch((err) => {
         console.error("Error loading questions:", err);
+
         this.setState({
           isLoading: false,
         });
@@ -73,21 +93,41 @@ class Quest extends React.Component {
 
   // Helper to extract clean text string regardless of option data shape
   getOptionText = (opt) => {
-    if (typeof opt === "string") return opt;
-    if (opt && typeof opt === "object")
-      return opt.text || opt.label || opt.value || JSON.stringify(opt);
+    if (typeof opt === "string") {
+      return opt;
+    }
+
+    if (opt && typeof opt === "object") {
+      return (
+        opt.text ||
+        opt.label ||
+        opt.value ||
+        JSON.stringify(opt)
+      );
+    }
+
     return String(opt);
   };
 
   handleOptionChange = (value) => {
-    if (this.state.hasVoted || this.state.isSubmitting) return;
-    this.setState({ selectedOption: value });
+    if (this.state.hasVoted || this.state.isSubmitting) {
+      return;
+    }
+
+    this.setState({
+      selectedOption: value,
+    });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
-      this.state;
+
+    const {
+      currentQuestion,
+      selectedOption,
+      hasVoted,
+      isSubmitting,
+    } = this.state;
 
     if (!selectedOption || hasVoted || isSubmitting) {
       return;
@@ -107,7 +147,9 @@ class Quest extends React.Component {
     try {
       const response = await fetch(apiUrl("/question/submit"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify(payload),
       });
@@ -125,6 +167,7 @@ class Quest extends React.Component {
         `vote_time_${currentQuestion.id}`,
         Date.now().toString(),
       );
+
       this.setState({
         hasVoted: true,
         isSubmitting: false,
@@ -132,6 +175,7 @@ class Quest extends React.Component {
       });
     } catch (err) {
       console.error("Submission failed:", err);
+
       this.setState({
         isSubmitting: false,
       });
@@ -140,7 +184,10 @@ class Quest extends React.Component {
 
   handleSeeResults = (e) => {
     e.preventDefault();
-    this.setState({ shouldRedirectToResults: true });
+
+    this.setState({
+      shouldRedirectToResults: true,
+    });
   };
 
   render() {
@@ -158,8 +205,12 @@ class Quest extends React.Component {
     }
 
     const options = currentQuestion?.options || [];
-    const isInteractionDisabled = isLoading || hasVoted || isSubmitting;
-    const isSubmitDisabled = isInteractionDisabled || !selectedOption;
+
+    const isInteractionDisabled =
+      isLoading || hasVoted || isSubmitting;
+
+    const isSubmitDisabled =
+      isInteractionDisabled || !selectedOption;
 
     return (
       <>
@@ -171,6 +222,7 @@ class Quest extends React.Component {
             <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-[#830000]">
               today's poll
             </h1>
+
             <div className="flex flex-wrap justify-center items-center my-8">
               <hr className="border-none bg-[#830000] md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
             </div>
@@ -179,7 +231,8 @@ class Quest extends React.Component {
               <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
                 Loading today's question...
               </div>
-            ) : !currentQuestion || !currentQuestion.question ? (
+            ) : !currentQuestion ||
+              !currentQuestion.question ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
                 No poll available at this moment.
               </div>
@@ -189,13 +242,21 @@ class Quest extends React.Component {
                   {currentQuestion.question}
                 </h3>
 
-                <form className="w-auto" onSubmit={this.handleSubmit}>
+                <form
+                  className="w-auto"
+                  onSubmit={this.handleSubmit}
+                >
                   {options.map((opt, idx) => {
                     const optionText = this.getOptionText(opt);
-                    const isChecked = selectedOption === optionText;
+
+                    const isChecked =
+                      selectedOption === optionText;
 
                     return (
-                      <div key={idx} className="md:my-3 lg:my-3">
+                      <div
+                        key={idx}
+                        className="md:my-3 lg:my-3"
+                      >
                         <label
                           className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
                             isInteractionDisabled
@@ -208,7 +269,11 @@ class Quest extends React.Component {
                             name="poll_answer"
                             value={optionText}
                             checked={isChecked}
-                            onChange={() => this.handleOptionChange(optionText)}
+                            onChange={() =>
+                              this.handleOptionChange(
+                                optionText,
+                              )
+                            }
                             disabled={isInteractionDisabled}
                           />{" "}
                           {optionText}
@@ -216,6 +281,7 @@ class Quest extends React.Component {
                       </div>
                     );
                   })}
+
                   <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
                     <button
                       type="submit"
@@ -238,21 +304,29 @@ class Quest extends React.Component {
                 </form>
               </>
             )}
-            {/* <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
+
+            {/* 
+            <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
               <div
                 onClick={this.handleSeeResults}
                 className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
               >
-                <a href="/results" onClick={this.handleSeeResults}>
+                <a
+                  href="/results"
+                  onClick={this.handleSeeResults}
+                >
                   <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
                     see past results
                   </p>
                 </a>
               </div>
-              
-              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
-            </div> */}
+
+              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5">
+              </div>
+            </div>
+            */}
           </div>
+
           <Advert />
         </div>
       </>
