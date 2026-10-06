@@ -28,6 +28,7 @@ function normalizePem(value) {
     .replace(/\\r\\n/g, "\n")
     .replace(/\\n/g, "\n")
     .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
     .trim();
 }
 
@@ -78,75 +79,62 @@ if (configurationErrors.length > 0) {
 function loadCaCertificate() {
   if (!DB_SSL_CA_FILE) {
     throw new Error(
-      "DB_SSL_CA_FILE is not configured. Use DB_SSL_CA_FILE=./certs/ca.pem",
+      "DB_SSL_CA_FILE is missing. Set DB_SSL_CA_FILE=./certs/ca.pem"
     );
   }
 
   const caPath = path.resolve(process.cwd(), DB_SSL_CA_FILE);
 
-  console.log("MySQL CA certificate:", caPath);
+  console.log("MySQL CA path:", caPath);
 
   if (!fs.existsSync(caPath)) {
     throw new Error(`MySQL CA certificate was not found: ${caPath}`);
   }
 
   const certificate = fs.readFileSync(caPath, "utf8");
-
   const normalizedCertificate = normalizePem(certificate);
 
-  if (!normalizedCertificate.includes("-----BEGIN CERTIFICATE-----")) {
-    throw new Error(
-      "CA certificate is invalid: BEGIN CERTIFICATE was not found.",
-    );
-  }
-
-  if (!normalizedCertificate.includes("-----END CERTIFICATE-----")) {
-    throw new Error(
-      "CA certificate is invalid: END CERTIFICATE was not found.",
-    );
+  if (
+    !normalizedCertificate.includes("-----BEGIN CERTIFICATE-----") ||
+    !normalizedCertificate.includes("-----END CERTIFICATE-----")
+  ) {
+    throw new Error("The CA certificate is not a valid PEM certificate.");
   }
 
   return {
-    source: caPath,
+    path: caPath,
     value: normalizedCertificate,
   };
 }
 
-let sslConfig;
+let sslConfig = undefined;
 let sslCertificateSource = null;
 
 if (SSL_MODE !== "DISABLED" && SSL_MODE !== "OFF") {
-  try {
-    const caCertificate = loadCaCertificate();
+  const caCertificate = loadCaCertificate();
 
-    sslCertificateSource = caCertificate.source;
+  sslCertificateSource = caCertificate.path;
 
-    sslConfig = {
-      ca: caCertificate.value,
-      rejectUnauthorized: DB_SSL_REJECT_UNAUTHORIZED,
-      minVersion: "TLSv1.2",
-    };
+  sslConfig = {
+    ca: caCertificate.value,
+    rejectUnauthorized: DB_SSL_REJECT_UNAUTHORIZED,
+    minVersion: "TLSv1.2",
+  };
 
-    console.log("==========================================");
-    console.log("AIVEN MYSQL SSL CONFIGURATION");
-    console.log("==========================================");
-    console.log("SSL mode:", SSL_MODE);
-    console.log("CA source:", sslCertificateSource);
-    console.log(
-      "CA size:",
-      Buffer.byteLength(caCertificate.value, "utf8"),
-      "bytes",
-    );
-    console.log("rejectUnauthorized:", sslConfig.rejectUnauthorized);
-    console.log("TLS minimum:", "TLSv1.2");
-    console.log("==========================================");
-  } catch (error) {
-    console.error("MYSQL SSL INITIALIZATION FAILED:");
-    console.error(error.message);
-    throw error;
-  }
+  console.log("MySQL SSL enabled");
+  console.log("SSL mode:", SSL_MODE);
+  console.log("CA:", sslCertificateSource);
+  console.log(
+    "CA size:",
+    Buffer.byteLength(caCertificate.value, "utf8"),
+    "bytes"
+  );
+  console.log(
+    "rejectUnauthorized:",
+    DB_SSL_REJECT_UNAUTHORIZED
+  );
 } else {
-  console.warn("WARNING: MySQL SSL is disabled.");
+  console.warn("MySQL SSL is disabled.");
 }
 
 const poolConfig = {
@@ -160,7 +148,7 @@ const poolConfig = {
   queueLimit: 0,
   connectTimeout: 30000,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
+  keepAliveInitialDelay: 10000,
 };
 
 if (sslConfig) {
@@ -169,31 +157,52 @@ if (sslConfig) {
 
 const pool = mysql.createPool(poolConfig);
 
-function logDatabaseError(prefix, error) {
-  console.error(`\n${prefix}`);
+function createDatabaseConnection() {
+  const config = {
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASS,
+    database: DB_DATABASE,
+    connectTimeout: 30000,
+  };
 
-  console.error({
-    message: error?.message,
-    code: error?.code,
-    errno: error?.errno,
-    sqlState: error?.sqlState,
-    fatal: error?.fatal,
-  });
-
-  if (error?.stack) {
-    console.error("\nStack trace:");
-
-    console.error(error.stack);
+  if (sslConfig) {
+    config.ssl = sslConfig;
   }
+
+  return mysql.createConnection(config);
+}
+
+function logDatabaseError(prefix, error) {
+  console.error("");
+  console.error("==========================================");
+  console.error(prefix);
+  console.error("==========================================");
+  console.error("name:", error?.name);
+  console.error("message:", error?.message);
+  console.error("code:", error?.code);
+  console.error("errno:", error?.errno);
+  console.error("sqlState:", error?.sqlState);
+  console.error("fatal:", error?.fatal);
+  console.error("syscall:", error?.syscall);
+  console.error("address:", error?.address);
+  console.error("port:", error?.port);
+  console.error("");
+  console.error("FULL STACK:");
+  console.error(error?.stack || error);
+  console.error("==========================================");
 }
 
 async function handleVoteInsertion(req, res) {
   try {
     const { question, answer } = req.body || {};
 
-    const cleanQuestion = typeof question === "string" ? question.trim() : "";
+    const cleanQuestion =
+      typeof question === "string" ? question.trim() : "";
 
-    const cleanAnswer = typeof answer === "string" ? answer.trim() : "";
+    const cleanAnswer =
+      typeof answer === "string" ? answer.trim() : "";
 
     if (!cleanQuestion || !cleanAnswer) {
       return res.status(400).json({
@@ -227,7 +236,10 @@ async function handleVoteInsertion(req, res) {
       VALUES (?, ?, 1, CURDATE())
     `;
 
-    const [result] = await pool.execute(sql, [cleanQuestion, cleanAnswer]);
+    const [result] = await pool.execute(sql, [
+      cleanQuestion,
+      cleanAnswer,
+    ]);
 
     return res.status(201).json({
       status: "success",
@@ -238,7 +250,10 @@ async function handleVoteInsertion(req, res) {
       votes: 1,
     });
   } catch (error) {
-    logDatabaseError("Failed to insert vote into MySQL:", error);
+    logDatabaseError(
+      "Failed to insert vote into MySQL",
+      error
+    );
 
     return res.status(500).json({
       status: "error",
@@ -258,7 +273,9 @@ router.get("/results", async (req, res) => {
     const rawQuestion = req.query.question;
 
     const cleanQuestion =
-      typeof rawQuestion === "string" ? rawQuestion.trim() : "";
+      typeof rawQuestion === "string"
+        ? rawQuestion.trim()
+        : "";
 
     if (!cleanQuestion) {
       return res.status(400).json({
@@ -268,16 +285,18 @@ router.get("/results", async (req, res) => {
     }
 
     const sql = `
-        SELECT
-          answers,
-          SUM(votes) AS total_votes
-        FROM poll
-        WHERE questions = ?
-        GROUP BY answers
-        ORDER BY total_votes DESC
-      `;
+      SELECT
+        answers,
+        SUM(votes) AS total_votes
+      FROM poll
+      WHERE questions = ?
+      GROUP BY answers
+      ORDER BY total_votes DESC
+    `;
 
-    const [rows] = await pool.execute(sql, [cleanQuestion]);
+    const [rows] = await pool.execute(sql, [
+      cleanQuestion,
+    ]);
 
     const formattedResults = rows.map((row) => ({
       answers: row.answers,
@@ -286,7 +305,7 @@ router.get("/results", async (req, res) => {
 
     const totalVotes = formattedResults.reduce(
       (total, item) => total + item.total_votes,
-      0,
+      0
     );
 
     return res.status(200).json({
@@ -296,7 +315,10 @@ router.get("/results", async (req, res) => {
       results: formattedResults,
     });
   } catch (error) {
-    logDatabaseError("Failed to fetch poll analytics:", error);
+    logDatabaseError(
+      "Failed to fetch poll analytics",
+      error
+    );
 
     return res.status(500).json({
       status: "error",
@@ -311,7 +333,7 @@ router.get("/db", async (req, res) => {
   let connection;
 
   try {
-    connection = await pool.getConnection();
+    connection = await createDatabaseConnection();
 
     const [connectionRows] = await connection.query(
       "SELECT 1 AS database_connection"
@@ -325,38 +347,57 @@ router.get("/db", async (req, res) => {
       "SHOW STATUS LIKE 'Ssl_cipher'"
     );
 
-    const sslCipher = sslRows.length > 0
-      ? sslRows[0].Value
-      : null;
+    const sslCipher =
+      sslRows.length > 0
+        ? sslRows[0].Value || null
+        : null;
 
-    connection.release();
+    await connection.end();
 
-    res.json({
+    return res.status(200).json({
       status: "success",
       message: "Database connection successful.",
       database: DB_DATABASE,
       host: DB_HOST,
       port: DB_PORT,
-      mysqlVersion: versionRows[0].mysql_version,
-      sslCipher,
-      sslConnectionVerified: Boolean(sslCipher),
-      connectionTest: connectionRows[0].database_connection === 1
+      mysqlVersion:
+        versionRows[0]?.mysql_version || null,
+      ssl: {
+        enabled: Boolean(sslConfig),
+        cipher: sslCipher,
+        verified: Boolean(sslCipher),
+        certificateSource: sslCertificateSource,
+      },
+      connectionTest:
+        connectionRows[0]?.database_connection === 1,
     });
   } catch (error) {
     if (connection) {
-      connection.release();
+      try {
+        await connection.end();
+      } catch (closeError) {
+        console.error(
+          "Connection close error:",
+          closeError.message
+        );
+      }
     }
 
-    console.error("DATABASE ERROR");
-    console.error(error);
-    console.error(error.stack);
+    logDatabaseError(
+      "AIVEN MYSQL DIRECT CONNECTION FAILED",
+      error
+    );
 
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       error: "Database connectivity check failed.",
       message: error.message,
       code: error.code || null,
-      errno: error.errno || null
+      errno: error.errno || null,
+      host: DB_HOST,
+      port: DB_PORT,
+      sslEnabled: Boolean(sslConfig),
+      certificateSource: sslCertificateSource,
     });
   }
 });
@@ -364,31 +405,34 @@ router.get("/db", async (req, res) => {
 router.post("/db", async (req, res) => {
   try {
     const createTableSql = `
-        CREATE TABLE IF NOT EXISTS poll (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          questions VARCHAR(255) NOT NULL,
-          answers VARCHAR(255) NOT NULL,
-          votes INT NOT NULL DEFAULT 1,
-          date DATE NOT NULL,
-          created_at TIMESTAMP NOT NULL
-            DEFAULT CURRENT_TIMESTAMP,
-          INDEX idx_questions (questions),
-          INDEX idx_date (date),
-          INDEX idx_created_at (created_at)
-        )
-        ENGINE=InnoDB
-        DEFAULT CHARSET=utf8mb4
-        COLLATE=utf8mb4_unicode_ci
-      `;
+      CREATE TABLE IF NOT EXISTS poll (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        questions VARCHAR(255) NOT NULL,
+        answers VARCHAR(255) NOT NULL,
+        votes INT NOT NULL DEFAULT 1,
+        date DATE NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_questions (questions),
+        INDEX idx_date (date),
+        INDEX idx_created_at (created_at)
+      )
+      ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+    `;
 
     await pool.execute(createTableSql);
 
     return res.status(200).json({
       status: "success",
-      message: "Poll table structure verified/created successfully.",
+      message:
+        "Poll table structure verified/created successfully.",
     });
   } catch (error) {
-    logDatabaseError("Failed to initialize poll table:", error);
+    logDatabaseError(
+      "Failed to initialize poll table",
+      error
+    );
 
     return res.status(500).json({
       status: "error",
@@ -402,24 +446,25 @@ router.post("/db", async (req, res) => {
 router.get("/db/config", (req, res) => {
   return res.status(200).json({
     status: "ok",
-
     database: {
       host: DB_HOST,
       port: DB_PORT,
       user: DB_USER,
       database: DB_DATABASE,
     },
-
     ssl: {
       enabled: Boolean(sslConfig),
-
-      verified: Boolean(sslConfig && sslConfig.rejectUnauthorized === true),
-
-      certificateSource: sslCertificateSource || null,
+      rejectUnauthorized:
+        Boolean(sslConfig?.rejectUnauthorized),
+      certificateSource:
+        sslCertificateSource || null,
     },
-
     environment: {
-      nodeEnvironment: process.env.NODE_ENV || "development",
+      nodeVersion: process.version,
+      nodeEnvironment:
+        process.env.NODE_ENV || "development",
+      mysql2Version:
+        require("mysql2/package.json").version,
     },
   });
 });
