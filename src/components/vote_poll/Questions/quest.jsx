@@ -5,7 +5,6 @@ import { Navigate } from "react-router-dom";
 import Advert from "../../features/component/Advertisement/components/advert";
 import { apiUrl, getApiError } from "../../../lib/api";
 
-// Sass CSS
 import "../../../../App.scss";
 
 class Quest extends React.Component {
@@ -24,8 +23,6 @@ class Quest extends React.Component {
       isLoading: true,
       isSubmitting: false,
       shouldRedirectToResults: false,
-
-      // Store API/form errors so the user can see what happened.
       errorMessage: "",
       successMessage: "",
     };
@@ -79,13 +76,6 @@ class Quest extends React.Component {
         );
       }
 
-      /*
-       * Check the browser's local vote timestamp.
-       *
-       * IMPORTANT:
-       * This is only a frontend convenience check.
-       * The backend should still enforce the 24-hour restriction.
-       */
       let alreadyVoted = false;
 
       if (activeQuestion.id !== undefined && activeQuestion.id !== null) {
@@ -99,7 +89,6 @@ class Quest extends React.Component {
           if (!Number.isNaN(parsedTimestamp)) {
             const timePassed = Date.now() - parsedTimestamp;
 
-            // A voter may submit this question only once during its 24-hour window.
             if (timePassed < 24 * 60 * 60 * 1000) {
               alreadyVoted = true;
             } else {
@@ -129,7 +118,6 @@ class Quest extends React.Component {
     }
   };
 
-  // Helper to extract clean text string regardless of option data shape
   getOptionText = (opt) => {
     if (typeof opt === "string") {
       return opt;
@@ -162,11 +150,13 @@ class Quest extends React.Component {
     const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
       this.state;
 
-    console.log("Poll form submitted.");
+    console.log("=================================");
+    console.log("POLL FORM SUBMISSION STARTED");
+    console.log("=================================");
 
-    /*
-     * Prevent invalid submissions.
-     */
+    console.log("Current question:", currentQuestion);
+    console.log("Selected option:", selectedOption);
+
     if (isSubmitting) {
       console.log("Submission already in progress.");
       return;
@@ -197,7 +187,7 @@ class Quest extends React.Component {
         errorMessage: "This question does not have a valid question ID.",
       });
 
-      console.error("Invalid question ID:", currentQuestion);
+      console.error("Invalid question:", currentQuestion);
 
       return;
     }
@@ -210,7 +200,6 @@ class Quest extends React.Component {
       return;
     }
 
-    // Lock interface immediately when clicked to prevent double clicks or race condition bugs
     this.setState({
       isSubmitting: true,
       errorMessage: "",
@@ -223,12 +212,12 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
-    console.log("Submitting poll:", payload);
+    console.log("Submitting payload:", payload);
 
     try {
       const endpoint = apiUrl("/question/submit");
 
-      console.log("Poll API endpoint:", endpoint);
+      console.log("POST endpoint:", endpoint);
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -240,67 +229,87 @@ class Quest extends React.Component {
         body: JSON.stringify(payload),
       });
 
-      console.log("Poll API status:", response.status);
+      console.log("API response status:", response.status);
+
+      let responseData = {};
+
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        console.log("Response has no JSON body.");
+      }
+
+      console.log("API response:", responseData);
+
+      if (response.status === 201 || response.ok) {
+        console.log("Vote successfully recorded.");
+
+        localStorage.setItem(
+          `vote_time_${currentQuestion.id}`,
+          Date.now().toString(),
+        );
+
+        this.setState(
+          {
+            hasVoted: true,
+            isSubmitting: false,
+            successMessage:
+              responseData?.message || "Your vote has been recorded.",
+            errorMessage: "",
+          },
+          () => {
+            console.log("Redirecting to /results...");
+
+            setTimeout(() => {
+              this.setState({
+                shouldRedirectToResults: true,
+              });
+            }, 300);
+          },
+        );
+
+        return;
+      }
+
+      if (response.status === 429) {
+        this.setState({
+          isSubmitting: false,
+          hasVoted: true,
+          errorMessage:
+            responseData?.message ||
+            responseData?.error ||
+            "You have already voted on this question within the last 24 hours.",
+        });
+
+        return;
+      }
+
+      if (response.status === 400) {
+        this.setState({
+          isSubmitting: false,
+          errorMessage:
+            responseData?.message ||
+            responseData?.error ||
+            "Invalid poll submission.",
+        });
+
+        return;
+      }
+
+      let errorMessage =
+        responseData?.message ||
+        responseData?.error ||
+        "We could not record your vote. Please try again.";
 
       if (!response.ok) {
-        let errorMessage = "We could not record your vote. Please try again.";
-
         try {
           errorMessage = await getApiError(response, errorMessage);
         } catch (error) {
           console.error("Could not parse API error:", error);
-
-          try {
-            const errorData = await response.json();
-
-            errorMessage =
-              errorData?.message || errorData?.error || errorMessage;
-          } catch {
-            // Ignore JSON parsing errors.
-          }
         }
-
-        throw new Error(errorMessage);
       }
 
-      /*
-       * Try to read the response.
-       * Some APIs return JSON while others return an empty response.
-       */
-      let result = null;
-
-      try {
-        result = await response.json();
-      } catch {
-        // Empty response body is acceptable if HTTP status is successful.
-      }
-
-      console.log("Poll submission successful:", result);
-
-      /*
-       * Save the vote time locally.
-       *
-       * The backend must ALSO enforce the 24-hour rule.
-       */
-      localStorage.setItem(
-        `vote_time_${currentQuestion.id}`,
-        Date.now().toString(),
-      );
-
-      this.setState({
-        hasVoted: true,
-        isSubmitting: false,
-        successMessage: "Your vote has been recorded.",
-      });
-
-      /*
-       * Redirect after the state has been updated.
-       */
-      setTimeout(() => {
-        this.setState({
-          shouldRedirectToResults: true,
-        });
-      }, 300);
+      throw new Error(errorMessage);
     } catch (err) {
       console.error("Submission failed:", err);
 
@@ -333,24 +342,13 @@ class Quest extends React.Component {
     } = this.state;
 
     if (shouldRedirectToResults) {
+      console.log("Rendering Navigate -> /results");
+
       return <Navigate replace to="/results" />;
     }
 
     const options = currentQuestion?.options || [];
 
-    /*
-     * IMPORTANT:
-     *
-     * The submit button should NOT be disabled simply because
-     * the browser thinks the user has voted.
-     *
-     * hasVoted is handled separately below.
-     *
-     * The button is disabled only when:
-     * 1. The question is loading.
-     * 2. A submission is currently happening.
-     * 3. No option has been selected.
-     */
     const isSubmitDisabled =
       isLoading || isSubmitting || !selectedOption || hasVoted;
 
@@ -375,13 +373,9 @@ class Quest extends React.Component {
               <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
                 Loading today's question...
               </div>
-            ) : errorMessage && !currentQuestion?.question ? (
-              <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
-                {errorMessage}
-              </div>
             ) : !currentQuestion || !currentQuestion.question ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
-                No poll available at this moment.
+                {errorMessage || "No poll available at this moment."}
               </div>
             ) : (
               <>
@@ -449,39 +443,31 @@ class Quest extends React.Component {
                           : "bg-[#830000] cursor-pointer"
                       }`}
                     >
-                      {isLoading
-                        ? "loading..."
-                        : isSubmitting
-                          ? "submitting..."
-                          : hasVoted
-                            ? "voted"
-                            : "vote"}
+                      {isSubmitting
+                        ? "submitting..."
+                        : hasVoted
+                          ? "voted"
+                          : "vote"}
                     </button>
                   </div>
                 </form>
               </>
             )}
 
-            {/* 
             <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
               <div
                 onClick={this.handleSeeResults}
                 className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
               >
-                <a
-                  href="/results"
-                  onClick={this.handleSeeResults}
-                >
+                <a href="/results" onClick={this.handleSeeResults}>
                   <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
                     see past results
                   </p>
                 </a>
               </div>
 
-              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5">
-              </div>
+              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
             </div>
-            */}
           </div>
 
           <Advert />
