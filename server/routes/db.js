@@ -203,7 +203,7 @@ router.post("/db/init", async (req, res) => {
         answers VARCHAR(255) NOT NULL,
         votes INT DEFAULT 1,
         date DATE NOT NULL
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      )
     `;
     await pool.execute(createTableSql);
 
