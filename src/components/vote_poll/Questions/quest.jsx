@@ -24,66 +24,117 @@ class Quest extends React.Component {
       isLoading: true,
       isSubmitting: false,
       shouldRedirectToResults: false,
+
+      // Store API/form errors so the user can see what happened.
+      errorMessage: "",
+      successMessage: "",
     };
   }
 
   componentDidMount() {
-    fetch(`${import.meta.env.BASE_URL}questions.json`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to load questions resource.");
-        }
+    this.loadQuestions();
+  }
 
-        return res.json();
-      })
-      .then((data) => {
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error("No poll questions are available.");
-        }
+  loadQuestions = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.BASE_URL}questions.json`,
+        {
+          method: "GET",
+          cache: "no-cache",
+        },
+      );
 
-        const today = new Date();
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load questions resource. HTTP ${response.status}`,
+        );
+      }
 
-        const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+      const data = await response.json();
 
-        const questionIndex = dayIndex % data.length;
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("No poll questions are available.");
+      }
 
-        const activeQuestion = data[questionIndex] || {
-          question: "",
-          options: [],
-        };
+      const today = new Date();
 
+      const dayIndex = Math.floor(
+        today.getTime() / (1000 * 60 * 60 * 24),
+      );
+
+      const questionIndex = dayIndex % data.length;
+
+      const activeQuestion = data[questionIndex];
+
+      if (!activeQuestion) {
+        throw new Error("Unable to determine today's question.");
+      }
+
+      if (!activeQuestion.question) {
+        throw new Error("Today's question is empty.");
+      }
+
+      if (!Array.isArray(activeQuestion.options)) {
+        throw new Error(
+          "Today's question does not contain valid answer options.",
+        );
+      }
+
+      /*
+       * Check the browser's local vote timestamp.
+       *
+       * IMPORTANT:
+       * This is only a frontend convenience check.
+       * The backend should still enforce the 24-hour restriction.
+       */
+      let alreadyVoted = false;
+
+      if (activeQuestion.id !== undefined && activeQuestion.id !== null) {
         const voteTimestamp = localStorage.getItem(
           `vote_time_${activeQuestion.id}`,
         );
 
-        let alreadyVoted = false;
-
         if (voteTimestamp) {
-          const timePassed = Date.now() - parseInt(voteTimestamp, 10);
+          const parsedTimestamp = parseInt(voteTimestamp, 10);
 
-          // A voter may submit this question only once during its 24-hour window.
-          if (timePassed < 24 * 60 * 60 * 1000) {
-            alreadyVoted = true;
+          if (!Number.isNaN(parsedTimestamp)) {
+            const timePassed = Date.now() - parsedTimestamp;
+
+            // A voter may submit this question only once during its 24-hour window.
+            if (timePassed < 24 * 60 * 60 * 1000) {
+              alreadyVoted = true;
+            } else {
+              localStorage.removeItem(
+                `vote_time_${activeQuestion.id}`,
+              );
+            }
           } else {
-            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
+            localStorage.removeItem(
+              `vote_time_${activeQuestion.id}`,
+            );
           }
         }
+      }
 
-        this.setState({
-          questions: data,
-          currentQuestion: activeQuestion,
-          hasVoted: alreadyVoted,
-          isLoading: false,
-        });
-      })
-      .catch((err) => {
-        console.error("Error loading questions:", err);
-
-        this.setState({
-          isLoading: false,
-        });
+      this.setState({
+        questions: data,
+        currentQuestion: activeQuestion,
+        hasVoted: alreadyVoted,
+        isLoading: false,
+        errorMessage: "",
       });
-  }
+    } catch (err) {
+      console.error("Error loading questions:", err);
+
+      this.setState({
+        isLoading: false,
+        errorMessage:
+          err?.message ||
+          "Unable to load today's poll. Please try again.",
+      });
+    }
+  };
 
   // Helper to extract clean text string regardless of option data shape
   getOptionText = (opt) => {
@@ -92,35 +143,99 @@ class Quest extends React.Component {
     }
 
     if (opt && typeof opt === "object") {
-      return opt.text || opt.label || opt.value || JSON.stringify(opt);
+      return (
+        opt.text ||
+        opt.label ||
+        opt.value ||
+        JSON.stringify(opt)
+      );
     }
 
     return String(opt);
   };
 
   handleOptionChange = (value) => {
-    if (this.state.hasVoted || this.state.isSubmitting) {
+    const { hasVoted, isSubmitting } = this.state;
+
+    if (hasVoted || isSubmitting) {
       return;
     }
 
     this.setState({
       selectedOption: value,
+      errorMessage: "",
+      successMessage: "",
     });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
-      this.state;
+    const {
+      currentQuestion,
+      selectedOption,
+      hasVoted,
+      isSubmitting,
+    } = this.state;
 
-    if (!selectedOption || hasVoted || isSubmitting) {
+    console.log("Poll form submitted.");
+
+    /*
+     * Prevent invalid submissions.
+     */
+    if (isSubmitting) {
+      console.log("Submission already in progress.");
+      return;
+    }
+
+    if (hasVoted) {
+      this.setState({
+        errorMessage:
+          "You have already voted on this question.",
+      });
+
+      return;
+    }
+
+    if (!selectedOption) {
+      this.setState({
+        errorMessage: "Please select an answer before voting.",
+      });
+
+      return;
+    }
+
+    if (
+      !currentQuestion ||
+      currentQuestion.id === undefined ||
+      currentQuestion.id === null
+    ) {
+      this.setState({
+        errorMessage:
+          "This question does not have a valid question ID.",
+      });
+
+      console.error(
+        "Invalid question ID:",
+        currentQuestion,
+      );
+
+      return;
+    }
+
+    if (!currentQuestion.question) {
+      this.setState({
+        errorMessage: "The current question is invalid.",
+      });
+
       return;
     }
 
     // Lock interface immediately when clicked to prevent double clicks or race condition bugs
     this.setState({
       isSubmitting: true,
+      errorMessage: "",
+      successMessage: "",
     });
 
     const payload = {
@@ -129,25 +244,74 @@ class Quest extends React.Component {
       answer: selectedOption,
     };
 
+    console.log("Submitting poll:", payload);
+
     try {
-      const response = await fetch(apiUrl("/question/submit"), {
+      const endpoint = apiUrl("/question/submit");
+
+      console.log("Poll API endpoint:", endpoint);
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         credentials: "include",
         body: JSON.stringify(payload),
       });
 
+      console.log("Poll API status:", response.status);
+
       if (!response.ok) {
-        throw new Error(
-          await getApiError(
+        let errorMessage =
+          "We could not record your vote. Please try again.";
+
+        try {
+          errorMessage = await getApiError(
             response,
-            "We could not record your vote. Please try again.",
-          ),
-        );
+            errorMessage,
+          );
+        } catch (error) {
+          console.error(
+            "Could not parse API error:",
+            error,
+          );
+
+          try {
+            const errorData = await response.json();
+
+            errorMessage =
+              errorData?.message ||
+              errorData?.error ||
+              errorMessage;
+          } catch {
+            // Ignore JSON parsing errors.
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
+      /*
+       * Try to read the response.
+       * Some APIs return JSON while others return an empty response.
+       */
+      let result = null;
+
+      try {
+        result = await response.json();
+      } catch {
+        // Empty response body is acceptable if HTTP status is successful.
+      }
+
+      console.log("Poll submission successful:", result);
+
+      /*
+       * Save the vote time locally.
+       *
+       * The backend must ALSO enforce the 24-hour rule.
+       */
       localStorage.setItem(
         `vote_time_${currentQuestion.id}`,
         Date.now().toString(),
@@ -156,13 +320,25 @@ class Quest extends React.Component {
       this.setState({
         hasVoted: true,
         isSubmitting: false,
-        shouldRedirectToResults: true,
+        successMessage: "Your vote has been recorded.",
       });
+
+      /*
+       * Redirect after the state has been updated.
+       */
+      setTimeout(() => {
+        this.setState({
+          shouldRedirectToResults: true,
+        });
+      }, 300);
     } catch (err) {
       console.error("Submission failed:", err);
 
       this.setState({
         isSubmitting: false,
+        errorMessage:
+          err?.message ||
+          "We could not record your vote. Please try again.",
       });
     }
   };
@@ -183,6 +359,8 @@ class Quest extends React.Component {
       isLoading,
       isSubmitting,
       shouldRedirectToResults,
+      errorMessage,
+      successMessage,
     } = this.state;
 
     if (shouldRedirectToResults) {
@@ -191,9 +369,17 @@ class Quest extends React.Component {
 
     const options = currentQuestion?.options || [];
 
-    const isInteractionDisabled = isLoading || hasVoted || isSubmitting;
+    
+    const isSubmitDisabled =
+      isLoading ||
+      isSubmitting ||
+      !selectedOption ||
+      hasVoted;
 
-    const isSubmitDisabled = isInteractionDisabled || !selectedOption;
+    const isInteractionDisabled =
+      isLoading ||
+      isSubmitting ||
+      hasVoted;
 
     return (
       <>
@@ -214,7 +400,12 @@ class Quest extends React.Component {
               <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
                 Loading today's question...
               </div>
-            ) : !currentQuestion || !currentQuestion.question ? (
+            ) : errorMessage && !currentQuestion?.question ? (
+              <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
+                {errorMessage}
+              </div>
+            ) : !currentQuestion ||
+              !currentQuestion.question ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
                 No poll available at this moment.
               </div>
@@ -224,14 +415,39 @@ class Quest extends React.Component {
                   {currentQuestion.question}
                 </h3>
 
-                <form className="w-auto" onSubmit={this.handleSubmit}>
+                {errorMessage && (
+                  <div className="text-center text-red-600 font-semibold font-sans text-base mt-4 px-4">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {successMessage && (
+                  <div className="text-center text-green-600 font-semibold font-sans text-base mt-4 px-4">
+                    {successMessage}
+                  </div>
+                )}
+
+                {hasVoted && !errorMessage && (
+                  <div className="text-center text-[#830000] font-semibold font-sans text-base mt-4 px-4">
+                    You have already voted on today's question.
+                  </div>
+                )}
+
+                <form
+                  className="w-auto"
+                  onSubmit={this.handleSubmit}
+                >
                   {options.map((opt, idx) => {
                     const optionText = this.getOptionText(opt);
 
-                    const isChecked = selectedOption === optionText;
+                    const isChecked =
+                      selectedOption === optionText;
 
                     return (
-                      <div key={idx} className="md:my-3 lg:my-3">
+                      <div
+                        key={`${currentQuestion.id}-${idx}`}
+                        className="md:my-3 lg:my-3"
+                      >
                         <label
                           className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
                             isInteractionDisabled
@@ -244,7 +460,11 @@ class Quest extends React.Component {
                             name="poll_answer"
                             value={optionText}
                             checked={isChecked}
-                            onChange={() => this.handleOptionChange(optionText)}
+                            onChange={() =>
+                              this.handleOptionChange(
+                                optionText,
+                              )
+                            }
                             disabled={isInteractionDisabled}
                           />{" "}
                           {optionText}
