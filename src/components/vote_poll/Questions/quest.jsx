@@ -59,9 +59,7 @@ class Quest extends React.Component {
 
       const today = new Date();
 
-      const dayIndex = Math.floor(
-        today.getTime() / (1000 * 60 * 60 * 24),
-      );
+      const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
 
       const questionIndex = dayIndex % data.length;
 
@@ -105,14 +103,10 @@ class Quest extends React.Component {
             if (timePassed < 24 * 60 * 60 * 1000) {
               alreadyVoted = true;
             } else {
-              localStorage.removeItem(
-                `vote_time_${activeQuestion.id}`,
-              );
+              localStorage.removeItem(`vote_time_${activeQuestion.id}`);
             }
           } else {
-            localStorage.removeItem(
-              `vote_time_${activeQuestion.id}`,
-            );
+            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
           }
         }
       }
@@ -130,8 +124,7 @@ class Quest extends React.Component {
       this.setState({
         isLoading: false,
         errorMessage:
-          err?.message ||
-          "Unable to load today's poll. Please try again.",
+          err?.message || "Unable to load today's poll. Please try again.",
       });
     }
   };
@@ -143,12 +136,7 @@ class Quest extends React.Component {
     }
 
     if (opt && typeof opt === "object") {
-      return (
-        opt.text ||
-        opt.label ||
-        opt.value ||
-        JSON.stringify(opt)
-      );
+      return opt.text || opt.label || opt.value || JSON.stringify(opt);
     }
 
     return String(opt);
@@ -171,12 +159,8 @@ class Quest extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    const {
-      currentQuestion,
-      selectedOption,
-      hasVoted,
-      isSubmitting,
-    } = this.state;
+    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
+      this.state;
 
     console.log("Poll form submitted.");
 
@@ -190,8 +174,7 @@ class Quest extends React.Component {
 
     if (hasVoted) {
       this.setState({
-        errorMessage:
-          "You have already voted on this question.",
+        errorMessage: "You have already voted on this question.",
       });
 
       return;
@@ -211,14 +194,10 @@ class Quest extends React.Component {
       currentQuestion.id === null
     ) {
       this.setState({
-        errorMessage:
-          "This question does not have a valid question ID.",
+        errorMessage: "This question does not have a valid question ID.",
       });
 
-      console.error(
-        "Invalid question ID:",
-        currentQuestion,
-      );
+      console.error("Invalid question ID:", currentQuestion);
 
       return;
     }
@@ -264,27 +243,18 @@ class Quest extends React.Component {
       console.log("Poll API status:", response.status);
 
       if (!response.ok) {
-        let errorMessage =
-          "We could not record your vote. Please try again.";
+        let errorMessage = "We could not record your vote. Please try again.";
 
         try {
-          errorMessage = await getApiError(
-            response,
-            errorMessage,
-          );
+          errorMessage = await getApiError(response, errorMessage);
         } catch (error) {
-          console.error(
-            "Could not parse API error:",
-            error,
-          );
+          console.error("Could not parse API error:", error);
 
           try {
             const errorData = await response.json();
 
             errorMessage =
-              errorData?.message ||
-              errorData?.error ||
-              errorMessage;
+              errorData?.message || errorData?.error || errorMessage;
           } catch {
             // Ignore JSON parsing errors.
           }
@@ -337,8 +307,7 @@ class Quest extends React.Component {
       this.setState({
         isSubmitting: false,
         errorMessage:
-          err?.message ||
-          "We could not record your vote. Please try again.",
+          err?.message || "We could not record your vote. Please try again.",
       });
     }
   };
@@ -369,17 +338,23 @@ class Quest extends React.Component {
 
     const options = currentQuestion?.options || [];
 
-    
+    /*
+     * IMPORTANT:
+     *
+     * The submit button should NOT be disabled simply because
+     * the browser thinks the user has voted.
+     *
+     * hasVoted is handled separately below.
+     *
+     * The button is disabled only when:
+     * 1. The question is loading.
+     * 2. A submission is currently happening.
+     * 3. No option has been selected.
+     */
     const isSubmitDisabled =
-      isLoading ||
-      isSubmitting ||
-      !selectedOption ||
-      hasVoted;
+      isLoading || isSubmitting || !selectedOption || hasVoted;
 
-    const isInteractionDisabled =
-      isLoading ||
-      isSubmitting ||
-      hasVoted;
+    const isInteractionDisabled = isLoading || isSubmitting || hasVoted;
 
     return (
       <>
@@ -404,8 +379,7 @@ class Quest extends React.Component {
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
                 {errorMessage}
               </div>
-            ) : !currentQuestion ||
-              !currentQuestion.question ? (
+            ) : !currentQuestion || !currentQuestion.question ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
                 No poll available at this moment.
               </div>
@@ -433,15 +407,11 @@ class Quest extends React.Component {
                   </div>
                 )}
 
-                <form
-                  className="w-auto"
-                  onSubmit={this.handleSubmit}
-                >
+                <form className="w-auto" onSubmit={this.handleSubmit}>
                   {options.map((opt, idx) => {
                     const optionText = this.getOptionText(opt);
 
-                    const isChecked =
-                      selectedOption === optionText;
+                    const isChecked = selectedOption === optionText;
 
                     return (
                       <div
@@ -460,11 +430,7 @@ class Quest extends React.Component {
                             name="poll_answer"
                             value={optionText}
                             checked={isChecked}
-                            onChange={() =>
-                              this.handleOptionChange(
-                                optionText,
-                              )
-                            }
+                            onChange={() => this.handleOptionChange(optionText)}
                             disabled={isInteractionDisabled}
                           />{" "}
                           {optionText}
