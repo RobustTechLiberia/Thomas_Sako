@@ -1,5 +1,3 @@
-"use strict";
-
 const express = require("express");
 const mysql = require("mysql2/promise");
 const crypto = require("crypto");
@@ -10,22 +8,16 @@ const router = express.Router();
 
 router.use(express.json());
 
-const REQUIRED_DB_VARS = [
-  "DB_HOST",
-  "DB_USER",
-  "DB_DATABASE",
-];
+const REQUIRED_DB_VARS = ["DB_HOST", "DB_USER", "DB_DATABASE"];
 
 const VOTE_WINDOW_SECONDS = 24 * 60 * 60;
 
 const isDatabaseConfigured = () => {
   const hasBaseVars = REQUIRED_DB_VARS.every((varName) =>
-    Boolean(process.env[varName])
+    Boolean(process.env[varName]),
   );
 
-  const hasPassword = Boolean(
-    process.env.DB_PASS || process.env.DB_PASSWORD
-  );
+  const hasPassword = Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
 
   return hasBaseVars && hasPassword;
 };
@@ -48,9 +40,7 @@ const loadSslConfig = () => {
       const ca = normalizePem(process.env.DB_SSL_CA);
 
       if (!ca.includes("BEGIN CERTIFICATE")) {
-        throw new Error(
-          "DB_SSL_CA does not contain a valid PEM certificate."
-        );
+        throw new Error("DB_SSL_CA does not contain a valid PEM certificate.");
       }
 
       return {
@@ -60,14 +50,9 @@ const loadSslConfig = () => {
     }
 
     if (process.env.DB_SSL_CA_FILE) {
-      const configuredValue =
-        process.env.DB_SSL_CA_FILE.trim();
+      const configuredValue = process.env.DB_SSL_CA_FILE.trim();
 
-      if (
-        configuredValue.includes(
-          "-----BEGIN CERTIFICATE-----"
-        )
-      ) {
+      if (configuredValue.includes("-----BEGIN CERTIFICATE-----")) {
         return {
           ca: normalizePem(configuredValue),
           rejectUnauthorized: true,
@@ -77,27 +62,14 @@ const loadSslConfig = () => {
       const possiblePaths = [
         path.resolve(process.cwd(), configuredValue),
         path.resolve(__dirname, configuredValue),
-        path.resolve(
-          process.cwd(),
-          "..",
-          configuredValue
-        ),
+        path.resolve(process.cwd(), "..", configuredValue),
       ];
 
       for (const certificatePath of possiblePaths) {
         if (fs.existsSync(certificatePath)) {
-          const ca = normalizePem(
-            fs.readFileSync(
-              certificatePath,
-              "utf8"
-            )
-          );
+          const ca = normalizePem(fs.readFileSync(certificatePath, "utf8"));
 
-          if (
-            ca.includes(
-              "-----BEGIN CERTIFICATE-----"
-            )
-          ) {
+          if (ca.includes("-----BEGIN CERTIFICATE-----")) {
             return {
               ca,
               rejectUnauthorized: true,
@@ -106,9 +78,7 @@ const loadSslConfig = () => {
         }
       }
 
-      throw new Error(
-        `CA certificate file was not found: ${configuredValue}`
-      );
+      throw new Error(`CA certificate file was not found: ${configuredValue}`);
     }
 
     const defaultPaths = [
@@ -119,18 +89,9 @@ const loadSslConfig = () => {
 
     for (const certificatePath of defaultPaths) {
       if (fs.existsSync(certificatePath)) {
-        const ca = normalizePem(
-          fs.readFileSync(
-            certificatePath,
-            "utf8"
-          )
-        );
+        const ca = normalizePem(fs.readFileSync(certificatePath, "utf8"));
 
-        if (
-          ca.includes(
-            "-----BEGIN CERTIFICATE-----"
-          )
-        ) {
+        if (ca.includes("-----BEGIN CERTIFICATE-----")) {
           return {
             ca,
             rejectUnauthorized: true,
@@ -139,21 +100,15 @@ const loadSslConfig = () => {
       }
     }
 
-    if (
-      String(process.env.SSL_MODE || "").toUpperCase() ===
-      "REQUIRED"
-    ) {
+    if (String(process.env.SSL_MODE || "").toUpperCase() === "REQUIRED") {
       throw new Error(
-        "SSL_MODE=REQUIRED but no valid Aiven CA certificate was found."
+        "SSL_MODE=REQUIRED but no valid Aiven CA certificate was found.",
       );
     }
 
     return undefined;
   } catch (error) {
-    console.error(
-      "Failed to initialize SSL configuration:",
-      error.message
-    );
+    console.error("Failed to initialize SSL configuration:", error.message);
 
     throw error;
   }
@@ -170,15 +125,10 @@ const getPool = () => {
     return null;
   }
 
-  const port = Number.parseInt(
-    process.env.DB_PORT || "3306",
-    10
-  );
+  const port = Number.parseInt(process.env.DB_PORT || "3306", 10);
 
   if (!Number.isInteger(port) || port <= 0) {
-    throw new Error(
-      `Invalid DB_PORT: ${process.env.DB_PORT}`
-    );
+    throw new Error(`Invalid DB_PORT: ${process.env.DB_PORT}`);
   }
 
   const ssl = loadSslConfig();
@@ -186,9 +136,7 @@ const getPool = () => {
   pool = mysql.createPool({
     host: process.env.DB_HOST.trim(),
     user: process.env.DB_USER.trim(),
-    password:
-      process.env.DB_PASS ||
-      process.env.DB_PASSWORD,
+    password: process.env.DB_PASS || process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE.trim(),
     port,
     waitForConnections: true,
@@ -216,10 +164,7 @@ const getVoteCookieName = (question) => {
 const hasVoteCookie = (req, cookieName) => {
   if (
     req.cookies &&
-    Object.prototype.hasOwnProperty.call(
-      req.cookies,
-      cookieName
-    )
+    Object.prototype.hasOwnProperty.call(req.cookies, cookieName)
   ) {
     return true;
   }
@@ -230,13 +175,11 @@ const hasVoteCookie = (req, cookieName) => {
     return false;
   }
 
-  return rawCookies
-    .split(";")
-    .some((cookieStr) => {
-      const parts = cookieStr.trim().split("=");
+  return rawCookies.split(";").some((cookieStr) => {
+    const parts = cookieStr.trim().split("=");
 
-      return parts[0] === cookieName;
-    });
+    return parts[0] === cookieName;
+  });
 };
 
 router.post("/submit", async (req, res) => {
@@ -245,25 +188,18 @@ router.post("/submit", async (req, res) => {
   try {
     dbPool = getPool();
   } catch (error) {
-    console.error(
-      "Database initialization error:",
-      error.message
-    );
+    console.error("Database initialization error:", error.message);
 
     return res.status(503).json({
-      error:
-        "Voting service is temporarily unavailable.",
+      error: "Voting service is temporarily unavailable.",
     });
   }
 
   if (!dbPool) {
-    console.error(
-      "Vote database is not configured."
-    );
+    console.error("Vote database is not configured.");
 
     return res.status(503).json({
-      error:
-        "Voting is temporarily unavailable. Please try again later.",
+      error: "Voting is temporarily unavailable. Please try again later.",
     });
   }
 
@@ -276,8 +212,7 @@ router.post("/submit", async (req, res) => {
     !answer.trim()
   ) {
     return res.status(400).json({
-      error:
-        "Question and answer fields are required.",
+      error: "Question and answer fields are required.",
     });
   }
 
@@ -286,20 +221,17 @@ router.post("/submit", async (req, res) => {
 
   if (normalizedQuestion.length > 255) {
     return res.status(400).json({
-      error:
-        "Question must not exceed 255 characters.",
+      error: "Question must not exceed 255 characters.",
     });
   }
 
   if (normalizedAnswer.length > 255) {
     return res.status(400).json({
-      error:
-        "Answer must not exceed 255 characters.",
+      error: "Answer must not exceed 255 characters.",
     });
   }
 
-  const voteCookieName =
-    getVoteCookieName(normalizedQuestion);
+  const voteCookieName = getVoteCookieName(normalizedQuestion);
 
   if (hasVoteCookie(req, voteCookieName)) {
     return res.status(429).json({
@@ -316,17 +248,16 @@ router.post("/submit", async (req, res) => {
 
     await connection.beginTransaction();
 
-    const [recentVotes] =
-      await connection.execute(
-        `
+    const [recentVotes] = await connection.execute(
+      `
           SELECT id
           FROM poll
           WHERE questions = ?
             AND date >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
           LIMIT 1
         `,
-        [normalizedQuestion]
-      );
+      [normalizedQuestion],
+    );
 
     if (recentVotes.length > 0) {
       await connection.rollback();
@@ -338,9 +269,8 @@ router.post("/submit", async (req, res) => {
       });
     }
 
-    const [result] =
-      await connection.execute(
-        `
+    const [result] = await connection.execute(
+      `
           INSERT INTO poll
           (
             questions,
@@ -350,34 +280,23 @@ router.post("/submit", async (req, res) => {
           )
           VALUES (?, ?, 1, CURDATE())
         `,
-        [
-          normalizedQuestion,
-          normalizedAnswer,
-        ]
-      );
+      [normalizedQuestion, normalizedAnswer],
+    );
 
     await connection.commit();
 
     if (typeof res.cookie === "function") {
-      res.cookie(
-        voteCookieName,
-        "1",
-        {
-          maxAge:
-            VOTE_WINDOW_SECONDS * 1000,
-          path: "/",
-          httpOnly: true,
-          sameSite: "lax",
-          secure:
-            process.env.NODE_ENV ===
-            "production",
-        }
-      );
+      res.cookie(voteCookieName, "1", {
+        maxAge: VOTE_WINDOW_SECONDS * 1000,
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      });
     }
 
     return res.status(201).json({
-      message:
-        "Vote recorded successfully!",
+      message: "Vote recorded successfully!",
       id: result.insertId,
     });
   } catch (error) {
@@ -385,29 +304,20 @@ router.post("/submit", async (req, res) => {
       try {
         await connection.rollback();
       } catch (rollbackError) {
-        console.error(
-          "Transaction rollback failed:",
-          rollbackError.message
-        );
+        console.error("Transaction rollback failed:", rollbackError.message);
       }
     }
 
-    console.error(
-      "Database error during vote submission:",
-      {
-        message: error.message,
-        code: error.code,
-        errno: error.errno,
-        sqlState: error.sqlState,
-      }
-    );
+    console.error("Database error during vote submission:", {
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+    });
 
     return res.status(500).json({
-      error:
-        "Failed to process form submission.",
-      code:
-        error.code ||
-        "DATABASE_ERROR",
+      error: "Failed to process form submission.",
+      code: error.code || "DATABASE_ERROR",
     });
   } finally {
     if (connection) {
@@ -422,43 +332,32 @@ router.get("/results", async (req, res) => {
   try {
     dbPool = getPool();
   } catch (error) {
-    console.error(
-      "Database initialization error:",
-      error.message
-    );
+    console.error("Database initialization error:", error.message);
 
     return res.status(503).json({
-      error:
-        "Analytics service is currently unavailable.",
+      error: "Analytics service is currently unavailable.",
     });
   }
 
   if (!dbPool) {
     return res.status(503).json({
-      error:
-        "Analytics service is currently unavailable.",
+      error: "Analytics service is currently unavailable.",
     });
   }
 
   const { question } = req.query;
 
-  if (
-    typeof question !== "string" ||
-    !question.trim()
-  ) {
+  if (typeof question !== "string" || !question.trim()) {
     return res.status(400).json({
-      error:
-        "Missing or invalid 'question' query parameter.",
+      error: "Missing or invalid 'question' query parameter.",
     });
   }
 
-  const normalizedQuestion =
-    question.trim();
+  const normalizedQuestion = question.trim();
 
   try {
-    const [rows] =
-      await dbPool.execute(
-        `
+    const [rows] = await dbPool.execute(
+      `
           SELECT
             answers,
             COALESCE(SUM(votes), 0) AS total_votes
@@ -467,22 +366,18 @@ router.get("/results", async (req, res) => {
           GROUP BY answers
           ORDER BY total_votes DESC
         `,
-        [normalizedQuestion]
-      );
+      [normalizedQuestion],
+    );
 
     const stats = {};
 
     rows.forEach((row) => {
-      stats[row.answers] =
-        Number(row.total_votes) || 0;
+      stats[row.answers] = Number(row.total_votes) || 0;
     });
 
-    const totalVotes = Object.values(
-      stats
-    ).reduce(
-      (total, votes) =>
-        total + votes,
-      0
+    const totalVotes = Object.values(stats).reduce(
+      (total, votes) => total + votes,
+      0,
     );
 
     return res.status(200).json({
@@ -491,22 +386,16 @@ router.get("/results", async (req, res) => {
       votes: stats,
     });
   } catch (error) {
-    console.error(
-      "Failed to fetch aggregate poll analytics:",
-      {
-        message: error.message,
-        code: error.code,
-        errno: error.errno,
-        sqlState: error.sqlState,
-      }
-    );
+    console.error("Failed to fetch aggregate poll analytics:", {
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+    });
 
     return res.status(500).json({
-      error:
-        "Database analytics retrieval failed.",
-      code:
-        error.code ||
-        "DATABASE_ERROR",
+      error: "Database analytics retrieval failed.",
+      code: error.code || "DATABASE_ERROR",
     });
   }
 });
@@ -519,8 +408,7 @@ router.get("/db", async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: "error",
-      error:
-        "Database initialization failed.",
+      error: "Database initialization failed.",
       message: error.message,
     });
   }
@@ -528,56 +416,38 @@ router.get("/db", async (req, res) => {
   if (!dbPool) {
     return res.status(503).json({
       status: "error",
-      error:
-        "Database is not configured.",
+      error: "Database is not configured.",
     });
   }
 
   let connection;
 
   try {
-    connection =
-      await dbPool.getConnection();
+    connection = await dbPool.getConnection();
 
-    const [rows] =
-      await connection.query(
-        "SELECT 1 AS database_connection"
-      );
+    const [rows] = await connection.query("SELECT 1 AS database_connection");
 
     return res.status(200).json({
       status: "ok",
-      message:
-        "Database connection verified successfully.",
-      database:
-        process.env.DB_DATABASE,
-      host:
-        process.env.DB_HOST,
-      port:
-        Number.parseInt(
-          process.env.DB_PORT || "3306",
-          10
-        ),
+      message: "Database connection verified successfully.",
+      database: process.env.DB_DATABASE,
+      host: process.env.DB_HOST,
+      port: Number.parseInt(process.env.DB_PORT || "3306", 10),
       test: rows[0],
     });
   } catch (error) {
-    console.error(
-      "Database health check failed:",
-      {
-        message: error.message,
-        code: error.code,
-        errno: error.errno,
-        sqlState: error.sqlState,
-      }
-    );
+    console.error("Database health check failed:", {
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+    });
 
     return res.status(500).json({
       status: "error",
-      error:
-        "Database connectivity check failed.",
+      error: "Database connectivity check failed.",
       message: error.message,
-      code:
-        error.code ||
-        "DATABASE_ERROR",
+      code: error.code || "DATABASE_ERROR",
     });
   } finally {
     if (connection) {
