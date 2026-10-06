@@ -11,18 +11,23 @@ class Quest extends React.Component {
     super(props);
     this.state = {
       questions: [],
-      currentQuestion: { question: "", options: [] },
+      currentQuestion: { id: null, question: "", options: [] },
       selectedOption: "",
-      statusMessage: "",
       hasVoted: false,
       isLoading: true,
+      isSubmitting: false,
       shouldRedirectToResults: false,
     };
   }
 
   componentDidMount() {
     fetch(`${import.meta.env.BASE_URL}questions.json`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to load questions resource.");
+        }
+        return res.json();
+      })
       .then((data) => {
         if (!Array.isArray(data) || data.length === 0) {
           throw new Error("No poll questions are available.");
@@ -31,7 +36,7 @@ class Quest extends React.Component {
         const today = new Date();
         const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
         const questionIndex = dayIndex % data.length;
-        const activeQuestion = data[questionIndex];
+        const activeQuestion = data[questionIndex] || { question: "", options: [] };
 
         const voteTimestamp = localStorage.getItem(`vote_time_${activeQuestion.id}`);
         let alreadyVoted = false;
@@ -51,37 +56,36 @@ class Quest extends React.Component {
           currentQuestion: activeQuestion,
           hasVoted: alreadyVoted,
           isLoading: false,
-          statusMessage: alreadyVoted
-            ? "You have already voted on this question."
-            : "",
         });
       })
       .catch((err) => {
         console.error("Error loading questions:", err);
         this.setState({
           isLoading: false,
-          statusMessage: "Unable to load today's poll. Please try again later.",
         });
       });
   }
 
   handleOptionChange = (e) => {
-    if (this.state.hasVoted) return;
-    this.setState({ selectedOption: e.target.value, statusMessage: "" });
+    if (this.state.hasVoted || this.state.isSubmitting) return;
+    this.setState({ selectedOption: e.target.value });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    const { currentQuestion, selectedOption, hasVoted } = this.state;
+    const { currentQuestion, selectedOption, hasVoted, isSubmitting } = this.state;
 
-    if (!selectedOption || hasVoted) {
+    if (!selectedOption || hasVoted || isSubmitting) {
       return;
     }
 
-    // FIX: Lock interface immediately when clicked to prevent double clicks or race condition bugs
-    this.setState({ hasVoted: true, statusMessage: "Submitting your vote..." });
+    // Lock interface immediately when clicked to prevent double clicks or race condition bugs
+    this.setState({ 
+      isSubmitting: true, 
+    });
 
     const payload = {
+      questionId: currentQuestion.id,
       question: currentQuestion.question,
       answer: selectedOption,
     };
@@ -98,25 +102,24 @@ class Quest extends React.Component {
         throw new Error(
           await getApiError(
             response,
-            "We could not record your vote. Please try again.",
-          ),
+            "We could not record your vote. Please try again."
+          )
         );
       }
 
       localStorage.setItem(
         `vote_time_${currentQuestion.id}`,
-        Date.now().toString(),
+        Date.now().toString()
       );
       this.setState({
         hasVoted: true,
-        statusMessage: "Vote recorded successfully! Redirecting...",
+        isSubmitting: false,
         shouldRedirectToResults: true,
       });
     } catch (err) {
       console.error("Submission failed:", err);
       this.setState({
-        hasVoted: false,
-        statusMessage: err.message || "Submission failed. Please try again.",
+        isSubmitting: false,
       });
     }
   };
@@ -131,14 +134,17 @@ class Quest extends React.Component {
       currentQuestion,
       selectedOption,
       hasVoted,
-      statusMessage,
       isLoading,
+      isSubmitting,
       shouldRedirectToResults,
     } = this.state;
 
     if (shouldRedirectToResults) {
-      return <Navigate to="/results" replace />;
+      return <Navigate replace to="/results"/>;
     }
+
+    const options = currentQuestion?.options || [];
+    const isInteractionDisabled = isLoading || hasVoted || isSubmitting;
 
     return (
       <>
@@ -160,7 +166,7 @@ class Quest extends React.Component {
               </div>
             ) : !currentQuestion || !currentQuestion.question ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
-                {statusMessage || "No poll available at this moment."}
+                No poll available at this moment.
               </div>
             ) : (
               <>
@@ -169,10 +175,14 @@ class Quest extends React.Component {
                 </h3>
 
                 <form className="w-auto" onSubmit={this.handleSubmit}>
-                  {currentQuestion?.options?.map((opt, idx) => (
+                  {options.map((opt, idx) => (
                     <div key={idx} className="md:my-3 lg:my-3">
                       <label
-                        className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${hasVoted ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                        className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
+                          isInteractionDisabled
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer"
+                        }`}
                       >
                         <input
                           type="radio"
@@ -180,7 +190,7 @@ class Quest extends React.Component {
                           value={opt}
                           checked={selectedOption === opt}
                           onChange={this.handleOptionChange}
-                          disabled={hasVoted || isLoading}
+                          disabled={isInteractionDisabled}
                         />{" "}
                         {opt}
                       </label>
@@ -189,15 +199,22 @@ class Quest extends React.Component {
                   <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
                     <input
                       type="submit"
-                      value={isLoading ? "loading..." : hasVoted ? "voted" : "vote"}
-                      disabled={isLoading || hasVoted || !selectedOption}
-                      className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${isLoading || hasVoted || !selectedOption ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase" : "bg-[#830000] cursor-pointer"}`}
+                      value={
+                        isLoading
+                          ? "loading..."
+                          : isSubmitting
+                          ? "submitting..."
+                          : hasVoted
+                          ? "voted"
+                          : "vote"
+                      }
+                      disabled={isInteractionDisabled || !selectedOption}
+                      className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${
+                        isInteractionDisabled || !selectedOption
+                          ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase"
+                          : "bg-[#830000] cursor-pointer"
+                      }`}
                     />
-                    {statusMessage && (
-                      <p className="text-sm font-sans font-semibold mt-2 text-[#830000]">
-                        {statusMessage}
-                      </p>
-                    )}
                   </div>
                 </form>
               </>
@@ -217,7 +234,7 @@ class Quest extends React.Component {
               <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
             </div> */}
           </div>
-          <Advert />
+          <Advert/>
         </div>
       </>
     );

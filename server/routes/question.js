@@ -17,7 +17,7 @@ router.use(express.json());
  */
 const isDatabaseConfigured = () => {
   const hasBaseVars = REQUIRED_DB_VARS.every((varName) =>
-    Boolean(process.env[varName])
+    Boolean(process.env[varName]),
   );
   const hasPassword = Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
   return hasBaseVars && hasPassword;
@@ -45,7 +45,7 @@ const cachedSslConfig = (() => {
 
       const configuredPath = path.resolve(
         process.cwd(),
-        process.env.DB_SSL_CA_FILE
+        process.env.DB_SSL_CA_FILE,
       );
       if (fs.existsSync(configuredPath)) {
         return {
