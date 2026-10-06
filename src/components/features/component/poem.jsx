@@ -16,7 +16,7 @@ class Poem extends React.Component {
           </div>
           <div className="w-96 mx-5 mb-5">
             <div className="flex flex-wrap justify-start items-start">
-              <p className="font-sans text-left md:mt-10">
+              {/* <p className="font-sans text-left md:mt-10">
                 <b>Hush, Listen, Read!</b>
                 <br />
                 <br />
@@ -37,7 +37,7 @@ class Poem extends React.Component {
                 <i>
                   Author: <b>Thomas M. Sarko</b>
                 </i>
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
