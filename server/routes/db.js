@@ -10,12 +10,13 @@ router.use(express.json());
 
 /**
  * Reads CA certificate synchronously ONCE during module init/startup.
+ * Returns undefined if no CA certificate is found or provided.
  */
 const getSslConfig = () => {
   if (process.env.DB_SSL_CA) {
     return {
       ca: process.env.DB_SSL_CA.replace(/\\n/g, "\n"),
-      rejectUnauthorized: true,
+      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
     };
   }
 
@@ -24,7 +25,7 @@ const getSslConfig = () => {
   if (rawCaFile && rawCaFile.includes("BEGIN CERTIFICATE")) {
     return {
       ca: rawCaFile.replace(/\\n/g, "\n"),
-      rejectUnauthorized: true,
+      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
     };
   }
 
@@ -35,7 +36,7 @@ const getSslConfig = () => {
   if (configuredPath && fs.existsSync(configuredPath)) {
     return {
       ca: fs.readFileSync(configuredPath),
-      rejectUnauthorized: true,
+      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
     };
   }
 
@@ -43,25 +44,35 @@ const getSslConfig = () => {
   if (fs.existsSync(rootCertPath)) {
     return {
       ca: fs.readFileSync(rootCertPath),
-      rejectUnauthorized: true,
+      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
     };
   }
 
   return undefined;
 };
 
-// Create promise-based connection pool
-const pool = mysql.createPool({
+// Create promise-based connection pool with robust fallbacks
+const poolConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
-  ...(process.env.DB_PORT && { port: parseInt(process.env.DB_PORT, 10) }),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: getSslConfig(),
-});
+  connectTimeout: 10000, // 10s timeout
+};
+
+if (process.env.DB_PORT) {
+  poolConfig.port = parseInt(process.env.DB_PORT, 10);
+}
+
+const sslConfig = getSslConfig();
+if (sslConfig) {
+  poolConfig.ssl = sslConfig;
+}
+
+const pool = mysql.createPool(poolConfig);
 
 /**
  * Controller to handle vote insertion
@@ -93,7 +104,10 @@ const handleVoteInsertion = async (req, res) => {
     });
   } catch (err) {
     console.error("Failed to insert vote into MySQL:", err);
-    return res.status(500).json({ error: "Failed to record vote" });
+    return res.status(500).json({
+      error: "Failed to record vote",
+      details: err.message,
+    });
   }
 };
 
@@ -137,33 +151,49 @@ router.get("/results", async (req, res) => {
     console.error("Failed to fetch aggregate poll analytics:", err);
     return res.status(500).json({
       error: "Database analytics retrieval failed",
+      details: err.message,
     });
   }
 });
 
 /**
- * GET /db - Health Check & Table Readiness Verification
+ * GET /db - Health Check & Diagnostics
+ * Returns exact error code, message, and host config if the connection fails.
  */
 router.get("/db", async (req, res) => {
   try {
-    // Ping DB to confirm connection pool is active
-    await pool.query("SELECT 1");
+    const connection = await pool.getConnection();
+    await connection.query("SELECT 1");
+    connection.release();
 
     return res.status(200).json({
       status: "ok",
       message: "Database connection verified and poll table is active.",
+      config: {
+        host: poolConfig.host,
+        port: poolConfig.port || 3306,
+        database: poolConfig.database,
+        user: poolConfig.user,
+        sslEnabled: !!poolConfig.ssl,
+      },
     });
   } catch (err) {
     console.error("Database health check failed:", err);
     return res.status(500).json({
       status: "error",
       error: "Database connectivity check failed",
+      message: err.message,
+      code: err.code || "UNKNOWN_ERROR",
+      errno: err.errno,
+      syscall: err.syscall,
+      targetHost: poolConfig.host,
+      targetPort: poolConfig.port || 3306,
     });
   }
 });
 
 /**
- * POST /db/init - Optional explicit table initialization
+ * POST /db/init - Explicit table initialization
  */
 router.post("/db/init", async (req, res) => {
   try {
@@ -185,6 +215,7 @@ router.post("/db/init", async (req, res) => {
     console.error("Failed to initialize database table:", err);
     return res.status(500).json({
       error: "Failed to execute table setup script",
+      details: err.message,
     });
   }
 });
