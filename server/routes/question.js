@@ -6,6 +6,9 @@ const path = require("path");
 const router = express.Router();
 const requiredDatabaseVariables = ["DB_HOST", "DB_USER", "DB_DATABASE"];
 
+// Required parsing middleware attached at the router level
+router.use(express.json());
+
 const isDatabaseConfigured = () =>
   requiredDatabaseVariables.every((variable) =>
     Boolean(process.env[variable]),
@@ -20,8 +23,6 @@ const getSslConfig = () => {
   }
 
   if (process.env.DB_SSL_CA_FILE) {
-    // Accept a PEM placed in the legacy *_FILE variable as well. This keeps
-    // existing deployments working while DB_SSL_CA remains the preferred name.
     if (process.env.DB_SSL_CA_FILE.includes("BEGIN CERTIFICATE")) {
       return {
         ca: process.env.DB_SSL_CA_FILE.replace(/\\n/g, "\n"),
@@ -51,6 +52,7 @@ const getSslConfig = () => {
   return undefined;
 };
 
+// Global config container parsed safely
 const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -63,6 +65,7 @@ const dbConfig = {
   ssl: getSslConfig(),
 };
 
+// Create the pool
 const pool = mysql.createPool(dbConfig).promise();
 const voteWindowSeconds = 24 * 60 * 60;
 
@@ -76,12 +79,23 @@ const getVoteCookieName = (question) => {
   return `poll_vote_${questionKey}`;
 };
 
-const hasVoteCookie = (req, cookieName) =>
-  (req.headers.cookie || "")
+const hasVoteCookie = (req, cookieName) => {
+  // Safe extraction supporting standard cookier parsers or raw headers
+  const rawCookies = req.headers.cookie || "";
+  return rawCookies
     .split(";")
     .some((cookie) => cookie.trim().startsWith(`${cookieName}=`));
+};
 
-router.post("/submit", express.json(), async (req, res) => {
+// Removed express.json() from route signature to prevent collision with router-level parsing
+router.post("/submit", async (req, res) => {
+  if (!isDatabaseConfigured()) {
+    console.error("Vote database is not configured.");
+    return res.status(503).json({
+      error: "Voting is temporarily unavailable. Please try again later.",
+    });
+  }
+
   const { question, answer } = req.body;
 
   if (
@@ -98,13 +112,6 @@ router.post("/submit", express.json(), async (req, res) => {
   const normalizedQuestion = question.trim();
   const normalizedAnswer = answer.trim();
 
-  if (!isDatabaseConfigured()) {
-    console.error("Vote database is not configured.");
-    return res.status(503).json({
-      error: "Voting is temporarily unavailable. Please try again later.",
-    });
-  }
-
   const voteCookieName = getVoteCookieName(normalizedQuestion);
   if (hasVoteCookie(req, voteCookieName)) {
     return res.status(429).json({
@@ -115,7 +122,7 @@ router.post("/submit", express.json(), async (req, res) => {
   }
 
   try {
-    // Use the existing poll table and its existing columns; no schema changes are needed.
+    // Inserts 1 row per vote with a value of '1' in the votes column
     const insertSql =
       "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
     const voteDate = new Date().toISOString().slice(0, 10);
@@ -155,15 +162,17 @@ router.get("/results", async (req, res) => {
       .json({ error: "Missing 'question' query parameter." });
   }
 
+  // FIXED: Summed the `votes` column instead of counting the rows. 
+  // If the schema matches an upsert pattern elsewhere, SUM(votes) ensures total numerical accuracy.
   const sql = `
-    SELECT answers, COUNT(*) AS total_votes 
+    SELECT answers, SUM(votes) AS total_votes 
     FROM poll 
     WHERE questions = ? 
     GROUP BY answers
   `;
 
   try {
-    const [rows] = await pool.query(sql, [question]);
+    const [rows] = await pool.query(sql, [question.trim()]);
 
     const stats = {};
     rows.forEach((row) => {
@@ -171,7 +180,7 @@ router.get("/results", async (req, res) => {
     });
 
     return res.status(200).json({
-      question: question,
+      question: question.trim(),
       votes: stats,
     });
   } catch (err) {

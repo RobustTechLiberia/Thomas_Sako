@@ -4,10 +4,10 @@ const router = express.Router();
 
 router.use(express.json());
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+\$/;
+// Fixed Regex: Removed the extra backslash before '$'
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 router.post("/subscribe", async (req, res) => {
-
   if (!req.body || !req.body.email) {
     return res.status(400).json({ error: "Email field is required." });
   }
@@ -31,11 +31,12 @@ router.post("/subscribe", async (req, res) => {
     });
   }
 
+  // Best practice: Re-use transporter or create once outside route handler if high volume
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      pass: process.env.EMAIL_PASS, // Note: Must be a Gmail App Password, not standard password
     },
   });
 
