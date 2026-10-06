@@ -5,6 +5,16 @@ const mysql = require("mysql2/promise");
 const fs = require("fs");
 const path = require("path");
 
+router.get("/version", (req, res) => {
+  res.json({
+    status: "success",
+    deployment: "MYSQL-DEBUG-2026-10-06-V2",
+    node: process.version,
+    mysql2: require("mysql2/package.json").version,
+    timestamp: new Date().toISOString()
+  });
+});
+
 const router = express.Router();
 
 router.use(express.json());
