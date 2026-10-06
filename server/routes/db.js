@@ -74,7 +74,9 @@ const handleVoteInsertion = async (req, res, next) => {
     const cleanAnswer = typeof answer === "string" ? answer.trim() : "";
 
     if (!cleanQuestion || !cleanAnswer) {
-      return res.status(400).json({ error: "Question and answer are required" });
+      return res
+        .status(400)
+        .json({ error: "Question and answer are required" });
     }
 
     // Let MySQL handle CURDATE() natively to avoid UTC drift

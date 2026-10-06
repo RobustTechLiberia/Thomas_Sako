@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
@@ -9,24 +9,24 @@ const router = express.Router();
 const REQUIRED_DB_VARS = ["DB_HOST", "DB_USER", "DB_DATABASE"];
 const VOTE_WINDOW_SECONDS = 24 * 60 * 60; // 24 hours
 
-// Attach required middleware
+// Attach JSON body parsing middleware
 router.use(express.json());
 
 /**
- * Checks if the minimal required database environment variables are set.
+ * Validates minimal required database environment variables.
  */
 const isDatabaseConfigured = () => {
   const hasBaseVars = REQUIRED_DB_VARS.every((varName) =>
-    Boolean(process.env[varName]),
+    Boolean(process.env[varName])
   );
   const hasPassword = Boolean(process.env.DB_PASS || process.env.DB_PASSWORD);
   return hasBaseVars && hasPassword;
 };
 
 /**
- * Safely builds SSL configuration object if certificates exist.
+ * Pre-evaluates SSL configuration ONCE at startup to prevent blocking event loop I/O.
  */
-const getSslConfig = () => {
+const cachedSslConfig = (() => {
   try {
     if (process.env.DB_SSL_CA) {
       return {
@@ -45,7 +45,7 @@ const getSslConfig = () => {
 
       const configuredPath = path.resolve(
         process.cwd(),
-        process.env.DB_SSL_CA_FILE,
+        process.env.DB_SSL_CA_FILE
       );
       if (fs.existsSync(configuredPath)) {
         return {
@@ -67,14 +67,16 @@ const getSslConfig = () => {
   }
 
   return undefined;
-};
+})();
 
-// Lazy connection pool initialization to prevent boot-time crash when misconfigured
+// Thread-safe / idempotent connection pool initialization
 let pool = null;
 
 const getPool = () => {
-  if (!pool && isDatabaseConfigured()) {
-    const dbConfig = {
+  if (pool) return pool;
+
+  if (isDatabaseConfigured()) {
+    pool = mysql.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASS || process.env.DB_PASSWORD,
@@ -83,11 +85,10 @@ const getPool = () => {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-      ssl: getSslConfig(),
-    };
-
-    pool = mysql.createPool(dbConfig).promise();
+      ssl: cachedSslConfig,
+    });
   }
+
   return pool;
 };
 
@@ -105,21 +106,24 @@ const getVoteCookieName = (question) => {
 };
 
 /**
- * Robust cookie check handling standard req.cookies or raw headers.
+ * Robust cookie parser fallback for requests missing cookie-parser middleware.
  */
 const hasVoteCookie = (req, cookieName) => {
   if (req.cookies && req.cookies[cookieName]) {
     return true;
   }
 
-  const rawCookies = req.headers.cookie || "";
-  return rawCookies.split(";").some((item) => {
-    const [key] = item.trim().split("=");
-    return key === cookieName;
+  const rawCookies = req.headers.cookie;
+  if (!rawCookies) return false;
+
+  return rawCookies.split(";").some((cookieStr) => {
+    const parts = cookieStr.trim().split("=");
+    const name = parts[0];
+    return name === cookieName;
   });
 };
 
-// POST /submit - Record a new vote
+// POST /submit - Record a poll vote
 router.post("/submit", async (req, res) => {
   const dbPool = getPool();
   if (!dbPool) {
@@ -129,7 +133,7 @@ router.post("/submit", async (req, res) => {
     });
   }
 
-  const { question, answer } = req.body;
+  const { question, answer } = req.body || {};
 
   if (
     typeof question !== "string" ||
@@ -155,27 +159,25 @@ router.post("/submit", async (req, res) => {
   }
 
   try {
-    const insertSql =
-      "INSERT INTO poll (questions, answers, votes, date) VALUES (?, ?, 1, ?)";
-    const voteDate = new Date().toISOString().slice(0, 10);
+    // Delegate date resolution to MySQL CURDATE() to avoid server UTC drift
+    const insertSql = `
+      INSERT INTO poll (questions, answers, votes, date) 
+      VALUES (?, ?, 1, CURDATE())
+    `;
 
-    const [result] = await dbPool.query(insertSql, [
+    const [result] = await dbPool.execute(insertSql, [
       normalizedQuestion,
       normalizedAnswer,
-      voteDate,
     ]);
 
-    const isProduction = process.env.NODE_ENV === "production";
-    const cookieFlags = [
-      `${voteCookieName}=1`,
-      `Max-Age=${VOTE_WINDOW_SECONDS}`,
-      "Path=/",
-      "HttpOnly",
-      "SameSite=Lax",
-      ...(isProduction ? ["Secure"] : []),
-    ].join("; ");
-
-    res.setHeader("Set-Cookie", cookieFlags);
+    // Use Express native res.cookie to prevent header overwrites
+    res.cookie(voteCookieName, "1", {
+      maxAge: VOTE_WINDOW_SECONDS * 1000, // Express expects milliseconds
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
 
     return res.status(201).json({
       message: "Vote recorded successfully!",
@@ -189,7 +191,7 @@ router.post("/submit", async (req, res) => {
   }
 });
 
-// GET /results - Fetch poll results
+// GET /results - Fetch aggregate poll results
 router.get("/results", async (req, res) => {
   const dbPool = getPool();
   if (!dbPool) {
@@ -217,7 +219,7 @@ router.get("/results", async (req, res) => {
   `;
 
   try {
-    const [rows] = await dbPool.query(sql, [normalizedQuestion]);
+    const [rows] = await dbPool.execute(sql, [normalizedQuestion]);
 
     const stats = {};
     rows.forEach((row) => {
