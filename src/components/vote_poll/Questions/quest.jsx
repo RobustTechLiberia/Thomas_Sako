@@ -36,9 +36,14 @@ class Quest extends React.Component {
         const today = new Date();
         const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
         const questionIndex = dayIndex % data.length;
-        const activeQuestion = data[questionIndex] || { question: "", options: [] };
+        const activeQuestion = data[questionIndex] || {
+          question: "",
+          options: [],
+        };
 
-        const voteTimestamp = localStorage.getItem(`vote_time_${activeQuestion.id}`);
+        const voteTimestamp = localStorage.getItem(
+          `vote_time_${activeQuestion.id}`,
+        );
         let alreadyVoted = false;
 
         if (voteTimestamp) {
@@ -66,22 +71,31 @@ class Quest extends React.Component {
       });
   }
 
-  handleOptionChange = (e) => {
+  // Helper to extract clean text string regardless of option data shape
+  getOptionText = (opt) => {
+    if (typeof opt === "string") return opt;
+    if (opt && typeof opt === "object")
+      return opt.text || opt.label || opt.value || JSON.stringify(opt);
+    return String(opt);
+  };
+
+  handleOptionChange = (value) => {
     if (this.state.hasVoted || this.state.isSubmitting) return;
-    this.setState({ selectedOption: e.target.value });
+    this.setState({ selectedOption: value });
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    const { currentQuestion, selectedOption, hasVoted, isSubmitting } = this.state;
+    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
+      this.state;
 
     if (!selectedOption || hasVoted || isSubmitting) {
       return;
     }
 
     // Lock interface immediately when clicked to prevent double clicks or race condition bugs
-    this.setState({ 
-      isSubmitting: true, 
+    this.setState({
+      isSubmitting: true,
     });
 
     const payload = {
@@ -102,14 +116,14 @@ class Quest extends React.Component {
         throw new Error(
           await getApiError(
             response,
-            "We could not record your vote. Please try again."
-          )
+            "We could not record your vote. Please try again.",
+          ),
         );
       }
 
       localStorage.setItem(
         `vote_time_${currentQuestion.id}`,
-        Date.now().toString()
+        Date.now().toString(),
       );
       this.setState({
         hasVoted: true,
@@ -140,11 +154,12 @@ class Quest extends React.Component {
     } = this.state;
 
     if (shouldRedirectToResults) {
-      return <Navigate replace to="/results"/>;
+      return <Navigate replace to="/results" />;
     }
 
     const options = currentQuestion?.options || [];
     const isInteractionDisabled = isLoading || hasVoted || isSubmitting;
+    const isSubmitDisabled = isInteractionDisabled || !selectedOption;
 
     return (
       <>
@@ -175,46 +190,50 @@ class Quest extends React.Component {
                 </h3>
 
                 <form className="w-auto" onSubmit={this.handleSubmit}>
-                  {options.map((opt, idx) => (
-                    <div key={idx} className="md:my-3 lg:my-3">
-                      <label
-                        className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
-                          isInteractionDisabled
-                            ? "cursor-not-allowed opacity-60"
-                            : "cursor-pointer"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="answer"
-                          value={opt}
-                          checked={selectedOption === opt}
-                          onChange={this.handleOptionChange}
-                          disabled={isInteractionDisabled}
-                        />{" "}
-                        {opt}
-                      </label>
-                    </div>
-                  ))}
+                  {options.map((opt, idx) => {
+                    const optionText = this.getOptionText(opt);
+                    const isChecked = selectedOption === optionText;
+
+                    return (
+                      <div key={idx} className="md:my-3 lg:my-3">
+                        <label
+                          className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
+                            isInteractionDisabled
+                              ? "cursor-not-allowed opacity-60"
+                              : "cursor-pointer"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="poll_answer"
+                            value={optionText}
+                            checked={isChecked}
+                            onChange={() => this.handleOptionChange(optionText)}
+                            disabled={isInteractionDisabled}
+                          />{" "}
+                          {optionText}
+                        </label>
+                      </div>
+                    );
+                  })}
                   <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
-                    <input
+                    <button
                       type="submit"
-                      value={
-                        isLoading
-                          ? "loading..."
-                          : isSubmitting
-                          ? "submitting..."
-                          : hasVoted
-                          ? "voted"
-                          : "vote"
-                      }
-                      disabled={isInteractionDisabled || !selectedOption}
-                      className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold ${
-                        isInteractionDisabled || !selectedOption
-                          ? "bg-[#830000] cursor-not-allowed opacity-60 uppercase"
+                      disabled={isSubmitDisabled}
+                      className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold uppercase ${
+                        isSubmitDisabled
+                          ? "bg-[#830000] cursor-not-allowed opacity-60"
                           : "bg-[#830000] cursor-pointer"
                       }`}
-                    />
+                    >
+                      {isLoading
+                        ? "loading..."
+                        : isSubmitting
+                          ? "submitting..."
+                          : hasVoted
+                            ? "voted"
+                            : "vote"}
+                    </button>
                   </div>
                 </form>
               </>
@@ -234,7 +253,7 @@ class Quest extends React.Component {
               <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
             </div> */}
           </div>
-          <Advert/>
+          <Advert />
         </div>
       </>
     );
