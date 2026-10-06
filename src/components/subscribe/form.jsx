@@ -49,7 +49,8 @@ class DefaultPage extends React.Component {
       console.error("Error submitting email:", error);
       this.setState({
         isSubmitting: false,
-        statusMessage: "Unable to reach the subscription service. Please try again.",
+        statusMessage:
+          "Unable to reach the subscription service. Please try again.",
       });
     }
   };
@@ -80,7 +81,8 @@ class DefaultPage extends React.Component {
             className="bg-[#830000] cursor-pointer text-white text-xl capitalize py-3 px-5 border-none"
           >
             {isSubmitting ? "sending..." : "subscribe"}
-          </button>
+          </button>{" "}
+          <br />
           {statusMessage && (
             <p className="w-full text-sm text-[#830000]" role="status">
               {statusMessage}
