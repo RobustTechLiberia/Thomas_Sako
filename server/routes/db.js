@@ -5,27 +5,33 @@ const path = require("path");
 
 const router = express.Router();
 
-// Parse incoming JSON requests for this router
 router.use(express.json());
 
-/**
- * Reads CA certificate synchronously ONCE during module init/startup.
- * Returns undefined if no CA certificate is found or provided.
- */
+const cleanEnv = (val) => (val ? val.trim().replace(/^["']|["']$/g, "") : "");
+
+const rawHost = cleanEnv(process.env.DB_HOST);
+const rawUser = cleanEnv(process.env.DB_USER);
+const rawPass = cleanEnv(process.env.DB_PASS);
+const rawDb = cleanEnv(process.env.DB_DATABASE);
+const rawPort = cleanEnv(process.env.DB_PORT);
+
 const getSslConfig = () => {
-  if (process.env.DB_SSL_CA) {
+  const inlineCa = cleanEnv(process.env.DB_SSL_CA);
+  if (inlineCa) {
     return {
-      ca: process.env.DB_SSL_CA.replace(/\\n/g, "\n"),
-      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+      ca: inlineCa.replace(/\\n/g, "\n"),
+      rejectUnauthorized:
+        cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED) !== "false",
     };
   }
 
-  const rawCaFile = process.env.DB_SSL_CA_FILE;
+  const rawCaFile = cleanEnv(process.env.DB_SSL_CA_FILE);
 
   if (rawCaFile && rawCaFile.includes("BEGIN CERTIFICATE")) {
     return {
       ca: rawCaFile.replace(/\\n/g, "\n"),
-      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+      rejectUnauthorized:
+        cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED) !== "false",
     };
   }
 
@@ -36,7 +42,8 @@ const getSslConfig = () => {
   if (configuredPath && fs.existsSync(configuredPath)) {
     return {
       ca: fs.readFileSync(configuredPath),
-      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+      rejectUnauthorized:
+        cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED) !== "false",
     };
   }
 
@@ -44,27 +51,33 @@ const getSslConfig = () => {
   if (fs.existsSync(rootCertPath)) {
     return {
       ca: fs.readFileSync(rootCertPath),
-      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+      rejectUnauthorized:
+        cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED) !== "false",
+    };
+  }
+
+  if (rawHost && rawHost.includes("aivencloud.com")) {
+    return {
+      rejectUnauthorized: false,
     };
   }
 
   return undefined;
 };
 
-// Create promise-based connection pool with robust fallbacks
 const poolConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
+  host: rawHost,
+  user: rawUser,
+  password: rawPass,
+  database: rawDb,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 10000, // 10s timeout
+  connectTimeout: 10000,
 };
 
-if (process.env.DB_PORT) {
-  poolConfig.port = parseInt(process.env.DB_PORT, 10);
+if (rawPort) {
+  poolConfig.port = parseInt(rawPort, 10);
 }
 
 const sslConfig = getSslConfig();
@@ -74,9 +87,6 @@ if (sslConfig) {
 
 const pool = mysql.createPool(poolConfig);
 
-/**
- * Controller to handle vote insertion
- */
 const handleVoteInsertion = async (req, res) => {
   try {
     const { question, answer } = req.body || {};
@@ -90,7 +100,6 @@ const handleVoteInsertion = async (req, res) => {
         .json({ error: "Question and answer are required" });
     }
 
-    // Let MySQL handle CURDATE() natively to avoid UTC drift
     const sql = `
       INSERT INTO poll (questions, answers, votes, date)
       VALUES (?, ?, 1, CURDATE())
@@ -111,7 +120,6 @@ const handleVoteInsertion = async (req, res) => {
   }
 };
 
-// Routes
 router.post("/", handleVoteInsertion);
 router.post("/db", handleVoteInsertion);
 
@@ -156,10 +164,6 @@ router.get("/results", async (req, res) => {
   }
 });
 
-/**
- * GET /db - Health Check & Diagnostics
- * Returns exact error code, message, and host config if the connection fails.
- */
 router.get("/db", async (req, res) => {
   try {
     const connection = await pool.getConnection();
@@ -171,7 +175,7 @@ router.get("/db", async (req, res) => {
       message: "Database connection verified and poll table is active.",
       config: {
         host: poolConfig.host,
-        port: poolConfig.port || 3306,
+        port: poolConfig.port,
         database: poolConfig.database,
         user: poolConfig.user,
         sslEnabled: !!poolConfig.ssl,
@@ -184,17 +188,12 @@ router.get("/db", async (req, res) => {
       error: "Database connectivity check failed",
       message: err.message,
       code: err.code || "UNKNOWN_ERROR",
-      errno: err.errno,
-      syscall: err.syscall,
       targetHost: poolConfig.host,
-      targetPort: poolConfig.port || 3306,
+      targetPort: poolConfig.port,
     });
   }
 });
 
-/**
- * POST /db/init - Explicit table initialization
- */
 router.post("/db/init", async (req, res) => {
   try {
     const createTableSql = `
