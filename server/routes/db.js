@@ -313,73 +313,55 @@ router.get("/db", async (req, res) => {
   try {
     connection = await pool.getConnection();
 
-    const [rows] = await connection.query("SELECT 1 AS database_connection");
-
-    const [versionRows] = await connection.query(
-      "SELECT VERSION() AS mysql_version",
+    const [connectionRows] = await connection.query(
+      "SELECT 1 AS database_connection"
     );
 
-    const [sslRows] = await connection.query("SHOW STATUS LIKE 'Ssl_cipher'");
+    const [versionRows] = await connection.query(
+      "SELECT VERSION() AS mysql_version"
+    );
 
-    const sslCipher = sslRows.length > 0 ? sslRows[0].Value : null;
+    const [sslRows] = await connection.query(
+      "SHOW STATUS LIKE 'Ssl_cipher'"
+    );
 
-    return res.status(200).json({
-      status: "ok",
+    const sslCipher = sslRows.length > 0
+      ? sslRows[0].Value
+      : null;
 
-      message: "Database connection verified successfully.",
+    connection.release();
 
+    res.json({
+      status: "success",
+      message: "Database connection successful.",
       database: DB_DATABASE,
-
-      targetHost: DB_HOST,
-
-      targetPort: DB_PORT,
-
-      sslEnabled: Boolean(sslConfig),
-
-      sslConfiguredForVerification: Boolean(
-        sslConfig && sslConfig.rejectUnauthorized === true,
-      ),
-
-      sslCipher: sslCipher || null,
-
+      host: DB_HOST,
+      port: DB_PORT,
+      mysqlVersion: versionRows[0].mysql_version,
+      sslCipher,
       sslConnectionVerified: Boolean(sslCipher),
-
-      sslCertificate: sslCertificateSource || "not configured",
-
-      mysqlVersion: versionRows[0]?.mysql_version || null,
-
-      test: rows[0],
+      connectionTest: connectionRows[0].database_connection === 1
     });
   } catch (error) {
-    logDatabaseError("Database health check failed:", error);
-
-    return res.status(500).json({
-      status: "error",
-
-      error: "Database connectivity check failed.",
-
-      message: error.message,
-
-      code: error.code || "UNKNOWN_DATABASE_ERROR",
-
-      targetHost: DB_HOST,
-
-      targetPort: DB_PORT,
-
-      sslEnabled: Boolean(sslConfig),
-
-      sslConfiguredForVerification: Boolean(
-        sslConfig && sslConfig.rejectUnauthorized === true,
-      ),
-    });
-  } finally {
     if (connection) {
       connection.release();
     }
+
+    console.error("DATABASE ERROR");
+    console.error(error);
+    console.error(error.stack);
+
+    res.status(500).json({
+      status: "error",
+      error: "Database connectivity check failed.",
+      message: error.message,
+      code: error.code || null,
+      errno: error.errno || null
+    });
   }
 });
 
-router.post("/db/setup", async (req, res) => {
+router.post("/db", async (req, res) => {
   try {
     const createTableSql = `
         CREATE TABLE IF NOT EXISTS poll (
