@@ -1,14 +1,14 @@
 import React from "react";
-import { apiUrl, getApiError } from "../../lib/api";
+import { apiUrl } from "../../lib/api";
 
 class DefaultPage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { email: "", statusMessage: "", isSubmitting: false };
+    this.state = { email: "", isSubmitting: false };
   }
 
   handleChange = (e) => {
-    this.setState({ email: e.target.value, statusMessage: "" });
+    this.setState({ email: e.target.value });
   };
 
   handleSubmit = async (e) => {
@@ -16,11 +16,10 @@ class DefaultPage extends React.Component {
 
     // validation
     if (!this.state.email || this.state.email.trim() === "") {
-      this.setState({ statusMessage: "Enter your email address." });
       return;
     }
 
-    this.setState({ isSubmitting: true, statusMessage: "" });
+    this.setState({ isSubmitting: true });
 
     try {
       const response = await fetch(apiUrl("/subscribe"), {
@@ -34,29 +33,22 @@ class DefaultPage extends React.Component {
         this.setState({
           email: "",
           isSubmitting: false,
-          statusMessage: "Thanks! Please check your inbox for confirmation.",
         });
       } else {
         this.setState({
           isSubmitting: false,
-          statusMessage: await getApiError(
-            response,
-            "Unable to subscribe. Please try again.",
-          ),
         });
       }
     } catch (error) {
       console.error("Error submitting email:", error);
       this.setState({
         isSubmitting: false,
-        statusMessage:
-          "Unable to reach the subscription service. Please try again.",
       });
     }
   };
 
   render() {
-    const { email, isSubmitting, statusMessage } = this.state;
+    const { email, isSubmitting } = this.state;
 
     return (
       <>
@@ -80,14 +72,8 @@ class DefaultPage extends React.Component {
             disabled={isSubmitting}
             className="bg-[#830000] cursor-pointer text-white text-xl capitalize py-3 px-5 border-none"
           >
-            {isSubmitting ? "sending..." : "subscribe"}
-          </button>{" "}
-          <br />
-          {statusMessage && (
-            <p className="w-full text-sm text-[#830000]" role="status">
-              {statusMessage}
-            </p>
-          )}
+            {isSubmitting ? "Subscribe" : "Subscribe"}
+          </button>
         </form>
       </>
     );
