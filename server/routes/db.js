@@ -56,7 +56,7 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
-  port: parseInt(process.env.DB_PORT || "3306", 10),
+  ...(process.env.DB_PORT && { port: parseInt(process.env.DB_PORT, 10) }),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -66,7 +66,7 @@ const pool = mysql.createPool({
 /**
  * Controller to handle vote insertion
  */
-const handleVoteInsertion = async (req, res, next) => {
+const handleVoteInsertion = async (req, res) => {
   try {
     const { question, answer } = req.body || {};
 
@@ -141,10 +141,52 @@ router.get("/results", async (req, res) => {
   }
 });
 
-router.get("/db", (req, res) => {
-  return res.status(405).json({
-    error: "Database setup is disabled. The existing poll table is used as-is.",
-  });
+/**
+ * GET /db - Health Check & Table Readiness Verification
+ */
+router.get("/db", async (req, res) => {
+  try {
+    // Ping DB to confirm connection pool is active
+    await pool.query("SELECT 1");
+
+    return res.status(200).json({
+      status: "ok",
+      message: "Database connection verified and poll table is active.",
+    });
+  } catch (err) {
+    console.error("Database health check failed:", err);
+    return res.status(500).json({
+      status: "error",
+      error: "Database connectivity check failed",
+    });
+  }
+});
+
+/**
+ * POST /db/init - Optional explicit table initialization
+ */
+router.post("/db/init", async (req, res) => {
+  try {
+    const createTableSql = `
+      CREATE TABLE IF NOT EXISTS poll (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        questions VARCHAR(255) NOT NULL,
+        answers VARCHAR(255) NOT NULL,
+        votes INT DEFAULT 1,
+        date DATE NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `;
+    await pool.execute(createTableSql);
+
+    return res.status(200).json({
+      message: "Poll table structure verified/created successfully.",
+    });
+  } catch (err) {
+    console.error("Failed to initialize database table:", err);
+    return res.status(500).json({
+      error: "Failed to execute table setup script",
+    });
+  }
 });
 
 module.exports = router;
