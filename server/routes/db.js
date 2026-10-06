@@ -194,7 +194,7 @@ router.get("/db", async (req, res) => {
   }
 });
 
-router.post("/db/init", async (req, res) => {
+router.post("/db", async (req, res) => {
   try {
     const createTableSql = `
       CREATE TABLE IF NOT EXISTS poll (
