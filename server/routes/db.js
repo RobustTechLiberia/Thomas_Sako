@@ -1,3 +1,4 @@
+"use strict";
 
 const express = require("express");
 const mysql = require("mysql2/promise");
@@ -22,7 +23,8 @@ const DB_PASS = cleanEnv(process.env.DB_PASS);
 const DB_DATABASE = cleanEnv(process.env.DB_DATABASE);
 const DB_PORT = Number.parseInt(cleanEnv(process.env.DB_PORT), 10);
 const DB_SSL_CA_FILE = cleanEnv(process.env.DB_SSL_CA_FILE);
-const DB_SSL_REJECT_UNAUTHORIZED = cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED).toLowerCase() !== "false";
+const DB_SSL_REJECT_UNAUTHORIZED =
+  cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED).toLowerCase() !== "false";
 
 const configurationErrors = [];
 
@@ -76,18 +78,28 @@ try {
       ca: caCert,
       rejectUnauthorized: DB_SSL_REJECT_UNAUTHORIZED,
     },
+    flags: "-SESSION_TRACK",
   });
-  
+
   console.log("Database connection pool initialized successfully.");
 } catch (error) {
-  console.error("Failed to initialize database connection pool:", error.message);
+  console.error(
+    "Failed to initialize database connection pool:",
+    error.message,
+  );
   process.exit(1);
 }
 
 router.get("/db", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT 1 + 1 AS result");
-    res.status(200).json({ success: true, message: "Connected to Aiven MySQL!", data: rows });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Connected to Aiven MySQL!",
+        data: rows,
+      });
   } catch (error) {
     console.error("Database query error:", error);
     res.status(500).json({ success: false, error: error.message });
