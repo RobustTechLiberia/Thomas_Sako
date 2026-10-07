@@ -13,6 +13,11 @@
       }
     }
   ],
+  "functions": {
+    "server/app.cjs": {
+      "includeFiles": "certs/ca.pem"
+    }
+  },
   "routes": [
     {
       "handle": "filesystem"

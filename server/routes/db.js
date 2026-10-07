@@ -26,28 +26,12 @@ const DB_SSL_CA_FILE = cleanEnv(process.env.DB_SSL_CA_FILE);
 const DB_SSL_REJECT_UNAUTHORIZED =
   cleanEnv(process.env.DB_SSL_REJECT_UNAUTHORIZED).toLowerCase() !== "false";
 
-const configurationErrors = [];
-
-if (!DB_HOST) configurationErrors.push("DB_HOST is missing.");
-if (!DB_USER) configurationErrors.push("DB_USER is missing.");
-if (!DB_PASS) configurationErrors.push("DB_PASS is missing.");
-if (!DB_DATABASE) configurationErrors.push("DB_DATABASE is missing.");
-if (!Number.isInteger(DB_PORT) || DB_PORT <= 0 || DB_PORT > 65535) {
-  configurationErrors.push("DB_PORT must be a valid TCP port (1-65535).");
-}
-
-if (configurationErrors.length > 0) {
-  configurationErrors.forEach((error) => console.error(`ERROR: ${error}`));
-  throw new Error("Invalid database configuration.");
-}
-
 function loadCaCertificate() {
   if (!DB_SSL_CA_FILE) {
     throw new Error("DB_SSL_CA_FILE is missing from environment variables.");
   }
 
   const caPath = path.resolve(process.cwd(), DB_SSL_CA_FILE);
-  console.log("MySQL CA certificate path:", caPath);
 
   if (!fs.existsSync(caPath)) {
     throw new Error(`MySQL CA certificate was not found at: ${caPath}`);
@@ -62,7 +46,25 @@ function loadCaCertificate() {
 }
 
 let pool;
-try {
+
+function getPool() {
+  if (pool) return pool;
+
+  const configurationErrors = [];
+  if (!DB_HOST) configurationErrors.push("DB_HOST is missing.");
+  if (!DB_USER) configurationErrors.push("DB_USER is missing.");
+  if (!DB_PASS) configurationErrors.push("DB_PASS is missing.");
+  if (!DB_DATABASE) configurationErrors.push("DB_DATABASE is missing.");
+  if (!Number.isInteger(DB_PORT) || DB_PORT <= 0 || DB_PORT > 65535) {
+    configurationErrors.push("DB_PORT must be a valid TCP port (1-65535).");
+  }
+
+  if (configurationErrors.length > 0) {
+    throw new Error(
+      `Invalid database configuration: ${configurationErrors.join(" ")}`,
+    );
+  }
+
   const caCert = loadCaCertificate();
 
   pool = mysql.createPool({
@@ -72,38 +74,41 @@ try {
     database: DB_DATABASE,
     port: DB_PORT,
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: 2, // Low connection limit prevents Vercel from maxing out Aiven's connection limits
     queueLimit: 0,
     ssl: {
       ca: caCert,
       rejectUnauthorized: DB_SSL_REJECT_UNAUTHORIZED,
     },
-    flags: "-SESSION_TRACK",
+    flags: "-SESSION_TRACK", // Prevents the ERR_OUT_OF_RANGE error on Aiven
   });
 
-  console.log("Database connection pool initialized successfully.");
-} catch (error) {
-  console.error(
-    "Failed to initialize database connection pool:",
-    error.message,
-  );
-  process.exit(1);
+  return pool;
 }
 
 router.get("/db", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT 1 + 1 AS result");
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Connected to Aiven MySQL!",
-        data: rows,
-      });
+    const dbPool = getPool();
+    const [rows] = await dbPool.query("SELECT 1 + 1 AS result");
+    res.status(200).json({
+      success: true,
+      message: "Connected to Aiven MySQL!",
+      data: rows,
+    });
   } catch (error) {
-    console.error("Database query error:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Database query error:", error.message);
+    res.status(500).json({
+      status: "error",
+      error: "Database connectivity check failed.",
+      message: error.message,
+      targetHost: DB_HOST,
+      targetPort: DB_PORT,
+    });
   }
 });
 
-module.exports = router;
+// Export both the router and a utility to grab the pool in other routes
+module.exports = {
+  router,
+  getPool,
+};

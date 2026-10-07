@@ -50,7 +50,7 @@ app.use(
 app.use(express.json());
 
 const subscribeRouter = require("./routes/subscribe");
-const databaseRouter = require("./routes/db");
+const { router: databaseRouter } = require("./routes/db"); // Destructured to extract the router object cleanly
 const questionRouter = require("./routes/question");
 const SocialRouter = require("./routes/socialmedia");
 
@@ -76,26 +76,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+// For local development execution via 'node app.cjs'
 if (require.main === module) {
   const port = Number.parseInt(process.env.PORT || "8080", 10);
-
-  const server = app.listen(port, "0.0.0.0", () => {
-    console.log(`Server listening on port ${port}`);
-    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`Database host: ${process.env.DB_HOST || "not configured"}`);
-    console.log(`Database port: ${process.env.DB_PORT || "not configured"}`);
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server listening locally on port ${port}`);
   });
-
-  const shutdown = () => {
-    console.log("Shutdown signal received. Closing HTTP server...");
-    server.close(() => {
-      console.log("HTTP server closed.");
-      process.exit(0);
-    });
-  };
-
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
 }
 
 module.exports = app;
