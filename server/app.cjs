@@ -33,7 +33,7 @@ app.use(
 
       const isAllowed =
         origin.includes("localhost") ||
-        /\.vercel\.app$/.test(origin) ||
+        /\.vercel\.app\$/.test(origin) ||
         configuredOrigins.includes(origin);
 
       if (isAllowed) {
@@ -55,11 +55,8 @@ const questionRouter = require("./routes/question");
 const SocialRouter = require("./routes/socialmedia");
 
 app.use("/question", questionRouter);
-
 app.use(SocialRouter);
-
 app.use("/", subscribeRouter);
-
 app.use("/", databaseRouter);
 
 app.get("/home", (req, res) => {
@@ -82,12 +79,23 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   const port = Number.parseInt(process.env.PORT || "8080", 10);
 
-  app.listen(port, "0.0.0.0", () => {
+  const server = app.listen(port, "0.0.0.0", () => {
     console.log(`Server listening on port ${port}`);
     console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(`Database host: ${process.env.DB_HOST || "not configured"}`);
     console.log(`Database port: ${process.env.DB_PORT || "not configured"}`);
   });
+
+  const shutdown = () => {
+    console.log("Shutdown signal received. Closing HTTP server...");
+    server.close(() => {
+      console.log("HTTP server closed.");
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 
 module.exports = app;
