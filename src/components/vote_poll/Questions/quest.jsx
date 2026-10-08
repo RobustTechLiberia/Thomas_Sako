@@ -222,7 +222,7 @@ const Quest = () => {
 
           {isLoading ? (
             <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
-              Loading today's question...
+              
             </div>
           ) : !currentQuestion || !currentQuestion.question ? (
             <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
