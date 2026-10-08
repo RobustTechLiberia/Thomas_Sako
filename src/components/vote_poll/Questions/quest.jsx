@@ -1,29 +1,38 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+/* eslint-disable no-unused-vars */
+
+import React from "react";
+import { Navigate } from "react-router-dom";
 import Advert from "../../features/component/Advertisement/components/advert";
 import { apiUrl, getApiError } from "../../../lib/api";
 
 import "../../../../App.scss";
 
-const Quest = () => {
-  const navigate = useNavigate();
+class Quest extends React.Component {
+  constructor(props) {
+    super(props);
 
-  const [currentQuestion, setCurrentQuestion] = useState({
-    id: null,
-    question: "",
-    options: [],
-  });
-  const [selectedOption, setSelectedOption] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+    this.state = {
+      questions: [],
+      currentQuestion: {
+        id: null,
+        question: "",
+        options: [],
+      },
+      selectedOption: "",
+      hasVoted: false,
+      isLoading: true,
+      isSubmitting: false,
+      shouldRedirectToResults: false,
+      errorMessage: "",
+      successMessage: "",
+    };
+  }
 
-  useEffect(() => {
-    loadQuestions();
-  }, []);
+  componentDidMount() {
+    this.loadQuestions();
+  }
 
-  const loadQuestions = async () => {
+  loadQuestions = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.BASE_URL}questions.json`,
@@ -46,8 +55,11 @@ const Quest = () => {
       }
 
       const today = new Date();
+
       const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+
       const questionIndex = dayIndex % data.length;
+
       const activeQuestion = data[questionIndex];
 
       if (!activeQuestion) {
@@ -64,118 +76,405 @@ const Quest = () => {
         );
       }
 
-      setCurrentQuestion(activeQuestion);
-      setIsLoading(false);
-      setErrorMessage("");
+      let alreadyVoted = false;
+
+      if (activeQuestion.id !== undefined && activeQuestion.id !== null) {
+        const voteTimestamp = localStorage.getItem(
+          `vote_time_${activeQuestion.id}`,
+        );
+
+        if (voteTimestamp) {
+          const parsedTimestamp = parseInt(voteTimestamp, 10);
+
+          if (!Number.isNaN(parsedTimestamp)) {
+            const timePassed = Date.now() - parsedTimestamp;
+
+            if (timePassed < 24 * 60 * 60 * 1000) {
+              alreadyVoted = true;
+            } else {
+              localStorage.removeItem(`vote_time_${activeQuestion.id}`);
+            }
+          } else {
+            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
+          }
+        }
+      }
+
+      this.setState({
+        questions: data,
+        currentQuestion: activeQuestion,
+        hasVoted: alreadyVoted,
+        isLoading: false,
+        errorMessage: "",
+      });
     } catch (err) {
-      setErrorMessage(
-        err.message || "An error occurred while loading questions.",
-      );
-      setIsLoading(false);
+      console.error("Error loading questions:", err);
+
+      this.setState({
+        isLoading: false,
+        errorMessage:
+          err?.message || "Unable to load today's poll. Please try again.",
+      });
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedOption) {
-      setErrorMessage("Please select an option before submitting.");
+  getOptionText = (opt) => {
+    if (typeof opt === "string") {
+      return opt;
+    }
+
+    if (opt && typeof opt === "object") {
+      return opt.text || opt.label || opt.value || JSON.stringify(opt);
+    }
+
+    return String(opt);
+  };
+
+  handleOptionChange = (value) => {
+    const { hasVoted, isSubmitting } = this.state;
+
+    if (hasVoted || isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
-    setErrorMessage("");
-    setSuccessMessage("");
+    this.setState({
+      selectedOption: value,
+      errorMessage: "",
+      successMessage: "",
+    });
+  };
+
+  handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
+      this.state;
+
+    console.log("=================================");
+    console.log("POLL FORM SUBMISSION STARTED");
+    console.log("=================================");
+
+    console.log("Current question:", currentQuestion);
+    console.log("Selected option:", selectedOption);
+
+    if (isSubmitting) {
+      console.log("Submission already in progress.");
+      return;
+    }
+
+    if (hasVoted) {
+      this.setState({
+        errorMessage: "You have already voted on this question.",
+      });
+
+      return;
+    }
+
+    if (!selectedOption) {
+      this.setState({
+        errorMessage: "Please select an answer before voting.",
+      });
+
+      return;
+    }
+
+    if (
+      !currentQuestion ||
+      currentQuestion.id === undefined ||
+      currentQuestion.id === null
+    ) {
+      this.setState({
+        errorMessage: "This question does not have a valid question ID.",
+      });
+
+      console.error("Invalid question:", currentQuestion);
+
+      return;
+    }
+
+    if (!currentQuestion.question) {
+      this.setState({
+        errorMessage: "The current question is invalid.",
+      });
+
+      return;
+    }
+
+    this.setState({
+      isSubmitting: true,
+      errorMessage: "",
+      successMessage: "",
+    });
+
+    const payload = {
+      questionId: currentQuestion.id,
+      question: currentQuestion.question,
+      answer: selectedOption,
+    };
+
+    console.log("Submitting payload:", payload);
 
     try {
-      const response = await fetch(`${apiUrl}/answers`, {
+      const endpoint = apiUrl("/question/submit");
+
+      console.log("POST endpoint:", endpoint);
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify({
-          questionId: currentQuestion.id,
-          selectedOption: selectedOption,
-        }),
+        credentials: "include",
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          getApiError(errorData) || "Failed to submit your response.",
-        );
+      console.log("API response status:", response.status);
+
+      let responseData = {};
+
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        console.log("Response has no JSON body.");
       }
 
-      setSuccessMessage("Thank you for your answer!");
-      setTimeout(() => {
-        navigate("/results");
-      }, 2000);
+      console.log("API response:", responseData);
+
+      if (response.status === 201 || response.ok) {
+        console.log("Vote successfully recorded.");
+
+        localStorage.setItem(
+          `vote_time_${currentQuestion.id}`,
+          Date.now().toString(),
+        );
+
+        this.setState(
+          {
+            hasVoted: true,
+            isSubmitting: false,
+            successMessage:
+              responseData?.message || "Your vote has been recorded.",
+            errorMessage: "",
+          },
+          () => {
+            console.log("Redirecting to /results...");
+
+            setTimeout(() => {
+              this.setState({
+                shouldRedirectToResults: true,
+              });
+            }, 300);
+          },
+        );
+
+        return;
+      }
+
+      if (response.status === 429) {
+        this.setState({
+          isSubmitting: false,
+          hasVoted: true,
+          errorMessage:
+            responseData?.message ||
+            responseData?.error ||
+            "You have already voted on this question within the last 24 hours.",
+        });
+
+        return;
+      }
+
+      if (response.status === 400) {
+        this.setState({
+          isSubmitting: false,
+          errorMessage:
+            responseData?.message ||
+            responseData?.error ||
+            "Invalid poll submission.",
+        });
+
+        return;
+      }
+
+      let errorMessage =
+        responseData?.message ||
+        responseData?.error ||
+        "We could not record your vote. Please try again.";
+
+      if (!response.ok) {
+        try {
+          errorMessage = await getApiError(response, errorMessage);
+        } catch (error) {
+          console.error("Could not parse API error:", error);
+        }
+      }
+
+      throw new Error(errorMessage);
     } catch (err) {
-      setErrorMessage(err.message);
-    } finally {
-      setIsSubmitting(false);
+      console.error("Submission failed:", err);
+
+      this.setState({
+        isSubmitting: false,
+        errorMessage:
+          err?.message || "We could not record your vote. Please try again.",
+      });
     }
   };
 
-  if (isLoading) {
-    return <div className="loading"></div>;
-  }
+  handleSeeResults = (e) => {
+    e.preventDefault();
 
-  return (
-    <div className="quest-container">
-      <Advert />
+    this.setState({
+      shouldRedirectToResults: true,
+    });
+  };
 
-      <main className="quest-content">
-        <h2>Today's Question</h2>
+  render() {
+    const {
+      currentQuestion,
+      selectedOption,
+      hasVoted,
+      isLoading,
+      isSubmitting,
+      shouldRedirectToResults,
+      errorMessage,
+      successMessage,
+    } = this.state;
 
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-        {successMessage && (
-          <div className="success-message">{successMessage}</div>
-        )}
+    if (shouldRedirectToResults) {
+      console.log("Rendering Navigate -> /results");
 
-        {!successMessage && currentQuestion.question && (
-          <form onSubmit={handleSubmit} className="quest-form">
-            <p className="question-text">{currentQuestion.question}</p>
+      return <Navigate replace to="/results" />;
+    }
 
-            <div className="options-list">
-              {currentQuestion.options.map((option, index) => {
-                const optionId = `option-${currentQuestion.id || 0}-${index}`;
+    const options = currentQuestion?.options || [];
 
-                return (
-                  <label
-                    key={index}
-                    htmlFor={optionId}
-                    className="option-label"
-                  >
-                    <input
-                      id={optionId}
-                      type="radio"
-                      name="quest-option"
-                      value={option}
-                      checked={selectedOption === option}
-                      onChange={(e) => {
-                        setErrorMessage("");
-                        setSelectedOption(e.target.value);
-                      }}
-                      disabled={isSubmitting}
-                    />
-                    <span className="option-text">{option}</span>
-                  </label>
-                );
-              })}
+    const isSubmitDisabled =
+      isLoading || isSubmitting || !selectedOption || hasVoted;
+
+    const isInteractionDisabled = isLoading || isSubmitting || hasVoted;
+
+    return (
+      <>
+        <div className="flex flex-wrap md:justify-between lg:justify-between justify-center items-center md:gap-0 lg:gap-0 gap-10">
+          <div
+            className="md:h-140 lg:h-140 bg-right bg-white md:mx-10 lg:mx-10 md:w-4xl lg:w-3xl w-80 h-110 md:shadow-xl lg:shadow-xl shadow-none"
+            id="quest"
+          >
+            <h1 className="md:text-5xl lg:text-5xl text-4xl pt-10 text-center md:pt-8 lg:pt-10 font-sans font-semibold uppercase text-[#830000]">
+              today's poll
+            </h1>
+
+            <div className="flex flex-wrap justify-center items-center my-8">
+              <hr className="border-none bg-[#830000] md:w-80 lg:w-80 w-75 md:h-1 lg:h-1 h-2" />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting || !selectedOption}
-              className="submit-btn"
-            >
-              {isSubmitting ? "Submitting..." : "Submit Answer"}
-            </button>
-          </form>
-        )}
-      </main>
-    </div>
-  );
-};
+            {isLoading ? (
+              <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
+                Loading today's question...
+              </div>
+            ) : !currentQuestion || !currentQuestion.question ? (
+              <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
+                {errorMessage || "No poll available at this moment."}
+              </div>
+            ) : (
+              <>
+                <h3 className="text-center flex flex-wrap md:justify-center lg:justify-start md:items-start lg:items-center font-sans font-semibold text-3xl md:mx-20 lg:mx-20 mx-2">
+                  {currentQuestion.question}
+                </h3>
+
+                {errorMessage && (
+                  <div className="text-center text-red-600 font-semibold font-sans text-base mt-4 px-4">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {successMessage && (
+                  <div className="text-center text-green-600 font-semibold font-sans text-base mt-4 px-4">
+                    {successMessage}
+                  </div>
+                )}
+
+                {hasVoted && !errorMessage && (
+                  <div className="text-center text-[#830000] font-semibold font-sans text-base mt-4 px-4">
+                    You have already voted on today's question.
+                  </div>
+                )}
+
+                <form className="w-auto" onSubmit={this.handleSubmit}>
+                  {options.map((opt, idx) => {
+                    const optionText = this.getOptionText(opt);
+
+                    const isChecked = selectedOption === optionText;
+
+                    return (
+                      <div
+                        key={`${currentQuestion.id}-${idx}`}
+                        className="md:my-3 lg:my-3"
+                      >
+                        <label
+                          className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
+                            isInteractionDisabled
+                              ? "cursor-not-allowed opacity-60"
+                              : "cursor-pointer"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="poll_answer"
+                            value={optionText}
+                            checked={isChecked}
+                            onChange={() => this.handleOptionChange(optionText)}
+                            disabled={isInteractionDisabled}
+                          />{" "}
+                          {optionText}
+                        </label>
+                      </div>
+                    );
+                  })}
+
+                  <div className="md:mt-10 lg:mt-10 mt-10 flex flex-col md:mx-20 lg:mx-20 mx-4 gap-2">
+                    <button
+                      type="submit"
+                      disabled={isSubmitDisabled}
+                      className={`md:py-3 lg:py-3 py-3 text-white md:w-28 lg:w-28 w-28 text-xl font-semibold uppercase ${
+                        isSubmitDisabled
+                          ? "bg-[#830000] cursor-not-allowed opacity-60"
+                          : "bg-[#830000] cursor-pointer"
+                      }`}
+                    >
+                      {isSubmitting
+                        ? "submitting..."
+                        : hasVoted
+                          ? "voted"
+                          : "vote"}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
+              <div
+                onClick={this.handleSeeResults}
+                className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
+              >
+                <a href="/results" onClick={this.handleSeeResults}>
+                  <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
+                    see past results
+                  </p>
+                </a>
+              </div>
+
+              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
+            </div>
+          </div>
+
+          <Advert />
+        </div>
+      </>
+    );
+  }
+}
 
 export default Quest;
