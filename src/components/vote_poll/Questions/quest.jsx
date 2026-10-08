@@ -107,7 +107,7 @@ const Quest = () => {
 
       setSuccessMessage("Thank you for your answer!");
       setTimeout(() => {
-        navigate("/results"); // Adjust route path as necessary
+        navigate("/results");
       }, 2000);
     } catch (err) {
       setErrorMessage(err.message);
@@ -137,19 +137,31 @@ const Quest = () => {
             <p className="question-text">{currentQuestion.question}</p>
 
             <div className="options-list">
-              {currentQuestion.options.map((option, index) => (
-                <label key={index} className="option-label">
-                  <input
-                    type="radio"
-                    name="quest-option"
-                    value={option}
-                    checked={selectedOption === option}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                    disabled={isSubmitting}
-                  />
-                  {option}
-                </label>
-              ))}
+              {currentQuestion.options.map((option, index) => {
+                const optionId = `option-${currentQuestion.id || 0}-${index}`;
+
+                return (
+                  <label
+                    key={index}
+                    htmlFor={optionId}
+                    className="option-label"
+                  >
+                    <input
+                      id={optionId}
+                      type="radio"
+                      name="quest-option"
+                      value={option}
+                      checked={selectedOption === option}
+                      onChange={(e) => {
+                        setErrorMessage("");
+                        setSelectedOption(e.target.value);
+                      }}
+                      disabled={isSubmitting}
+                    />
+                    <span className="option-text">{option}</span>
+                  </label>
+                );
+              })}
             </div>
 
             <button
