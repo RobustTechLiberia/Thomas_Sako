@@ -1,21 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/app.cjs",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
   "functions": {
     "server/app.cjs": {
-      "includeFiles": "certs/ca.pem"
+      "runtime": "vercel-nodejs@22.x"
     }
   },
   "routes": [
