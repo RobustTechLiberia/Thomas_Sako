@@ -117,7 +117,7 @@ const Quest = () => {
   };
 
   if (isLoading) {
-    return <div className="loading">Loading question...</div>;
+    return <div className="loading"></div>;
   }
 
   return (
