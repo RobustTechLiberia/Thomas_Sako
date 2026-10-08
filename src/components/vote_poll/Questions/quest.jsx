@@ -1,10 +1,7 @@
-/* eslint-disable no-unused-vars */
-
 import React from "react";
 import { Navigate } from "react-router-dom";
 import Advert from "../../features/component/Advertisement/components/advert";
-import { apiUrl, getApiError } from "../../../lib/api";
-
+import { apiUrl } from "../../../lib/api";
 import "../../../../App.scss";
 
 class Quest extends React.Component {
@@ -26,6 +23,8 @@ class Quest extends React.Component {
       errorMessage: "",
       successMessage: "",
     };
+
+    this._submissionInProgress = false;
   }
 
   componentDidMount() {
@@ -43,9 +42,7 @@ class Quest extends React.Component {
       );
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to load questions resource. HTTP ${response.status}`,
-        );
+        throw new Error(`Failed to load questions. HTTP ${response.status}`);
       }
 
       const data = await response.json();
@@ -54,86 +51,96 @@ class Quest extends React.Component {
         throw new Error("No poll questions are available.");
       }
 
-      const today = new Date();
-
-      const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+      const dayIndex = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
 
       const questionIndex = dayIndex % data.length;
-
       const activeQuestion = data[questionIndex];
 
-      if (!activeQuestion) {
-        throw new Error("Unable to determine today's question.");
-      }
-
-      if (!activeQuestion.question) {
-        throw new Error("Today's question is empty.");
-      }
-
-      if (!Array.isArray(activeQuestion.options)) {
+      if (
+        !activeQuestion ||
+        activeQuestion.id === undefined ||
+        activeQuestion.id === null ||
+        !activeQuestion.question ||
+        !Array.isArray(activeQuestion.options) ||
+        activeQuestion.options.length === 0
+      ) {
         throw new Error(
-          "Today's question does not contain valid answer options.",
+          "Today's question does not contain valid question data.",
         );
       }
 
       let alreadyVoted = false;
 
-      if (activeQuestion.id !== undefined && activeQuestion.id !== null) {
-        const voteTimestamp = localStorage.getItem(
-          `vote_time_${activeQuestion.id}`,
-        );
+      try {
+        const storageKey = `vote_time_${activeQuestion.id}`;
+        const voteTimestamp = localStorage.getItem(storageKey);
 
         if (voteTimestamp) {
-          const parsedTimestamp = parseInt(voteTimestamp, 10);
+          const parsedTimestamp = Number(voteTimestamp);
+          const elapsed = Date.now() - parsedTimestamp;
+          const oneDay = 24 * 60 * 60 * 1000;
 
-          if (!Number.isNaN(parsedTimestamp)) {
-            const timePassed = Date.now() - parsedTimestamp;
-
-            if (timePassed < 24 * 60 * 60 * 1000) {
-              alreadyVoted = true;
-            } else {
-              localStorage.removeItem(`vote_time_${activeQuestion.id}`);
-            }
+          if (
+            Number.isFinite(parsedTimestamp) &&
+            elapsed >= 0 &&
+            elapsed < oneDay
+          ) {
+            alreadyVoted = true;
           } else {
-            localStorage.removeItem(`vote_time_${activeQuestion.id}`);
+            localStorage.removeItem(storageKey);
           }
         }
+      } catch {
+        alreadyVoted = false;
       }
 
       this.setState({
         questions: data,
         currentQuestion: activeQuestion,
+        selectedOption: "",
         hasVoted: alreadyVoted,
         isLoading: false,
         errorMessage: "",
+        successMessage: "",
       });
-    } catch (err) {
-      console.error("Error loading questions:", err);
-
+    } catch (error) {
       this.setState({
         isLoading: false,
         errorMessage:
-          err?.message || "Unable to load today's poll. Please try again.",
+          error?.message || "Unable to load today's poll. Please try again.",
       });
     }
   };
 
-  getOptionText = (opt) => {
-    if (typeof opt === "string") {
-      return opt;
+  getOptionText = (option) => {
+    if (typeof option === "string") {
+      return option;
     }
 
-    if (opt && typeof opt === "object") {
-      return opt.text || opt.label || opt.value || JSON.stringify(opt);
+    if (option && typeof option === "object") {
+      const value = option.text ?? option.label ?? option.value;
+
+      return value == null ? "" : String(value);
     }
 
-    return String(opt);
+    return option == null ? "" : String(option);
   };
 
   handleOptionChange = (value) => {
-    const { hasVoted, isSubmitting } = this.state;
+    const { hasVoted, isSubmitting, currentQuestion } = this.state;
 
-    if (hasVoted || isSubmitting) {
+    if (hasVoted || isSubmitting || this._submissionInProgress) {
+      return;
+    }
+
+    const validOption = (currentQuestion.options || []).some(
+      (option) => this.getOptionText(option) === value,
+    );
+
+    if (!validOption) {
+      this.setState({
+        errorMessage: "Please select a valid answer.",
+      });
       return;
     }
 
@@ -144,61 +151,54 @@ class Quest extends React.Component {
     });
   };
 
-  handleSubmit = async (e) => {
-    e.preventDefault();
+  handleSubmit = async (event) => {
+    event.preventDefault();
 
-    const { currentQuestion, selectedOption, hasVoted, isSubmitting } =
-      this.state;
+    if (this._submissionInProgress) {
+      return;
+    }
 
-    console.log("=================================");
-    console.log("POLL FORM SUBMISSION STARTED");
-    console.log("=================================");
+    const { currentQuestion, selectedOption, hasVoted, isLoading } = this.state;
 
-    console.log("Current question:", currentQuestion);
-    console.log("Selected option:", selectedOption);
-
-    if (isSubmitting) {
-      console.log("Submission already in progress.");
+    if (isLoading) {
       return;
     }
 
     if (hasVoted) {
       this.setState({
         errorMessage: "You have already voted on this question.",
+        successMessage: "",
       });
-
-      return;
-    }
-
-    if (!selectedOption) {
-      this.setState({
-        errorMessage: "Please select an answer before voting.",
-      });
-
       return;
     }
 
     if (
       !currentQuestion ||
       currentQuestion.id === undefined ||
-      currentQuestion.id === null
+      currentQuestion.id === null ||
+      !currentQuestion.question
     ) {
       this.setState({
-        errorMessage: "This question does not have a valid question ID.",
+        errorMessage:
+          "The current question is invalid. Please reload the page.",
+        successMessage: "",
       });
-
-      console.error("Invalid question:", currentQuestion);
-
       return;
     }
 
-    if (!currentQuestion.question) {
+    const validOption = (currentQuestion.options || []).some(
+      (option) => this.getOptionText(option) === selectedOption,
+    );
+
+    if (!selectedOption || !validOption) {
       this.setState({
-        errorMessage: "The current question is invalid.",
+        errorMessage: "Please select an answer before voting.",
+        successMessage: "",
       });
-
       return;
     }
+
+    this._submissionInProgress = true;
 
     this.setState({
       isSubmitting: true,
@@ -207,19 +207,12 @@ class Quest extends React.Component {
     });
 
     const payload = {
-      questionId: currentQuestion.id,
       question: currentQuestion.question,
       answer: selectedOption,
     };
 
-    console.log("Submitting payload:", payload);
-
     try {
-      const endpoint = apiUrl("/question/submit");
-
-      console.log("POST endpoint:", endpoint);
-
-      const response = await fetch(endpoint, {
+      const response = await fetch(apiUrl("/question/vote"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,100 +222,91 @@ class Quest extends React.Component {
         body: JSON.stringify(payload),
       });
 
-      console.log("API response status:", response.status);
-
+      const responseText = await response.text();
       let responseData = {};
 
-      try {
-        responseData = await response.json();
-      } catch (jsonError) {
-        console.log("Response has no JSON body.");
-      }
-
-      console.log("API response:", responseData);
-
-      if (response.status === 201 || response.ok) {
-        console.log("Vote successfully recorded.");
-
-        localStorage.setItem(
-          `vote_time_${currentQuestion.id}`,
-          Date.now().toString(),
-        );
-
-        this.setState(
-          {
-            hasVoted: true,
-            isSubmitting: false,
-            successMessage:
-              responseData?.message || "Your vote has been recorded.",
-            errorMessage: "",
-          },
-          () => {
-            console.log("Redirecting to /results...");
-
-            setTimeout(() => {
-              this.setState({
-                shouldRedirectToResults: true,
-              });
-            }, 300);
-          },
-        );
-
-        return;
-      }
-
-      if (response.status === 429) {
-        this.setState({
-          isSubmitting: false,
-          hasVoted: true,
-          errorMessage:
-            responseData?.message ||
-            responseData?.error ||
-            "You have already voted on this question within the last 24 hours.",
-        });
-
-        return;
-      }
-
-      if (response.status === 400) {
-        this.setState({
-          isSubmitting: false,
-          errorMessage:
-            responseData?.message ||
-            responseData?.error ||
-            "Invalid poll submission.",
-        });
-
-        return;
-      }
-
-      let errorMessage =
-        responseData?.message ||
-        responseData?.error ||
-        "We could not record your vote. Please try again.";
-
-      if (!response.ok) {
+      if (responseText) {
         try {
-          errorMessage = await getApiError(response, errorMessage);
-        } catch (error) {
-          console.error("Could not parse API error:", error);
+          responseData = JSON.parse(responseText);
+        } catch {
+          responseData = {
+            message: responseText,
+          };
         }
       }
 
-      throw new Error(errorMessage);
-    } catch (err) {
-      console.error("Submission failed:", err);
+      if (response.ok) {
+        try {
+          localStorage.setItem(
+            `vote_time_${currentQuestion.id}`,
+            String(Date.now()),
+          );
+        } catch {
+          this.setState({
+            hasVoted: true,
+            isSubmitting: false,
+            successMessage:
+              responseData.message || "Your vote has been recorded.",
+            errorMessage: "",
+            shouldRedirectToResults: true,
+          });
+
+          return;
+        }
+
+        this.setState({
+          hasVoted: true,
+          isSubmitting: false,
+          successMessage:
+            responseData.message || "Your vote has been recorded.",
+          errorMessage: "",
+          shouldRedirectToResults: true,
+        });
+
+        return;
+      }
+
+      const errorMessage =
+        responseData.message ||
+        responseData.error ||
+        (response.status === 400
+          ? "Invalid poll submission. Check your selected answer."
+          : response.status === 401
+            ? "Please sign in before submitting your vote."
+            : response.status === 403
+              ? "You are not permitted to submit this vote."
+              : response.status === 404
+                ? "The poll API route was not found. Check your backend route."
+                : response.status === 409 || response.status === 429
+                  ? "You have already voted on this question."
+                  : response.status >= 500
+                    ? "The server encountered an error. Please try again later."
+                    : `Unable to submit your vote. HTTP ${response.status}.`);
 
       this.setState({
         isSubmitting: false,
-        errorMessage:
-          err?.message || "We could not record your vote. Please try again.",
+        hasVoted: response.status === 409 || response.status === 429,
+        errorMessage,
+        successMessage: "",
       });
+    } catch (error) {
+      this.setState({
+        isSubmitting: false,
+        errorMessage:
+          error?.message === "Failed to fetch"
+            ? "Unable to connect to the server. Check the API URL, server status, and CORS configuration."
+            : error?.message || "Unable to record your vote. Please try again.",
+        successMessage: "",
+      });
+    } finally {
+      this._submissionInProgress = false;
     }
   };
 
-  handleSeeResults = (e) => {
-    e.preventDefault();
+  handleSeeResults = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
 
     this.setState({
       shouldRedirectToResults: true,
@@ -342,8 +326,6 @@ class Quest extends React.Component {
     } = this.state;
 
     if (shouldRedirectToResults) {
-      console.log("Rendering Navigate -> /results");
-
       return <Navigate replace to="/results" />;
     }
 
@@ -384,13 +366,19 @@ class Quest extends React.Component {
                 </h3>
 
                 {errorMessage && (
-                  <div className="text-center text-red-600 font-semibold font-sans text-base mt-4 px-4">
+                  <div
+                    role="alert"
+                    className="text-center text-red-600 font-semibold font-sans text-base mt-4 px-4"
+                  >
                     {errorMessage}
                   </div>
                 )}
 
                 {successMessage && (
-                  <div className="text-center text-green-600 font-semibold font-sans text-base mt-4 px-4">
+                  <div
+                    role="status"
+                    className="text-center text-green-600 font-semibold font-sans text-base mt-4 px-4"
+                  >
                     {successMessage}
                   </div>
                 )}
@@ -401,15 +389,23 @@ class Quest extends React.Component {
                   </div>
                 )}
 
-                <form className="w-auto" onSubmit={this.handleSubmit}>
-                  {options.map((opt, idx) => {
-                    const optionText = this.getOptionText(opt);
+                <form
+                  className="w-auto"
+                  onSubmit={this.handleSubmit}
+                  aria-busy={isSubmitting}
+                >
+                  {options.map((option, index) => {
+                    const optionText = this.getOptionText(option);
+
+                    if (!optionText) {
+                      return null;
+                    }
 
                     const isChecked = selectedOption === optionText;
 
                     return (
                       <div
-                        key={`${currentQuestion.id}-${idx}`}
+                        key={`${currentQuestion.id}-${index}`}
                         className="md:my-3 lg:my-3"
                       >
                         <label
@@ -426,6 +422,7 @@ class Quest extends React.Component {
                             checked={isChecked}
                             onChange={() => this.handleOptionChange(optionText)}
                             disabled={isInteractionDisabled}
+                            required
                           />{" "}
                           {optionText}
                         </label>
@@ -453,21 +450,6 @@ class Quest extends React.Component {
                 </form>
               </>
             )}
-
-            <div className="flex flex-wrap justify-start h-auto md:mt-32 lg:mt-32 mt-8 bg-green-200 text-white w-auto">
-              <div
-                onClick={this.handleSeeResults}
-                className="md:w-80 lg:w-80 w-auto bg-blue-900 py-5 cursor-pointer"
-              >
-                <a href="/results" onClick={this.handleSeeResults}>
-                  <p className="font-sans mx-5 capitalize font-semibold md:text-2xl lg:text-2xl text-xs">
-                    see past results
-                  </p>
-                </a>
-              </div>
-
-              <div className="md:w-80 lg:w-80 w-20 cursor-pointer hover:bg-green-800 py-5"></div>
-            </div>
           </div>
 
           <Advert />
