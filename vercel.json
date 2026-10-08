@@ -1,9 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "server/app.cjs": {
-      "runtime": "vercel-nodejs@22.x"
-    }
+    "server/app.cjs": {}
   },
   "routes": [
     {
