@@ -9,12 +9,7 @@ class Quest extends React.Component {
     super(props);
 
     this.state = {
-      questions: [],
-      currentQuestion: {
-        id: null,
-        question: "",
-        options: [],
-      },
+      currentQuestion: null,
       selectedOption: "",
       hasVoted: false,
       isLoading: true,
@@ -53,14 +48,13 @@ class Quest extends React.Component {
 
       const dayIndex = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
 
-      const questionIndex = dayIndex % data.length;
-      const activeQuestion = data[questionIndex];
+      const activeQuestion = data[dayIndex % data.length];
 
       if (
         !activeQuestion ||
-        activeQuestion.id === undefined ||
-        activeQuestion.id === null ||
-        !activeQuestion.question ||
+        activeQuestion.id == null ||
+        typeof activeQuestion.question !== "string" ||
+        !activeQuestion.question.trim() ||
         !Array.isArray(activeQuestion.options) ||
         activeQuestion.options.length === 0
       ) {
@@ -69,13 +63,21 @@ class Quest extends React.Component {
         );
       }
 
+      const validOptions = activeQuestion.options
+        .map((option) => this.getOptionText(option))
+        .filter((option) => option.trim() !== "");
+
+      if (validOptions.length === 0) {
+        throw new Error("Today's question has no valid answer options.");
+      }
+
       let alreadyVoted = false;
 
       try {
         const storageKey = `vote_time_${activeQuestion.id}`;
         const voteTimestamp = localStorage.getItem(storageKey);
 
-        if (voteTimestamp) {
+        if (voteTimestamp !== null) {
           const parsedTimestamp = Number(voteTimestamp);
           const elapsed = Date.now() - parsedTimestamp;
           const oneDay = 24 * 60 * 60 * 1000;
@@ -95,7 +97,6 @@ class Quest extends React.Component {
       }
 
       this.setState({
-        questions: data,
         currentQuestion: activeQuestion,
         selectedOption: "",
         hasVoted: alreadyVoted,
@@ -105,6 +106,7 @@ class Quest extends React.Component {
       });
     } catch (error) {
       this.setState({
+        currentQuestion: null,
         isLoading: false,
         errorMessage:
           error?.message || "Unable to load today's poll. Please try again.",
@@ -119,7 +121,6 @@ class Quest extends React.Component {
 
     if (option && typeof option === "object") {
       const value = option.text ?? option.label ?? option.value;
-
       return value == null ? "" : String(value);
     }
 
@@ -133,7 +134,7 @@ class Quest extends React.Component {
       return;
     }
 
-    const validOption = (currentQuestion.options || []).some(
+    const validOption = (currentQuestion?.options || []).some(
       (option) => this.getOptionText(option) === value,
     );
 
@@ -174,8 +175,7 @@ class Quest extends React.Component {
 
     if (
       !currentQuestion ||
-      currentQuestion.id === undefined ||
-      currentQuestion.id === null ||
+      currentQuestion.id == null ||
       !currentQuestion.question
     ) {
       this.setState({
@@ -206,11 +206,6 @@ class Quest extends React.Component {
       successMessage: "",
     });
 
-    const payload = {
-      question: currentQuestion.question,
-      answer: selectedOption,
-    };
-
     try {
       const response = await fetch(apiUrl("/question/vote"), {
         method: "POST",
@@ -219,7 +214,10 @@ class Quest extends React.Component {
           Accept: "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          question: currentQuestion.question,
+          answer: selectedOption,
+        }),
       });
 
       const responseText = await response.text();
@@ -229,65 +227,50 @@ class Quest extends React.Component {
         try {
           responseData = JSON.parse(responseText);
         } catch {
-          responseData = {
-            message: responseText,
-          };
+          responseData = { message: responseText };
         }
       }
 
-      if (response.ok) {
-        try {
-          localStorage.setItem(
-            `vote_time_${currentQuestion.id}`,
-            String(Date.now()),
-          );
-        } catch {
-          this.setState({
-            hasVoted: true,
-            isSubmitting: false,
-            successMessage:
-              responseData.message || "Your vote has been recorded.",
-            errorMessage: "",
-            shouldRedirectToResults: true,
-          });
-
-          return;
-        }
+      if (!response.ok) {
+        const message =
+          responseData.message ||
+          responseData.error ||
+          (response.status === 400
+            ? "Invalid poll submission. Check your selected answer."
+            : response.status === 401
+              ? "Please sign in before submitting your vote."
+              : response.status === 403
+                ? "You are not permitted to submit this vote."
+                : response.status === 404
+                  ? "The poll API route was not found. Check your backend route."
+                  : response.status === 409 || response.status === 429
+                    ? "You have already voted on this question."
+                    : response.status >= 500
+                      ? "The server encountered an error. Please try again later."
+                      : `Unable to submit your vote. HTTP ${response.status}.`);
 
         this.setState({
-          hasVoted: true,
           isSubmitting: false,
-          successMessage:
-            responseData.message || "Your vote has been recorded.",
-          errorMessage: "",
-          shouldRedirectToResults: true,
+          hasVoted: response.status === 409 || response.status === 429,
+          errorMessage: message,
+          successMessage: "",
         });
 
         return;
       }
 
-      const errorMessage =
-        responseData.message ||
-        responseData.error ||
-        (response.status === 400
-          ? "Invalid poll submission. Check your selected answer."
-          : response.status === 401
-            ? "Please sign in before submitting your vote."
-            : response.status === 403
-              ? "You are not permitted to submit this vote."
-              : response.status === 404
-                ? "The poll API route was not found. Check your backend route."
-                : response.status === 409 || response.status === 429
-                  ? "You have already voted on this question."
-                  : response.status >= 500
-                    ? "The server encountered an error. Please try again later."
-                    : `Unable to submit your vote. HTTP ${response.status}.`);
+      try {
+        localStorage.setItem(
+          `vote_time_${currentQuestion.id}`,
+          String(Date.now()),
+        );
+      } catch {}
 
       this.setState({
+        hasVoted: true,
         isSubmitting: false,
-        hasVoted: response.status === 409 || response.status === 429,
-        errorMessage,
-        successMessage: "",
+        successMessage: responseData.message || "Your vote has been recorded.",
+        errorMessage: "",
       });
     } catch (error) {
       this.setState({
@@ -303,11 +286,7 @@ class Quest extends React.Component {
     }
   };
 
-  handleSeeResults = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-
+  handleSeeResults = () => {
     this.setState({
       shouldRedirectToResults: true,
     });
@@ -352,12 +331,17 @@ class Quest extends React.Component {
             </div>
 
             {isLoading ? (
-              <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10">
-                Loading today's question...
-              </div>
-            ) : !currentQuestion || !currentQuestion.question ? (
+              <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10"></div>
+            ) : !currentQuestion ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
                 {errorMessage || "No poll available at this moment."}
+                <button
+                  type="button"
+                  onClick={this.loadQuestions}
+                  className="block mx-auto mt-4 text-[#830000] underline"
+                >
+                  Try again
+                </button>
               </div>
             ) : (
               <>
@@ -397,7 +381,7 @@ class Quest extends React.Component {
                   {options.map((option, index) => {
                     const optionText = this.getOptionText(option);
 
-                    if (!optionText) {
+                    if (!optionText.trim()) {
                       return null;
                     }
 
@@ -423,7 +407,7 @@ class Quest extends React.Component {
                             onChange={() => this.handleOptionChange(optionText)}
                             disabled={isInteractionDisabled}
                             required
-                          />{" "}
+                          />
                           {optionText}
                         </label>
                       </div>
@@ -445,6 +429,14 @@ class Quest extends React.Component {
                         : hasVoted
                           ? "voted"
                           : "vote"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={this.handleSeeResults}
+                      className="md:py-3 lg:py-3 py-3 text-[#830000] w-40 text-xl font-semibold uppercase cursor-pointer"
+                    >
+                      See results
                     </button>
                   </div>
                 </form>
