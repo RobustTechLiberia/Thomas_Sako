@@ -12,7 +12,7 @@ function getConfiguration() {
     projectId: (process.env.GOOGLE_PROJECT_ID || "").trim(),
     clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
     clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
-    privateKey: (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n").trim(),
+    privateKey: normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
     spreadsheetId: (process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET || "").trim(),
     sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
     tokenUri: (process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token").trim(),
@@ -24,7 +24,43 @@ function getConfiguration() {
     ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
     ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET)", configuration.spreadsheetId],
   ];
-  return { configuration, missing: required.filter(([, value]) => !value).map(([name]) => name) };
+  const missing = required.filter(([, value]) => !value).map(([name]) => name);
+
+  if (configuration.privateKey && !isValidPrivateKey(configuration.privateKey)) {
+    missing.push("GOOGLE_PRIVATE_KEY must be a complete, valid PKCS#8 PEM key");
+  }
+
+  return { configuration, missing };
+}
+
+function normalizePrivateKey(value) {
+  let key = String(value || "").trim();
+
+  if (
+    key.length >= 2 &&
+    ((key.startsWith('"') && key.endsWith('"')) ||
+      (key.startsWith("'") && key.endsWith("'")))
+  ) {
+    key = key.slice(1, -1);
+  }
+
+  return key.replace(/\\r?\\n/g, "\n").replace(/\r\n/g, "\n").trim();
+}
+
+function isValidPrivateKey(privateKey) {
+  if (
+    !privateKey.includes("-----BEGIN PRIVATE KEY-----") ||
+    !privateKey.includes("-----END PRIVATE KEY-----")
+  ) {
+    return false;
+  }
+
+  try {
+    crypto.createPrivateKey({ key: privateKey, format: "pem", type: "pkcs8" });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function getVoteCookieName(question) {
@@ -51,7 +87,10 @@ router.post("/vote", async (req, res) => {
   const { configuration, missing } = getConfiguration();
   if (missing.length > 0) {
     console.error("Google Sheets configuration is incomplete:", missing.join(", "));
-    return res.status(503).json({ success: false, error: "Voting is temporarily unavailable. Please try again later." });
+    return res.status(503).json({
+      success: false,
+      error: "Voting is temporarily unavailable because the Google Sheets credentials are invalid.",
+    });
   }
 
   try {

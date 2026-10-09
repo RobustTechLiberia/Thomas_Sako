@@ -270,6 +270,7 @@ class Quest extends React.Component {
       this.setState({
         hasVoted: true,
         isSubmitting: false,
+        shouldRedirectToResults: true,
         successMessage: responseData.message || "Your vote has been recorded.",
         errorMessage: "",
       });

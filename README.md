@@ -45,6 +45,10 @@ JSON key from Google Cloud and copy its entire `private_key` value into
 `GOOGLE_PRIVATE_KEY`. Do not copy the JSON object itself, abbreviate the key, or
 include a trailing semicolon. Redeploy after changing the environment variable.
 
+The same `GOOGLE_PRIVATE_KEY` is used by both `POST /question/vote` and the
+Google Sheets health check. Confirm `GET /db` returns a successful connection
+before testing a vote; otherwise votes cannot be written to the spreadsheet.
+
 ## Verify before deploying
 
 ```
