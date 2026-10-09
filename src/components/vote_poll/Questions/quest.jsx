@@ -430,14 +430,6 @@ class Quest extends React.Component {
                           ? "voted"
                           : "vote"}
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={this.handleSeeResults}
-                      className="md:py-3 lg:py-3 py-3 text-[#830000] w-40 text-xl font-semibold uppercase cursor-pointer"
-                    >
-                      See results
-                    </button>
                   </div>
                 </form>
               </>
