@@ -17,7 +17,7 @@ const GOOGLE_TOKEN_URI = (
 ).trim();
 
 const SPREADSHEET_ID = (process.env.GOOGLE_SHEETS_ID || "").trim();
-const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "liberty_vote").trim();
+const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "").trim();
 
 const PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "")
   .replace(/\\n/g, "\n")
