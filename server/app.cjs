@@ -13,55 +13,6 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-const defaultAllowedOrigins = [
-  // The production frontend is published through this repository's GitHub Pages site.
-  "https://robusttechliberia.github.io",
-];
-
-const configuredOrigins = [
-  ...defaultAllowedOrigins,
-  ...(process.env.ALLOWED_ORIGINS || "").split(","),
-]
-  .map((value) => value.trim().replace(/\/+$/, ""))
-  .filter(Boolean);
-
-function isAllowedOrigin(origin) {
-  if (!origin) {
-    return true;
-  }
-
-  const normalizedOrigin = origin.replace(/\/+$/, "");
-
-  // Explicitly allow configured frontend origins.
-  if (configuredOrigins.includes(normalizedOrigin)) {
-    return true;
-  }
-
-  let parsedOrigin;
-
-  try {
-    parsedOrigin = new URL(normalizedOrigin);
-  } catch {
-    return false;
-  }
-
-  const hostname = parsedOrigin.hostname.toLowerCase();
-
-  // Local development only.
-  const isLocalhost =
-    process.env.NODE_ENV !== "production" &&
-    (hostname === "localhost" ||
-      hostname === "127.0.0.1" ||
-      hostname === "::1");
-
-  // Allow HTTPS Vercel deployment domains.
-  const isVercel =
-    parsedOrigin.protocol === "https:" &&
-    (hostname === "vercel.app" || hostname.endsWith(".vercel.app"));
-
-  return isLocalhost || isVercel;
-}
-
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -70,15 +21,11 @@ app.use(
 
 app.use(
   cors({
-    origin(origin, callback) {
-      if (isAllowedOrigin(origin)) {
-        return callback(null, true);
-      }
-
-      console.warn("Blocked CORS origin:", origin);
-      return callback(new Error("Origin not allowed by CORS"));
-    },
-    credentials: true,
+    // These endpoints are public and do not use browser sessions or cookies.
+    // Reflecting the caller's origin allows the site to be hosted on GitHub
+    // Pages, Vercel, or a custom domain without an origin-specific redeploy.
+    origin: true,
+    credentials: false,
     optionsSuccessStatus: 200,
   }),
 );
@@ -128,14 +75,6 @@ app.use((err, req, res, next) => {
 
   if (res.headersSent) {
     return next(err);
-  }
-
-  // CORS errors should not be reported as generic server failures.
-  if (err.message === "Origin not allowed by CORS") {
-    return res.status(403).json({
-      success: false,
-      error: "This website is not allowed to access the API.",
-    });
   }
 
   if (err instanceof SyntaxError && err.status === 400 && "body" in err) {

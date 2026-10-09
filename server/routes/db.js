@@ -2,6 +2,7 @@
 
 require("dotenv").config();
 
+const { createPrivateKey } = require("crypto");
 const express = require("express");
 const { google } = require("googleapis");
 
@@ -21,9 +22,43 @@ const SPREADSHEET_ID = (
 ).trim();
 const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim();
 
-const PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "")
-  .replace(/\\n/g, "\n")
-  .trim();
+function normalizePrivateKey(value) {
+  let key = String(value || "").trim();
+
+  // Deployment dashboards commonly store newlines either literally or as \n.
+  // They also sometimes retain a pair of wrapping quotes when copied from JSON.
+  if (
+    key.length >= 2 &&
+    ((key.startsWith('"') && key.endsWith('"')) ||
+      (key.startsWith("'") && key.endsWith("'")))
+  ) {
+    key = key.slice(1, -1);
+  }
+
+  return key.replace(/\\r?\\n/g, "\n").replace(/\r\n/g, "\n").trim();
+}
+
+const PRIVATE_KEY = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
+
+function getPrivateKeyError() {
+  if (!PRIVATE_KEY) {
+    return "GOOGLE_PRIVATE_KEY is missing.";
+  }
+
+  if (
+    !PRIVATE_KEY.includes("-----BEGIN PRIVATE KEY-----") ||
+    !PRIVATE_KEY.includes("-----END PRIVATE KEY-----")
+  ) {
+    return "GOOGLE_PRIVATE_KEY must be the complete private_key value from the Google service-account JSON file.";
+  }
+
+  try {
+    createPrivateKey({ key: PRIVATE_KEY, format: "pem", type: "pkcs8" });
+    return null;
+  } catch {
+    return "GOOGLE_PRIVATE_KEY is not a valid PKCS#8 PEM key. Replace it with the complete private_key value from a newly downloaded Google service-account JSON file.";
+  }
+}
 
 let sheetsClient;
 
@@ -38,17 +73,11 @@ function getSheetsClient() {
   if (!GOOGLE_CLIENT_EMAIL) missing.push("GOOGLE_CLIENT_EMAIL");
   if (!GOOGLE_CLIENT_ID) missing.push("GOOGLE_CLIENT_ID");
   if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID (or GOOGLE_SHEET)");
-  if (!PRIVATE_KEY) missing.push("GOOGLE_PRIVATE_KEY");
+  const privateKeyError = getPrivateKeyError();
+  if (privateKeyError) missing.push(privateKeyError);
 
   if (missing.length > 0) {
     throw new Error(`Missing environment variables: ${missing.join(", ")}`);
-  }
-
-  if (
-    !PRIVATE_KEY.includes("-----BEGIN PRIVATE KEY-----") ||
-    !PRIVATE_KEY.includes("-----END PRIVATE KEY-----")
-  ) {
-    throw new Error("GOOGLE_PRIVATE_KEY must contain a valid PEM private key.");
   }
 
   const credentials = {

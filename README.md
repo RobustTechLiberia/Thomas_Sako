@@ -18,7 +18,7 @@ appropriate):
 GOOGLE_PROJECT_ID
 GOOGLE_CLIENT_EMAIL
 GOOGLE_CLIENT_ID
-GOOGLE_PRIVATE_KEY         # service-account PEM; use literal newlines or \n
+GOOGLE_PRIVATE_KEY         # complete service-account private_key PEM; literal newlines or \n are accepted
 GOOGLE_SHEETS_ID             # `GOOGLE_SHEET` is also supported for existing deployments
 GOOGLE_SHEET_NAME=Sheet1     # optional; defaults to Sheet1
 EMAIL_USER                 # optional unless the subscription form is used
@@ -30,17 +30,20 @@ INSTAGRAM_PAGE_URL
 WHATSAPP_ACCOUNT
 TIKTOK_PAGE_URL
 GMAIL_ACCOUNT
-ALLOWED_ORIGINS            # optional comma-separated custom frontend origins
 ```
 
-`https://robusttechliberia.github.io` is allowed by default for the repository's
-GitHub Pages frontend. If the site is served from a custom domain, add its full
-origin (for example, `https://example.com`) to `ALLOWED_ORIGINS`; do not include
-a path or trailing slash.
+The API is public and does not use browser cookies, so it accepts requests from
+the deployed frontend regardless of whether it is hosted on GitHub Pages,
+Vercel, or a custom domain. No CORS origin environment variable is required.
 
 Share the target spreadsheet with the service account email in
 `GOOGLE_CLIENT_EMAIL` with Editor access. Credentials are intentionally not
 stored in the repository.
+
+If Google Sheets returns a key-decoding error, download a fresh service-account
+JSON key from Google Cloud and copy its entire `private_key` value into
+`GOOGLE_PRIVATE_KEY`. Do not copy the JSON object itself, abbreviate the key, or
+include a trailing semicolon. Redeploy after changing the environment variable.
 
 ## Verify before deploying
 
