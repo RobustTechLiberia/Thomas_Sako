@@ -2,7 +2,7 @@
 
 The app is a Vite/React site with an Express API deployed as a Vercel serverless
 function. The vote form submits to the same-origin endpoint
-`POST /question/submit`; it does not use a localhost URL in production.
+`POST /question/vote`; it does not use a localhost URL in production.
 
 ## Deploy to Vercel
 
@@ -15,12 +15,12 @@ for each environment you deploy (Production, Preview, and Development as
 appropriate):
 
 ```
-DB_HOST
-DB_PORT=3306
-DB_USER
-DB_PASS
-DB_DATABASE
-DB_SSL_CA                 # PEM certificate; use literal newlines or \n
+GOOGLE_PROJECT_ID
+GOOGLE_CLIENT_EMAIL
+GOOGLE_CLIENT_ID
+GOOGLE_PRIVATE_KEY         # service-account PEM; use literal newlines or \n
+GOOGLE_SHEETS_ID             # `GOOGLE_SHEET` is also supported for existing deployments
+GOOGLE_SHEET_NAME=Sheet1     # optional; defaults to Sheet1
 EMAIL_USER                 # optional unless the subscription form is used
 EMAIL_PASS                 # optional unless the subscription form is used
 YOUTUBE_CHANNEL_URL        # optional social link values
@@ -33,10 +33,9 @@ GMAIL_ACCOUNT
 ALLOWED_ORIGINS            # optional comma-separated custom frontend origins
 ```
 
-`DB_SSL_CA` is recommended for serverless deployments because it avoids relying
-on a filesystem certificate. Local development uses the ignored
-`DB_SSL_CA_FILE=../ca.pem` entry in `server/.env`; do not set that file path in
-Vercel. Database credentials are intentionally not stored in the repository.
+Share the target spreadsheet with the service account email in
+`GOOGLE_CLIENT_EMAIL` with Editor access. Credentials are intentionally not
+stored in the repository.
 
 ## Verify before deploying
 
@@ -46,13 +45,6 @@ npm run lint
 npm run build
 ```
 
-For a new Aiven database, run the idempotent schema migration once after adding
-the database variables:
-
-```
-npm run db:migrate
-```
-
-After deployment, submit a vote from the deployed site and confirm a new row is
-written to the existing `poll` table. The API returns a clear JSON error if the
-database configuration or connection is unavailable.
+After deployment, submit a vote from the deployed site and confirm a row is
+written to the configured Google Sheet. The API returns a clear JSON error when
+its Google Sheets configuration or connection is unavailable.

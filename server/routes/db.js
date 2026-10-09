@@ -16,8 +16,10 @@ const GOOGLE_TOKEN_URI = (
   process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token"
 ).trim();
 
-const SPREADSHEET_ID = (process.env.GOOGLE_SHEETS_ID || "").trim();
-const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "").trim();
+const SPREADSHEET_ID = (
+  process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET || ""
+).trim();
+const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim();
 
 const PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || "")
   .replace(/\\n/g, "\n")
@@ -35,8 +37,7 @@ function getSheetsClient() {
   if (!GOOGLE_PROJECT_ID) missing.push("GOOGLE_PROJECT_ID");
   if (!GOOGLE_CLIENT_EMAIL) missing.push("GOOGLE_CLIENT_EMAIL");
   if (!GOOGLE_CLIENT_ID) missing.push("GOOGLE_CLIENT_ID");
-  if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID");
-  if (!SHEET_NAME) missing.push("GOOGLE_SHEET_NAME");
+  if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID (or GOOGLE_SHEET)");
   if (!PRIVATE_KEY) missing.push("GOOGLE_PRIVATE_KEY");
 
   if (missing.length > 0) {

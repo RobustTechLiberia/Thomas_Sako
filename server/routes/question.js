@@ -1,210 +1,84 @@
 "use strict";
 
+const crypto = require("crypto");
 const express = require("express");
-const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
 
 const router = express.Router();
+const VOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const youtubeUrl =
-  process.env.YOUTUBE_CHANNEL_URL || "https://www.youtube.com/";
-
-function createTransporter() {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-
-  if (!user || !pass) {
-    return null;
-  }
-
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user,
-      pass,
-    },
-  });
+function getConfiguration() {
+  const configuration = {
+    projectId: (process.env.GOOGLE_PROJECT_ID || "").trim(),
+    clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
+    clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
+    privateKey: (process.env.GOOGLE_PRIVATE_KEY || "").replace(/\\n/g, "\n").trim(),
+    spreadsheetId: (process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET || "").trim(),
+    sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
+    tokenUri: (process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token").trim(),
+  };
+  const required = [
+    ["GOOGLE_PROJECT_ID", configuration.projectId],
+    ["GOOGLE_CLIENT_EMAIL", configuration.clientEmail],
+    ["GOOGLE_CLIENT_ID", configuration.clientId],
+    ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
+    ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET)", configuration.spreadsheetId],
+  ];
+  return { configuration, missing: required.filter(([, value]) => !value).map(([name]) => name) };
 }
 
-router.post("/subscribe", async (req, res) => {
+function getVoteCookieName(question) {
+  const digest = crypto.createHash("sha256").update(question).digest("hex").slice(0, 20);
+  return `poll_vote_${digest}`;
+}
+
+function hasCookie(req, name) {
+  return (req.headers.cookie || "").split(";").some((part) => part.trim().startsWith(`${name}=`));
+}
+
+router.post("/vote", async (req, res) => {
+  const question = typeof req.body?.question === "string" ? req.body.question.trim() : "";
+  const answer = typeof req.body?.answer === "string" ? req.body.answer.trim() : "";
+  if (!question || !answer || question.length > 500 || answer.length > 500) {
+    return res.status(400).json({ success: false, error: "A valid question and answer are required." });
+  }
+
+  const cookieName = getVoteCookieName(question);
+  if (hasCookie(req, cookieName)) {
+    return res.status(429).json({ success: false, error: "You have already voted on this question. Please try again tomorrow." });
+  }
+
+  const { configuration, missing } = getConfiguration();
+  if (missing.length > 0) {
+    console.error("Google Sheets configuration is incomplete:", missing.join(", "));
+    return res.status(503).json({ success: false, error: "Voting is temporarily unavailable. Please try again later." });
+  }
+
   try {
-    // Validate request body
-    const email =
-      typeof req.body?.email === "string" ? req.body.email.trim() : "";
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        error: "Please enter your email address.",
-      });
-    }
-
-    if (email.length > 254 || !emailPattern.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: "Please enter a valid email address.",
-      });
-    }
-
-    // Validate SMTP configuration
-    const emailUser = process.env.EMAIL_USER;
-    const emailPass = process.env.EMAIL_PASS;
-
-    if (!emailUser || !emailPass) {
-      console.error("Email credentials are not configured.");
-
-      return res.status(503).json({
-        success: false,
-        error: "Email service is temporarily unavailable.",
-      });
-    }
-
-    // Validate YouTube URL
-    let parsedYoutubeUrl;
-
-    try {
-      parsedYoutubeUrl = new URL(youtubeUrl);
-    } catch {
-      return res.status(503).json({
-        success: false,
-        error: "The YouTube channel URL is invalid.",
-      });
-    }
-
-    const allowedHosts = [
-      "youtube.com",
-      "www.youtube.com",
-      "m.youtube.com",
-      "youtu.be",
-    ];
-
-    if (
-      parsedYoutubeUrl.protocol !== "https:" ||
-      !allowedHosts.includes(parsedYoutubeUrl.hostname.toLowerCase())
-    ) {
-      return res.status(503).json({
-        success: false,
-        error: "The YouTube channel URL is invalid.",
-      });
-    }
-
-    const transporter = createTransporter();
-
-    const safeYoutubeUrl = parsedYoutubeUrl.toString();
-
-    const mailOptions = {
-      from: {
-        name: "1847 Liberty",
-        address: emailUser,
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        type: "service_account", project_id: configuration.projectId,
+        private_key: configuration.privateKey, client_email: configuration.clientEmail,
+        client_id: configuration.clientId, token_uri: configuration.tokenUri,
       },
-      to: email,
-      subject: "1847 Liberty - Thanks for subscribing!",
-      text: [
-        "Thanks for subscribing!",
-        "",
-        "Don't miss our live podcasts.",
-        "We host live sessions covering the latest insights and trends.",
-        "Follow our YouTube channel and turn on notifications.",
-        safeYoutubeUrl,
-        "",
-        "See you on the next stream,",
-        "47liberty Team",
-      ].join("\n"),
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <body style="font-family: Arial, sans-serif; color: #333;">
-            <div style="
-              max-width: 600px;
-              margin: 20px auto;
-              padding: 24px;
-              border: 1px solid #eee;
-              border-radius: 8px;
-            ">
-              <h2>Thanks for subscribing!</h2>
-
-              <div style="
-                background: #f9f9f9;
-                padding: 20px;
-                border-radius: 6px;
-                text-align: center;
-              ">
-                <h3 style="color: #cc0000;">
-                  Don't Miss Our Live Podcasts!
-                </h3>
-
-                <p style="font-size: 14px; line-height: 1.6;">
-                  We host live sessions covering the latest
-                  insights and trends. Follow our YouTube
-                  channel and turn on notifications so you
-                  never miss a live stream.
-                </p>
-
-                <a
-                  href="${safeYoutubeUrl}"
-                  style="
-                    display: inline-block;
-                    background: #cc0000;
-                    color: white;
-                    padding: 12px 24px;
-                    text-decoration: none;
-                    font-weight: bold;
-                    border-radius: 4px;
-                  "
-                >
-                  Subscribe on YouTube
-                </a>
-              </div>
-
-              <p style="font-size: 14px; color: #888; margin-top: 24px;">
-                See you on the next stream,<br />
-                <strong>47liberty Team</strong>
-              </p>
-            </div>
-          </body>
-        </html>
-      `,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    console.log("Subscription email sent:", {
-      messageId: info.messageId,
-      recipient: email,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
-
-    return res.status(200).json({
-      success: true,
-      message: "Subscription confirmed! Please check your inbox.",
+    const sheets = google.sheets({ version: "v4", auth });
+    const timestamp = new Date().toISOString();
+    const range = `'${configuration.sheetName.replace(/'/g, "''")}'!A:E`;
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: configuration.spreadsheetId, range, valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: { values: [[timestamp, question, answer, 1, timestamp.slice(0, 10)]] },
     });
+    res.cookie(cookieName, "1", {
+      maxAge: VOTE_WINDOW_MS, httpOnly: true, sameSite: "lax",
+      secure: process.env.NODE_ENV === "production", path: "/",
+    });
+    return res.status(201).json({ success: true, message: "Your vote has been recorded." });
   } catch (error) {
-    // Log diagnostic information on the server only
-    console.error("Subscription delivery failed:", {
-      message: error.message,
-      code: error.code,
-      command: error.command,
-      responseCode: error.responseCode,
-    });
-
-    if (error.code === "EAUTH") {
-      return res.status(503).json({
-        success: false,
-        error: "Email service authentication failed. Please contact support.",
-      });
-    }
-
-    if (error.code === "EENVELOPE" || error.code === "EMESSAGE") {
-      return res.status(400).json({
-        success: false,
-        error: "The confirmation email could not be accepted for delivery.",
-      });
-    }
-
-    return res.status(502).json({
-      success: false,
-      error: "Unable to send your confirmation email. Please try again later.",
-    });
+    console.error("Unable to record vote:", error.message);
+    return res.status(502).json({ success: false, error: "Unable to record your vote. Please try again later." });
   }
 });
 

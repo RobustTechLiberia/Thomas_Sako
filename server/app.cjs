@@ -80,7 +80,7 @@ app.use(express.json({ limit: "10kb" }));
 
 // Import routers.
 const subscribeRouter = require("./routes/subscribe");
-const { router: databaseRouter } = require("./routes/db");
+const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
 const socialRouter = require("./routes/socialmedia");
 

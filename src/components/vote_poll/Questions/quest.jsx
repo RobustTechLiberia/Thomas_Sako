@@ -264,7 +264,9 @@ class Quest extends React.Component {
           `vote_time_${currentQuestion.id}`,
           String(Date.now()),
         );
-      } catch {}
+      } catch {
+        // Voting still succeeds when browser storage is unavailable.
+      }
 
       this.setState({
         hasVoted: true,

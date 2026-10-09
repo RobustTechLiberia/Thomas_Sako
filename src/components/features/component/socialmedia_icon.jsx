@@ -1,5 +1,6 @@
 import React from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome CSS
+import { apiUrl } from "../../../lib/api";
 
 class SocialIcons extends React.Component {
   constructor(props) {
@@ -19,16 +20,7 @@ class SocialIcons extends React.Component {
   }
 
   componentDidMount() {
-    const isLocalhost =
-      window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1";
-
-    // Updated port from 5000 to 8080 to match your Express server configuration
-    const backendUrl = isLocalhost
-      ? "http://localhost:8080/api/socialmedia"
-      : "/api/socialmedia";
-
-    fetch(backendUrl)
+    fetch(apiUrl("/api/socialmedia"))
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

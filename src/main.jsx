@@ -13,12 +13,3 @@ createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </StrictMode>,
 );
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register(`${import.meta.env.BASE_URL}serviceWorker.js`)
-      .then((reg) => console.log("Service Worker registered:", reg.scope))
-      .catch((err) => console.log("Service Worker failed:", err));
-  });
-}
