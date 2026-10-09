@@ -33,6 +33,11 @@ GMAIL_ACCOUNT
 ALLOWED_ORIGINS            # optional comma-separated custom frontend origins
 ```
 
+`https://robusttechliberia.github.io` is allowed by default for the repository's
+GitHub Pages frontend. If the site is served from a custom domain, add its full
+origin (for example, `https://example.com`) to `ALLOWED_ORIGINS`; do not include
+a path or trailing slash.
+
 Share the target spreadsheet with the service account email in
 `GOOGLE_CLIENT_EMAIL` with Editor access. Credentials are intentionally not
 stored in the repository.

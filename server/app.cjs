@@ -13,8 +13,15 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-const configuredOrigins = (process.env.ALLOWED_ORIGINS || "")
-  .split(",")
+const defaultAllowedOrigins = [
+  // The production frontend is published through this repository's GitHub Pages site.
+  "https://robusttechliberia.github.io",
+];
+
+const configuredOrigins = [
+  ...defaultAllowedOrigins,
+  ...(process.env.ALLOWED_ORIGINS || "").split(","),
+]
   .map((value) => value.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
