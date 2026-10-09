@@ -40,7 +40,7 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(null, false);
+      return callback(new Error("Not allowed by CORS"), false);
     },
     credentials: true,
     optionsSuccessStatus: 200,
@@ -50,7 +50,7 @@ app.use(
 app.use(express.json());
 
 const subscribeRouter = require("./routes/subscribe");
-const { router: databaseRouter } = require("./routes/db"); // Destructured to extract the router object cleanly
+const { router: databaseRouter } = require("./routes/db");
 const questionRouter = require("./routes/question");
 const SocialRouter = require("./routes/socialmedia");
 
@@ -76,12 +76,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// For local development execution via 'node app.cjs'
 if (require.main === module) {
   const port = Number.parseInt(process.env.PORT || "8080", 10);
   app.listen(port, "0.0.0.0", () => {
     console.log(`Server listening locally on port ${port}`);
   });
 }
-
-module.exports = app;
