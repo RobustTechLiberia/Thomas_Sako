@@ -15,6 +15,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+router.get("/subscribe", (req, res) => {
+  return res.status(405).json({
+    error: "Subscription requests must use POST /subscribe.",
+  });
+});
+
 router.post("/subscribe", async (req, res) => {
   try {
     if (!req.body || typeof req.body.email !== "string") {

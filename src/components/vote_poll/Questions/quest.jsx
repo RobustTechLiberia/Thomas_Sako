@@ -301,8 +301,6 @@ class Quest extends React.Component {
       isLoading,
       isSubmitting,
       shouldRedirectToResults,
-      errorMessage,
-      successMessage,
     } = this.state;
 
     if (shouldRedirectToResults) {
@@ -335,7 +333,6 @@ class Quest extends React.Component {
               <div className="text-center font-sans font-semibold text-2xl text-gray-500 mt-10"></div>
             ) : !currentQuestion ? (
               <div className="text-center font-sans font-semibold text-xl text-[#830000] mt-10 px-4">
-                {errorMessage || "No poll available at this moment."}
                 <button
                   type="button"
                   onClick={this.loadQuestions}
@@ -349,30 +346,6 @@ class Quest extends React.Component {
                 <h3 className="text-center flex flex-wrap md:justify-center lg:justify-start md:items-start lg:items-center font-sans font-semibold text-3xl md:mx-20 lg:mx-20 mx-2">
                   {currentQuestion.question}
                 </h3>
-
-                {errorMessage && (
-                  <div
-                    role="alert"
-                    className="text-center text-red-600 font-semibold font-sans text-base mt-4 px-4"
-                  >
-                    {errorMessage}
-                  </div>
-                )}
-
-                {successMessage && (
-                  <div
-                    role="status"
-                    className="text-center text-green-600 font-semibold font-sans text-base mt-4 px-4"
-                  >
-                    {successMessage}
-                  </div>
-                )}
-
-                {hasVoted && !errorMessage && (
-                  <div className="text-center text-[#830000] font-semibold font-sans text-base mt-4 px-4">
-                    You have already voted on today's question.
-                  </div>
-                )}
 
                 <form
                   className="w-auto"

@@ -31,6 +31,7 @@ app.use(
 );
 
 app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 
 // Import routers.
 const subscribeRouter = require("./routes/subscribe");

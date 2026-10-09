@@ -117,12 +117,14 @@ class DefaultPage extends React.Component {
   };
 
   render() {
-    const { email, isSubmitting, errorMessage, successMessage } = this.state;
+    const { email, isSubmitting } = this.state;
 
     return (
       <>
         <form
           onSubmit={this.handleSubmit}
+          action={apiUrl("/subscribe")}
+          method="post"
           className="h-auto bg-white flex items-center gap-2"
         >
           <input
@@ -144,24 +146,9 @@ class DefaultPage extends React.Component {
             disabled={isSubmitting}
             className="bg-[#830000] cursor-pointer text-white text-xl capitalize py-3 px-5 border-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Subscribing..." : "Subscribe"}
+            {isSubmitting ? "Subscribe" : "Subscribe"}
           </button>
         </form>
-
-        {errorMessage && (
-          <p role="alert" className="mt-2 text-sm font-semibold text-red-600">
-            {errorMessage}
-          </p>
-        )}
-
-        {successMessage && (
-          <p
-            role="status"
-            className="mt-2 text-sm font-semibold text-green-600"
-          >
-            {successMessage}
-          </p>
-        )}
       </>
     );
   }
