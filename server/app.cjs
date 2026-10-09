@@ -47,7 +47,7 @@ app.use("/", databaseRouter);
 
 // Health check.
 app.get("/home", (req, res) => {
-  return res.status(200).send("hello, world!");
+  return res.status(200).send("");
 });
 
 app.get("/health", (req, res) => {
