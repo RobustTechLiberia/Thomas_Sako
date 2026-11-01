@@ -348,7 +348,7 @@ class Quest extends React.Component {
                   {currentQuestion.question}
                 </h3>
 
-                <form action="/results" method
+                <form action="/results" method="post"
                   className="w-auto"
                   onSubmit={this.handleSubmit}
                   aria-busy={isSubmitting}
