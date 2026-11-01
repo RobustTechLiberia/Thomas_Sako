@@ -1,4 +1,5 @@
 import React from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/home";
 import VotePoll from "./components/vote_poll/vote_poll";
@@ -15,22 +16,25 @@ import Results from "./components/vote_poll/Questions/Result/results";
 class App extends React.Component {
   render() {
     return (
-      <Routes>
-        <Route path="/" element={<HomePage />}>
-          <Route element={<VotePoll />}>
-            <Route index element={<Quest />} />
-            <Route path="quest" element={<Quest />} />
+      <>
+        <Routes>
+          <Route path="/" element={<HomePage />}>
+            <Route element={<VotePoll />}>
+              <Route index element={<Quest />} />
+              <Route path="quest" element={<Quest />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="/podcast" element={<PodcastPage />} />
-        <Route path="/playlist" element={<PlayList />} />
-        <Route path="/about" element={<AboutMe />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/book" element={<BookMe />} />
-        <Route path="/advertising" element={<Advert />} />
-        <Route path="/results" element={<Results />} />
-      </Routes>
+          <Route path="/podcast" element={<PodcastPage />} />
+          <Route path="/playlist" element={<PlayList />} />
+          <Route path="/about" element={<AboutMe />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/book" element={<BookMe />} />
+          <Route path="/advertising" element={<Advert />} />
+          <Route path="/results" element={<Results />} />
+        </Routes>
+        <Analytics />
+      </>
     );
   }
 }
