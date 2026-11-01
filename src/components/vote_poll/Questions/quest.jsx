@@ -258,9 +258,6 @@ class Quest extends React.Component {
         errorMessage: "",
       });
 
-      if (typeof window !== "undefined") {
-        window.location.assign("/results");
-      }
     } catch (error) {
       this.setState({
         isSubmitting: false,
@@ -333,8 +330,6 @@ class Quest extends React.Component {
                 </h3>
 
                 <form
-                  action="/results"
-                  method="post"
                   className="w-auto"
                   onSubmit={this.handleSubmit}
                   aria-busy={isSubmitting}
@@ -384,6 +379,11 @@ class Quest extends React.Component {
                     >
                       {isSubmitting ? "submitting..." : hasVoted ? "voted" : "vote"}
                     </button>
+                    {this.state.errorMessage ? (
+                      <p className="text-sm font-medium text-[#830000]" role="alert">
+                        {this.state.errorMessage}
+                      </p>
+                    ) : null}
                   </div>
                 </form>
               </>

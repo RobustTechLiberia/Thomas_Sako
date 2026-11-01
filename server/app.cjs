@@ -4,23 +4,6 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
-const fs = require("fs");
-
-const serviceAccountPath = path.resolve(__dirname, "liberty-510919-a2f801783f8d.json");
-
-if (fs.existsSync(serviceAccountPath)) {
-  try {
-    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
-
-    process.env.GOOGLE_PROJECT_ID = (process.env.GOOGLE_PROJECT_ID || serviceAccount.project_id || "").trim();
-    process.env.GOOGLE_CLIENT_EMAIL = (process.env.GOOGLE_CLIENT_EMAIL || serviceAccount.client_email || "").trim();
-    process.env.GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || serviceAccount.client_id || "").trim();
-    process.env.GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || serviceAccount.private_key || "").trim();
-    process.env.GOOGLE_TOKEN_URI = (process.env.GOOGLE_TOKEN_URI || serviceAccount.token_uri || "https://oauth2.googleapis.com/token").trim();
-  } catch (error) {
-    console.warn("Failed to load Google service account JSON. Falling back to environment variables.", error.message);
-  }
-}
 
 require("dotenv").config({
   path: path.resolve(__dirname, ".env"),

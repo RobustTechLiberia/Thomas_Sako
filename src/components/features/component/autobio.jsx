@@ -1,5 +1,5 @@
 import React from "react";
-import image from "../../../images/617521616_1984950405787294_11200720191272892_n.jpg";
+// import image from "../../../images/617521616_1984950405787294_11200720191272892_n.jpg";
 
 class AutoBio extends React.Component {
   render() {
@@ -34,7 +34,7 @@ class AutoBio extends React.Component {
               tempore nam, praesentium maiores ad.
             </p>
             <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg text-gray-700">
-              Developer <br />
+              The Developer Of <br />
               Chip Chat{" "}
             </p>
           </div>

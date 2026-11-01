@@ -1,6 +1,6 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 import Header from "../components/header";
-import VotePoll from "../components/vote_poll/vote_poll";
 import Section from "../components/section";
 import Features from "../components/features/component/default";
 import Footer from "../components/footer";
@@ -11,7 +11,7 @@ class HomePage extends React.Component {
     return (
       <>
         <Header />
-        <VotePoll />
+        <Outlet />
         <Section />
         {/* <Subscribe /> */}
         <Features />

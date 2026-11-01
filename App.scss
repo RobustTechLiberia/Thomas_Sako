@@ -20,7 +20,8 @@ $bg-opacity: 0.10;
         background-image: $bg-img;
         background-repeat: $bg-repeat;
         opacity: $bg-opacity;
-        z-index: -0; 
+        pointer-events: none;
+        z-index: -1;
     
     }
 }

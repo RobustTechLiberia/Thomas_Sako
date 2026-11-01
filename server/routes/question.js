@@ -1,36 +1,11 @@
 "use strict";
 
 const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
 const express = require("express");
 const { google } = require("googleapis");
 
 const router = express.Router();
 const VOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
-
-function loadServiceAccountJson() {
-  const serviceAccountPath = path.resolve(__dirname, "liberty-510919-a2f801783f8d.json");
-
-  if (!fs.existsSync(serviceAccountPath)) {
-    return;
-  }
-
-  try {
-    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
-
-    process.env.GOOGLE_PROJECT_ID = (process.env.GOOGLE_PROJECT_ID || serviceAccount.project_id || "").trim();
-    process.env.GOOGLE_CLIENT_EMAIL = (process.env.GOOGLE_CLIENT_EMAIL || serviceAccount.client_email || "").trim();
-    process.env.GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || serviceAccount.client_id || "").trim();
-    process.env.GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || serviceAccount.private_key || "").trim();
-    process.env.GOOGLE_TOKEN_URI = (process.env.GOOGLE_TOKEN_URI || serviceAccount.token_uri || "https://oauth2.googleapis.com/token").trim();
-    process.env.GOOGLE_SHEET_ID = (process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEETS_ID || "").trim();
-  } catch {
-    // Ignore JSON parse issues and let environment variables drive the config.
-  }
-}
-
-loadServiceAccountJson();
 
 function getConfiguration() {
   const configuration = {
