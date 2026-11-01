@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "npx --yes vercel@latest --prod",
+    "deploy": "git push origin main",
     "deploy:github-pages": "gh-pages -d dist"
   },
   "dependencies": {

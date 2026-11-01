@@ -10,9 +10,13 @@ Import the repository with the project root set to this directory. Vercel uses
 `vercel.json` to build the Vite app and route API requests to `server/app.cjs`.
 No custom output directory or framework override is required.
 
-For a command-line production deployment, run `npm run deploy`. This deploys
-to Vercel; the former GitHub Pages command is available as
-`npm run deploy:github-pages` when that hosting target is intentional.
+This project deploys through Vercel's Git integration, so no Vercel CLI is
+required. Commit the changes you want to publish, then run `npm run deploy`.
+The script builds the site and pushes `main` to GitHub; Vercel deploys that push
+automatically when this repository is connected to the Vercel project.
+
+The former GitHub Pages command is available as `npm run deploy:github-pages`
+when that hosting target is intentional.
 
 Add these environment variables in **Project Settings → Environment Variables**
 for each environment you deploy (Production, Preview, and Development as
