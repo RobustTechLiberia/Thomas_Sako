@@ -46,7 +46,11 @@ function normalizePrivateKey(value) {
     key = key.slice(1, -1);
   }
 
-  return key.replace(/\\r?\\n/g, "\n").replace(/\r\n/g, "\n").trim();
+  return key
+    .replace(/\\r\\n/g, "\n")
+    .replace(/\\n/g, "\n")
+    .replace(/\r\n/g, "\n")
+    .trim();
 }
 
 function isValidPrivateKey(privateKey) {
