@@ -9,9 +9,7 @@ const VOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function getConfiguration() {
   const configuration = {
-    projectId: (process.env.GOOGLE_PROJECT_ID || "").trim(),
     clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
-    clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
     privateKey: normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
     spreadsheetId: (
       process.env.GOOGLE_SHEETS_ID ||
@@ -26,9 +24,7 @@ function getConfiguration() {
   };
 
   const required = [
-    ["GOOGLE_PROJECT_ID", configuration.projectId],
     ["GOOGLE_CLIENT_EMAIL", configuration.clientEmail],
-    ["GOOGLE_CLIENT_ID", configuration.clientId],
     ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
     [
       "GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)",
@@ -120,13 +116,10 @@ router.post("/vote", async (req, res) => {
 
   const { configuration, missing } = getConfiguration();
   if (missing.length > 0) {
-    console.error(
-      "",
-      missing.join(", "),
-    );
+    console.error("Google Sheets vote configuration is incomplete:", missing);
     return res.status(503).json({
       success: false,
-      error: "",
+      error: "Voting is temporarily unavailable.",
     });
   }
 
@@ -134,10 +127,8 @@ router.post("/vote", async (req, res) => {
     const auth = new google.auth.GoogleAuth({
       credentials: {
         type: "service_account",
-        project_id: configuration.projectId,
         private_key: configuration.privateKey,
         client_email: configuration.clientEmail,
-        client_id: configuration.clientId,
         token_uri: configuration.tokenUri,
       },
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -167,18 +158,22 @@ router.post("/vote", async (req, res) => {
 
     return res.status(201).json({ success: true, message: "" });
   } catch (error) {
-    console.error("", error.message);
+    const status = error.code || error.response?.status;
+    console.error("Google Sheets vote insertion failed:", {
+      status,
+      message: error.message,
+    });
 
-    if (error.message?.includes("")) {
+    if (status === 401 || status === 403) {
       return res.status(503).json({
         success: false,
-        error: "",
+        error: "Voting is temporarily unavailable.",
       });
     }
 
     return res.status(502).json({
       success: false,
-      error:"",
+      error: "Voting is temporarily unavailable.",
     });
   }
 });

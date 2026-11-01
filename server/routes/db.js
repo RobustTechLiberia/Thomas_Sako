@@ -8,9 +8,7 @@ const router = express.Router();
 
 router.use(express.json({ limit: "1mb" }));
 
-const GOOGLE_PROJECT_ID = (process.env.GOOGLE_PROJECT_ID || "").trim();
 const GOOGLE_CLIENT_EMAIL = (process.env.GOOGLE_CLIENT_EMAIL || "").trim();
-const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || "").trim();
 const GOOGLE_TOKEN_URI = (
   process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token"
 ).trim();
@@ -69,9 +67,7 @@ function getSheetsClient() {
 
   const missing = [];
 
-  if (!GOOGLE_PROJECT_ID) missing.push("GOOGLE_PROJECT_ID");
   if (!GOOGLE_CLIENT_EMAIL) missing.push("GOOGLE_CLIENT_EMAIL");
-  if (!GOOGLE_CLIENT_ID) missing.push("GOOGLE_CLIENT_ID");
   if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)");
   const privateKeyError = getPrivateKeyError();
   if (privateKeyError) missing.push(privateKeyError);
@@ -82,10 +78,8 @@ function getSheetsClient() {
 
   const credentials = {
     type: "service_account",
-    project_id: GOOGLE_PROJECT_ID,
     private_key: PRIVATE_KEY,
     client_email: GOOGLE_CLIENT_EMAIL,
-    client_id: GOOGLE_CLIENT_ID,
     token_uri: GOOGLE_TOKEN_URI,
   };
 
@@ -122,9 +116,6 @@ router.get("/db", async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Google Sheets connection successful.",
-      projectId: GOOGLE_PROJECT_ID,
-      serviceAccount: GOOGLE_CLIENT_EMAIL,
-      spreadsheetId: response.data.spreadsheetId,
       spreadsheetTitle: response.data.properties?.title || "",
     });
   } catch (error) {

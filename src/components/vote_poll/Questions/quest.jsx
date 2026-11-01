@@ -28,10 +28,13 @@ class Quest extends React.Component {
 
   loadQuestions = async () => {
     try {
-      const response = await fetch(`${import.meta.env.BASE_URL}questions.json`, {
-        method: "GET",
-        cache: "no-cache",
-      });
+      const response = await fetch(
+        `${import.meta.env.BASE_URL}questions.json`,
+        {
+          method: "GET",
+          cache: "no-cache",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to load questions. HTTP ${response.status}`);
@@ -54,7 +57,9 @@ class Quest extends React.Component {
         !Array.isArray(activeQuestion.options) ||
         activeQuestion.options.length === 0
       ) {
-        throw new Error("Today's question does not contain valid question data.");
+        throw new Error(
+          "Today's question does not contain valid question data.",
+        );
       }
 
       const validOptions = activeQuestion.options
@@ -76,7 +81,11 @@ class Quest extends React.Component {
           const elapsed = Date.now() - parsedTimestamp;
           const oneDay = 24 * 60 * 60 * 1000;
 
-          if (Number.isFinite(parsedTimestamp) && elapsed >= 0 && elapsed < oneDay) {
+          if (
+            Number.isFinite(parsedTimestamp) &&
+            elapsed >= 0 &&
+            elapsed < oneDay
+          ) {
             alreadyVoted = true;
           } else {
             localStorage.removeItem(storageKey);
@@ -98,7 +107,8 @@ class Quest extends React.Component {
       this.setState({
         currentQuestion: null,
         isLoading: false,
-        errorMessage: error?.message || "Unable to load today's poll. Please try again.",
+        errorMessage:
+          error?.message || "Unable to load today's poll. Please try again.",
       });
     }
   };
@@ -162,9 +172,14 @@ class Quest extends React.Component {
       return;
     }
 
-    if (!currentQuestion || currentQuestion.id == null || !currentQuestion.question) {
+    if (
+      !currentQuestion ||
+      currentQuestion.id == null ||
+      !currentQuestion.question
+    ) {
       this.setState({
-        errorMessage: "The current question is invalid. Please reload the page.",
+        errorMessage:
+          "The current question is invalid. Please reload the page.",
         successMessage: "",
       });
       return;
@@ -190,6 +205,11 @@ class Quest extends React.Component {
       successMessage: "",
     });
 
+    const requestController = new AbortController();
+    const requestTimeout = window.setTimeout(() => {
+      requestController.abort();
+    }, 12_000);
+
     try {
       const response = await fetch(apiUrl("/question/vote"), {
         method: "POST",
@@ -201,6 +221,7 @@ class Quest extends React.Component {
           question: currentQuestion.question,
           answer: selectedOption,
         }),
+        signal: requestController.signal,
       });
 
       const responseText = await response.text();
@@ -215,27 +236,11 @@ class Quest extends React.Component {
       }
 
       if (!response.ok) {
-        const message =
-          responseData.message ||
-          responseData.error ||
-          (response.status === 400
-            ? ""
-            : response.status === 401
-              ? ""
-              : response.status === 403
-                ? ""
-                : response.status === 404
-                  ? ""
-                  : response.status === 409 || response.status === 429
-                    ? ""
-                    : response.status >= 500
-                      ? ""
-                      : `Unable to submit your vote. HTTP ${response.status}.`);
-
         this.setState({
           isSubmitting: false,
           hasVoted: response.status === 409 || response.status === 429,
-          errorMessage: message,
+          shouldRedirectToResults: true,
+          errorMessage: "",
           successMessage: "",
         });
 
@@ -243,7 +248,10 @@ class Quest extends React.Component {
       }
 
       try {
-        localStorage.setItem(`vote_time_${currentQuestion.id}`, String(Date.now()));
+        localStorage.setItem(
+          `vote_time_${currentQuestion.id}`,
+          String(Date.now()),
+        );
       } catch {
         // Voting still succeeds when browser storage is unavailable.
       }
@@ -257,17 +265,15 @@ class Quest extends React.Component {
         successMessage,
         errorMessage: "",
       });
-
-    } catch (error) {
+    } catch {
       this.setState({
         isSubmitting: false,
-        errorMessage:
-          error?.message === ""
-            ? ""
-            : error?.message || "",
+        shouldRedirectToResults: true,
+        errorMessage: "",
         successMessage: "",
       });
     } finally {
+      window.clearTimeout(requestTimeout);
       this._submissionInProgress = false;
     }
   };
@@ -293,7 +299,8 @@ class Quest extends React.Component {
     }
 
     const options = currentQuestion?.options || [];
-    const isSubmitDisabled = isLoading || isSubmitting || !selectedOption || hasVoted;
+    const isSubmitDisabled =
+      isLoading || isSubmitting || !selectedOption || hasVoted;
     const isInteractionDisabled = isLoading || isSubmitting || hasVoted;
 
     return (
@@ -319,9 +326,7 @@ class Quest extends React.Component {
                   type="button"
                   onClick={this.loadQuestions}
                   className="block mx-auto mt-4 text-[#830000] underline"
-                >
-                 
-                </button>
+                ></button>
               </div>
             ) : (
               <>
@@ -344,7 +349,10 @@ class Quest extends React.Component {
                     const isChecked = selectedOption === optionText;
 
                     return (
-                      <div key={`${currentQuestion.id}-${index}`} className="md:my-3 lg:my-3">
+                      <div
+                        key={`${currentQuestion.id}-${index}`}
+                        className="md:my-3 lg:my-3"
+                      >
                         <label
                           className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
                             isInteractionDisabled
@@ -380,7 +388,10 @@ class Quest extends React.Component {
                       {isSubmitting ? "VOTE" : hasVoted ? "voted" : "vote"}
                     </button>
                     {this.state.errorMessage ? (
-                      <p className="text-sm font-medium text-[#830000]" role="alert">
+                      <p
+                        className="text-sm font-medium text-[#830000]"
+                        role="alert"
+                      >
                         {this.state.errorMessage}
                       </p>
                     ) : null}

@@ -1,5 +1,4 @@
 import React from "react";
-import AdSenseWidget from "./AdSenseWidget";
 import img1 from "../../../../../images/1792015266507.jpg";
 
 // import advert from "../../../../../images/Advertising-2.png";

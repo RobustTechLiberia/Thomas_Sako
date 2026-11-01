@@ -4,7 +4,6 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
-const fs = require("fs");
 const dotenv = require("dotenv");
 
 function loadLocalEnvironment() {
@@ -14,37 +13,7 @@ function loadLocalEnvironment() {
   dotenv.config({ path: path.resolve(__dirname, ".env") });
 }
 
-function loadLocalServiceAccountConfig() {
-  const credentialsPath = path.resolve(__dirname, "liberty.json");
-
-  if (!fs.existsSync(credentialsPath)) {
-    return;
-  }
-
-  try {
-    const credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf8"));
-    const values = {
-      GOOGLE_PROJECT_ID: credentials.project_id,
-      GOOGLE_CLIENT_EMAIL: credentials.client_email,
-      GOOGLE_CLIENT_ID: credentials.client_id,
-      GOOGLE_PRIVATE_KEY: credentials.private_key,
-      GOOGLE_TOKEN_URI: credentials.token_uri,
-      GOOGLE_SHEETS_ID: credentials.spreadsheet_id,
-      GOOGLE_SHEET_NAME: credentials.sheet_name,
-    };
-
-    for (const [name, value] of Object.entries(values)) {
-      if (!process.env[name] && value) {
-        process.env[name] = String(value);
-      }
-    }
-  } catch (error) {
-    console.error("Unable to load server/liberty.json:", error.message);
-  }
-}
-
 loadLocalEnvironment();
-loadLocalServiceAccountConfig();
 
 const app = express();
 

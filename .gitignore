@@ -25,4 +25,5 @@ dist-ssr
 *.sw?
 server/.env
 server/liberty.json
-server/liberty-510919-a2f801783f8d.json
+server/liberty-*.json
+!server/liberty.example.json

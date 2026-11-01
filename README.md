@@ -6,11 +6,10 @@ function. The vote form submits to the same-origin endpoint
 
 ## Local Google Sheets configuration
 
-For local development, add the Google Sheets values to `server/.env` (or copy
-`server/liberty.example.json` to `server/liberty.json` and replace every
-placeholder with values from one Google service-account key JSON file). Both
-files are local-only and are never deployed. Values already set in the
-environment take precedence over `server/.env`.
+For local development, add the Google Sheets values to an untracked
+`server/.env` file. In Vercel, add them through Project Settings → Environment
+Variables. Never commit a service-account JSON file, `.env` file, or private
+key. Values already set by the host take precedence over `server/.env`.
 
 ## Deploy to Vercel
 
@@ -31,9 +30,7 @@ for each environment you deploy (Production, Preview, and Development as
 appropriate):
 
 ```
-GOOGLE_PROJECT_ID
 GOOGLE_CLIENT_EMAIL
-GOOGLE_CLIENT_ID
 GOOGLE_PRIVATE_KEY         # complete service-account private_key PEM; literal newlines or \n are accepted
 GOOGLE_SHEETS_ID             # `GOOGLE_SHEET` is also supported for existing deployments
 GOOGLE_SHEET_NAME=Sheet1     # optional; defaults to Sheet1
@@ -48,11 +45,17 @@ TIKTOK_PAGE_URL
 GMAIL_ACCOUNT
 ```
 
-The API is public and does not use browser cookies, so it accepts requests from
-the deployed frontend regardless of whether it is hosted on GitHub Pages,
-Vercel, or a custom domain. No CORS origin environment variable is required.
+Do not prefix the Google variables with `VITE_`: Vite embeds `VITE_*` values in
+the browser bundle. Vercel injects the variables above only into the serverless
+function. After saving or changing them, redeploy so the new function receives
+them.
 
-Share the target spreadsheet with the service account email in
+The API is public and does not require cookie authentication. On the same
+domain, it uses a short-lived cookie only to help prevent duplicate votes. No
+CORS origin environment variable is required.
+
+Enable the **Google Sheets API** in the Google Cloud project that owns the
+service account. Then share the target spreadsheet with the service account email in
 `GOOGLE_CLIENT_EMAIL` with Editor access. Credentials are intentionally not
 stored in the repository.
 
@@ -61,9 +64,14 @@ JSON key from Google Cloud and copy its entire `private_key` value into
 `GOOGLE_PRIVATE_KEY`. Do not copy the JSON object itself, abbreviate the key, or
 include a trailing semicolon. Redeploy after changing the environment variable.
 
+`GOOGLE_PROJECT_ID` and `GOOGLE_CLIENT_ID` are not required for vote insertion.
 The same `GOOGLE_PRIVATE_KEY` is used by both `POST /question/vote` and the
 Google Sheets health check. Confirm `GET /db` returns a successful connection
 before testing a vote; otherwise votes cannot be written to the spreadsheet.
+For a deployed app, open `https://your-domain/db`; it reports the connection
+status without returning credentials or the spreadsheet ID. If it fails, use
+the Vercel Function logs and verify the API is enabled, the sheet is shared
+with the service account, and the sheet tab name matches `GOOGLE_SHEET_NAME`.
 
 ## Verify before deploying
 
