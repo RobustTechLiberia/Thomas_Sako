@@ -4,6 +4,13 @@ The app is a Vite/React site with an Express API deployed as a Vercel serverless
 function. The vote form submits to the same-origin endpoint
 `POST /question/vote`; it does not use a localhost URL in production.
 
+## Local Google Sheets configuration
+
+For local development, copy `server/liberty.example.json` to
+`server/liberty.json` and replace every placeholder with values from one Google
+service-account key JSON file. The local credential file is ignored by Git and
+is never deployed. The server no longer loads `server/.env` for Google Sheets.
+
 ## Deploy to Vercel
 
 Import the repository with the project root set to this directory. Vercel uses

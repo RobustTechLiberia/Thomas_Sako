@@ -1,7 +1,5 @@
 "use strict";
 
-require("dotenv").config();
-
 const { createPrivateKey } = require("crypto");
 const express = require("express");
 const { google } = require("googleapis");
