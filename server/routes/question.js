@@ -13,9 +13,16 @@ function getConfiguration() {
     clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
     clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
     privateKey: normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
-    spreadsheetId: (process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEET || "").trim(),
+    spreadsheetId: (
+      process.env.GOOGLE_SHEETS_ID ||
+      process.env.GOOGLE_SHEET_ID ||
+      process.env.GOOGLE_SHEET ||
+      ""
+    ).trim(),
     sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
-    tokenUri: (process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token").trim(),
+    tokenUri: (
+      process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token"
+    ).trim(),
   };
 
   const required = [
@@ -23,12 +30,18 @@ function getConfiguration() {
     ["GOOGLE_CLIENT_EMAIL", configuration.clientEmail],
     ["GOOGLE_CLIENT_ID", configuration.clientId],
     ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
-    ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)", configuration.spreadsheetId],
+    [
+      "GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)",
+      configuration.spreadsheetId,
+    ],
   ];
 
   const missing = required.filter(([, value]) => !value).map(([name]) => name);
 
-  if (configuration.privateKey && !isValidPrivateKey(configuration.privateKey)) {
+  if (
+    configuration.privateKey &&
+    !isValidPrivateKey(configuration.privateKey)
+  ) {
     missing.push("GOOGLE_PRIVATE_KEY must be a complete, valid PKCS#8 PEM key");
   }
 
@@ -70,32 +83,51 @@ function isValidPrivateKey(privateKey) {
 }
 
 function getVoteCookieName(question) {
-  const digest = crypto.createHash("sha256").update(question).digest("hex").slice(0, 20);
+  const digest = crypto
+    .createHash("sha256")
+    .update(question)
+    .digest("hex")
+    .slice(0, 20);
   return `poll_vote_${digest}`;
 }
 
 function hasCookie(req, name) {
-  return (req.headers.cookie || "").split(";").some((part) => part.trim().startsWith(`${name}=`));
+  return (req.headers.cookie || "")
+    .split(";")
+    .some((part) => part.trim().startsWith(`${name}=`));
 }
 
 router.post("/vote", async (req, res) => {
-  const question = typeof req.body?.question === "string" ? req.body.question.trim() : "";
-  const answer = typeof req.body?.answer === "string" ? req.body.answer.trim() : "";
+  const question =
+    typeof req.body?.question === "string" ? req.body.question.trim() : "";
+  const answer =
+    typeof req.body?.answer === "string" ? req.body.answer.trim() : "";
   if (!question || !answer || question.length > 500 || answer.length > 500) {
-    return res.status(400).json({ success: false, error: "A valid question and answer are required." });
+    return res.status(400).json({
+      success: false,
+      error: "A valid question and answer are required.",
+    });
   }
 
   const cookieName = getVoteCookieName(question);
   if (hasCookie(req, cookieName)) {
-    return res.status(429).json({ success: false, error: "You have already voted on this question. Please try again tomorrow." });
+    return res.status(429).json({
+      success: false,
+      error:
+        "You have already voted on this question. Please try again tomorrow.",
+    });
   }
 
   const { configuration, missing } = getConfiguration();
   if (missing.length > 0) {
-    console.error("Google Sheets configuration is incomplete:", missing.join(", "));
+    console.error(
+      "Google Sheets configuration is incomplete:",
+      missing.join(", "),
+    );
     return res.status(503).json({
       success: false,
-      error: "Voting is temporarily unavailable because the Google Sheets credentials are invalid.",
+      error:
+        "Voting is temporarily unavailable because the Google Sheets credentials are invalid.",
     });
   }
 
@@ -121,7 +153,9 @@ router.post("/vote", async (req, res) => {
       range,
       valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
-      requestBody: { values: [[timestamp, question, answer, 1, timestamp.slice(0, 10)]] },
+      requestBody: {
+        values: [[timestamp, question, answer, 1, timestamp.slice(0, 10)]],
+      },
     });
 
     res.cookie(cookieName, "1", {
@@ -132,19 +166,21 @@ router.post("/vote", async (req, res) => {
       path: "/",
     });
 
-    return res.status(201).json({ success: true, message: "Your vote has been recorded." });
+    return res.status(201).json({ success: true, message: "" });
   } catch (error) {
     console.error("Unable to record vote:", error.message);
 
     if (error.message?.includes("Invalid JWT Signature")) {
       return res.status(503).json({
         success: false,
-        error:
-          "Google Sheets authentication failed. Update GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY in Vercel from the same service-account key, then redeploy.",
+        error: "",
       });
     }
 
-    return res.status(502).json({ success: false, error: "Unable to record your vote. Please try again later." });
+    return res.status(502).json({
+      success: false,
+      error: "try again later",
+    });
   }
 });
 
