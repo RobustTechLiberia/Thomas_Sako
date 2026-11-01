@@ -6,10 +6,11 @@ function. The vote form submits to the same-origin endpoint
 
 ## Local Google Sheets configuration
 
-For local development, copy `server/liberty.example.json` to
-`server/liberty.json` and replace every placeholder with values from one Google
-service-account key JSON file. The local credential file is ignored by Git and
-is never deployed. The server no longer loads `server/.env` for Google Sheets.
+For local development, add the Google Sheets values to `server/.env` (or copy
+`server/liberty.example.json` to `server/liberty.json` and replace every
+placeholder with values from one Google service-account key JSON file). Both
+files are local-only and are never deployed. Values already set in the
+environment take precedence over `server/.env`.
 
 ## Deploy to Vercel
 

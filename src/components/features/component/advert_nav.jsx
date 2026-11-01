@@ -1,4 +1,5 @@
 import React from "react";
+// import img1 from "../../../images/1792015266507.jpg";
 
 class AdvertNav extends React.Component {
   render() {

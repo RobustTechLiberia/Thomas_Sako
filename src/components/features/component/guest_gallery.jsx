@@ -1,27 +1,41 @@
 import React from "react";
-
+import guest_1 from "../../../images/1793551783406.jpg";
+import guest_2 from "../../../images/1793555053400.jpg";
 class GuestGallery extends React.Component {
   render() {
     return (
       <>
         <div className="flex flex-wrap justify-center items-center md:justify-start md:mt-10 lg:mt-10 mt-8 lg:justify-start md:items-start lg:items-start gap-10 md:gap-0 md:mx-10 lg:mx-10 lg:gap-0  md:h-auto lg:h-auto h-auto mb-20 md:mb-0 lg:mb-0">
-          <div className="w-80 bg-gray-100 h-80">
+          <div className="w-80 bg-gray-100 h-auto">
             <img
-              src="path/to/image1.jpg"
+              src={guest_1}
               alt="Guest 1"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#830000]"></div>
+            <div className="md:mt-0 lg:mt-0 mt-20 h-28 bg-[#830000]  text-white text-lg text-center capitalize">
+              ahamadu sirleaf
+              <br />{" "}
+              <span className="font-bold capitalize">
+                <span className="uppercase">ceo</span> &amp; developer
+                <br /> chip chat
+              </span>
+            </div>
           </div>
-          <div className="w-80 bg-gray-50 h-80">
+          <div className="w-80 bg-gray-50 h-auto">
             <img
-              src="path/to/image1.jpg"
+              src={guest_2}
               alt="Guest 2"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full"
             />
-            <div className="md:mt-20 mt-20 lg:mt-20 h-28 bg-[#BC0202]"></div>
+            <div className="md:mt-0 mt-0 lg:mt-0 h-28 bg-[#BC0202]  text-white text-lg text-center capitalize">
+              <span className="font-bold capitalize">
+                enid mai jones king <br />
+                entrepreneur
+                <br /> <span className="uppercase">ai</span>-strategist
+              </span>
+            </div>
           </div>
           <div className="w-80 bg-gray-200 h-80">
             <img

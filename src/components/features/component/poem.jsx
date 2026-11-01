@@ -1,5 +1,5 @@
 import React from "react";
-import img4 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.54 PM.jpeg";
+import img4 from "../../../images/1793551736652.jpg";
 
 class Poem extends React.Component {
   render() {
@@ -11,10 +11,10 @@ class Poem extends React.Component {
             <img
               src={img4}
               alt="Poem feature"
-              className="md:w-full object-cover md:h-120 h-auto"
+              className="md:w-full object-cover md:h-120 h-full"
             />
           </div>
-          <div className="w-96 mx-5 mb-5">
+          <div className="w-96 mx-5 md:mb-5 mb-0">
             <div className="flex flex-wrap justify-start items-start">
               {/* <p className="font-sans text-left md:mt-10">
                 <b>Hush, Listen, Read!</b>

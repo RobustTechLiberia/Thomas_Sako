@@ -5,6 +5,14 @@ const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
 const fs = require("fs");
+const dotenv = require("dotenv");
+
+function loadLocalEnvironment() {
+  // Vercel supplies these values through its environment.  Locally, load the
+  // untracked server/.env file before the route modules read their settings.
+  // dotenv does not replace values already supplied by the host.
+  dotenv.config({ path: path.resolve(__dirname, ".env") });
+}
 
 function loadLocalServiceAccountConfig() {
   const credentialsPath = path.resolve(__dirname, "liberty.json");
@@ -35,6 +43,7 @@ function loadLocalServiceAccountConfig() {
   }
 }
 
+loadLocalEnvironment();
 loadLocalServiceAccountConfig();
 
 const app = express();
