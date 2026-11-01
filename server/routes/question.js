@@ -8,15 +8,17 @@ const router = express.Router();
 const VOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function getConfiguration() {
+  const configuredSpreadsheet = (
+    process.env.GOOGLE_SHEETS_ID ||
+    process.env.GOOGLE_SHEET_ID ||
+    process.env.GOOGLE_SHEET ||
+    ""
+  ).trim();
+
   const configuration = {
     clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
     privateKey: normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
-    spreadsheetId: (
-      process.env.GOOGLE_SHEETS_ID ||
-      process.env.GOOGLE_SHEET_ID ||
-      process.env.GOOGLE_SHEET ||
-      ""
-    ).trim(),
+    spreadsheetId: normalizeSpreadsheetId(configuredSpreadsheet),
     sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
     tokenUri: (
       process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token"
@@ -60,6 +62,13 @@ function normalizePrivateKey(value) {
     .replace(/\\n/g, "\n")
     .replace(/\r\n/g, "\n")
     .trim();
+}
+
+function normalizeSpreadsheetId(value) {
+  const spreadsheet = String(value || "").trim();
+  const match = spreadsheet.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+
+  return match ? match[1] : spreadsheet;
 }
 
 function isValidPrivateKey(privateKey) {
@@ -139,7 +148,7 @@ router.post("/vote", async (req, res) => {
     const timestamp = new Date().toISOString();
     const range = `'${configuration.sheetName.replace(/'/g, "''")}'!A:E`;
 
-    await sheets.spreadsheets.values.append({
+    const appendResponse = await sheets.spreadsheets.values.append({
       spreadsheetId: configuration.spreadsheetId,
       range,
       valueInputOption: "RAW",
@@ -149,6 +158,10 @@ router.post("/vote", async (req, res) => {
       },
     });
 
+    if (appendResponse.data.updates?.updatedRows !== 1) {
+      throw new Error("Google Sheets did not confirm that one vote row was written.");
+    }
+
     res.cookie(cookieName, "1", {
       maxAge: VOTE_WINDOW_MS,
       httpOnly: true,
@@ -157,7 +170,11 @@ router.post("/vote", async (req, res) => {
       path: "/",
     });
 
-    return res.status(201).json({ success: true, message: "" });
+    return res.status(201).json({
+      success: true,
+      message: "Vote recorded.",
+      updatedRange: appendResponse.data.updates.updatedRange || null,
+    });
   } catch (error) {
     const status = error.code || error.response?.status;
     console.error("Google Sheets vote insertion failed:", {

@@ -32,7 +32,7 @@ appropriate):
 ```
 GOOGLE_CLIENT_EMAIL
 GOOGLE_PRIVATE_KEY         # complete service-account private_key PEM; literal newlines or \n are accepted
-GOOGLE_SHEETS_ID             # `GOOGLE_SHEET` is also supported for existing deployments
+GOOGLE_SHEETS_ID             # raw Sheet ID or full Google Sheets URL; `GOOGLE_SHEET` is also supported
 GOOGLE_SHEET_NAME=Sheet1     # optional; defaults to Sheet1
 EMAIL_USER                 # optional unless the subscription form is used
 EMAIL_PASS                 # optional unless the subscription form is used

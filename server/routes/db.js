@@ -13,9 +13,14 @@ const GOOGLE_TOKEN_URI = (
   process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token"
 ).trim();
 
-const SPREADSHEET_ID = (
-  process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEET || ""
-).trim();
+const SPREADSHEET_ID = normalizeSpreadsheetId(
+  (
+    process.env.GOOGLE_SHEETS_ID ||
+    process.env.GOOGLE_SHEET_ID ||
+    process.env.GOOGLE_SHEET ||
+    ""
+  ).trim(),
+);
 const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim();
 
 function normalizePrivateKey(value) {
@@ -34,6 +39,13 @@ function normalizePrivateKey(value) {
     .replace(/\\n/g, "\n")
     .replace(/\r\n/g, "\n")
     .trim();
+}
+
+function normalizeSpreadsheetId(value) {
+  const spreadsheet = String(value || "").trim();
+  const match = spreadsheet.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+
+  return match ? match[1] : spreadsheet;
 }
 
 const PRIVATE_KEY = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY);
