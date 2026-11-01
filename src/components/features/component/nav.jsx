@@ -73,12 +73,14 @@ class Nav extends React.Component {
               >
                 <ul className="flex capitalize text-[#830000] flex-col p-4 md:p-0 font-medium text-lg md:text-xl lg:text-xl rounded-none bg-white md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
                   <li>
-                    <Link
-                      to="/youtube"
+                    <a
+                      href="https://www.youtube.com/@1847Liberty"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="block py-2 px-3 text-[#830000] hover:text-[#830000]md:p-0"
                     >
                       YouTube
-                    </Link>
+                    </a>
                   </li>
                   <li>
                     <Link
