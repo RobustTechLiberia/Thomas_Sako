@@ -219,17 +219,17 @@ class Quest extends React.Component {
           responseData.message ||
           responseData.error ||
           (response.status === 400
-            ? "Invalid poll submission. Check your selected answer."
+            ? ""
             : response.status === 401
-              ? "Please sign in before submitting your vote."
+              ? ""
               : response.status === 403
-                ? "You are not permitted to submit this vote."
+                ? ""
                 : response.status === 404
-                  ? "The poll API route was not found. Check your backend route."
+                  ? ""
                   : response.status === 409 || response.status === 429
-                    ? "You have already voted on this question."
+                    ? ""
                     : response.status >= 500
-                      ? "The server encountered an error. Please try again later."
+                      ? ""
                       : `Unable to submit your vote. HTTP ${response.status}.`);
 
         this.setState({
@@ -248,7 +248,7 @@ class Quest extends React.Component {
         // Voting still succeeds when browser storage is unavailable.
       }
 
-      const successMessage = responseData.message || "Your vote has been recorded.";
+      const successMessage = responseData.message || "";
 
       this.setState({
         hasVoted: true,
@@ -262,9 +262,9 @@ class Quest extends React.Component {
       this.setState({
         isSubmitting: false,
         errorMessage:
-          error?.message === "Failed to fetch"
-            ? "Unable to connect to the server. Check the API URL, server status, and CORS configuration."
-            : error?.message || "Unable to record your vote. Please try again.",
+          error?.message === ""
+            ? ""
+            : error?.message || "",
         successMessage: "",
       });
     } finally {
@@ -320,7 +320,7 @@ class Quest extends React.Component {
                   onClick={this.loadQuestions}
                   className="block mx-auto mt-4 text-[#830000] underline"
                 >
-                  Try again
+                 
                 </button>
               </div>
             ) : (
@@ -377,7 +377,7 @@ class Quest extends React.Component {
                           : "bg-[#830000] cursor-pointer"
                       }`}
                     >
-                      {isSubmitting ? "submitting..." : hasVoted ? "voted" : "vote"}
+                      {isSubmitting ? "VOTE" : hasVoted ? "voted" : "vote"}
                     </button>
                     {this.state.errorMessage ? (
                       <p className="text-sm font-medium text-[#830000]" role="alert">

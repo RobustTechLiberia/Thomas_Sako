@@ -105,7 +105,7 @@ router.post("/vote", async (req, res) => {
   if (!question || !answer || question.length > 500 || answer.length > 500) {
     return res.status(400).json({
       success: false,
-      error: "A valid question and answer are required.",
+      error: "",
     });
   }
 
@@ -114,20 +114,19 @@ router.post("/vote", async (req, res) => {
     return res.status(429).json({
       success: false,
       error:
-        "You have already voted on this question. Please try again tomorrow.",
+        "",
     });
   }
 
   const { configuration, missing } = getConfiguration();
   if (missing.length > 0) {
     console.error(
-      "Google Sheets configuration is incomplete:",
+      "",
       missing.join(", "),
     );
     return res.status(503).json({
       success: false,
-      error:
-        "Voting is temporarily unavailable because the Google Sheets credentials are invalid.",
+      error: "",
     });
   }
 
@@ -168,9 +167,9 @@ router.post("/vote", async (req, res) => {
 
     return res.status(201).json({ success: true, message: "" });
   } catch (error) {
-    console.error("Unable to record vote:", error.message);
+    console.error("", error.message);
 
-    if (error.message?.includes("Invalid JWT Signature")) {
+    if (error.message?.includes("")) {
       return res.status(503).json({
         success: false,
         error: "",
@@ -179,7 +178,7 @@ router.post("/vote", async (req, res) => {
 
     return res.status(502).json({
       success: false,
-      error: "try again later",
+      error:"",
     });
   }
 });
