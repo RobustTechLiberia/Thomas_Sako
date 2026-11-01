@@ -12,7 +12,7 @@ class AutoBio extends React.Component {
           {/* Left column: image */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-start">
             <img
-              src={image}
+              src="#"
               alt="Speaker at event"
               className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover rounded-none shadow-none"
             />
@@ -34,8 +34,8 @@ class AutoBio extends React.Component {
               tempore nam, praesentium maiores ad.
             </p>
             <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg text-gray-700">
-              Philomena R. Koffa <br />
-              Media Coordinator - Orange Liberia{" "}
+              Developer <br />
+              Chip Chat{" "}
             </p>
           </div>
         </div>
