@@ -78,19 +78,20 @@ function isValidPrivateKey(privateKey) {
   }
 }
 
-function getVoteCookieName(question) {
-  const digest = crypto
-    .createHash("sha256")
-    .update(question)
-    .digest("hex")
-    .slice(0, 20);
-  return `poll_vote_${digest}`;
+function getVoteCookieName() {
+  return "poll_vote";
 }
 
 function hasCookie(req, name) {
   return (req.headers.cookie || "")
     .split(";")
     .some((part) => part.trim().startsWith(`${name}=`));
+}
+
+function hasLegacyVoteCookie(req) {
+  return (req.headers.cookie || "")
+    .split(";")
+    .some((part) => part.trim().startsWith("poll_vote_"));
 }
 
 router.post("/vote", async (req, res) => {
@@ -105,8 +106,8 @@ router.post("/vote", async (req, res) => {
     });
   }
 
-  const cookieName = getVoteCookieName(question);
-  if (hasCookie(req, cookieName)) {
+  const cookieName = getVoteCookieName();
+  if (hasCookie(req, cookieName) || hasLegacyVoteCookie(req)) {
     return res.status(429).json({
       success: false,
       error:

@@ -4,6 +4,8 @@ import Advert from "../../features/component/Advertisement/components/advert";
 import { apiUrl } from "../../../lib/api";
 import "../../../../App.scss";
 
+const VOTE_STORAGE_KEY = "poll_vote_time";
+
 class Quest extends React.Component {
   constructor(props) {
     super(props);
@@ -73,14 +75,12 @@ class Quest extends React.Component {
       let alreadyVoted = false;
 
       try {
-        const storageKey = `vote_time_${activeQuestion.id}`;
-        const voteTimestamp = localStorage.getItem(storageKey);
+        const oneDay = 24 * 60 * 60 * 1000;
+        const voteTimestamp = localStorage.getItem(VOTE_STORAGE_KEY);
 
         if (voteTimestamp !== null) {
           const parsedTimestamp = Number(voteTimestamp);
           const elapsed = Date.now() - parsedTimestamp;
-          const oneDay = 24 * 60 * 60 * 1000;
-
           if (
             Number.isFinite(parsedTimestamp) &&
             elapsed >= 0 &&
@@ -88,7 +88,28 @@ class Quest extends React.Component {
           ) {
             alreadyVoted = true;
           } else {
-            localStorage.removeItem(storageKey);
+            localStorage.removeItem(VOTE_STORAGE_KEY);
+          }
+        } else {
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+
+            if (!key?.startsWith("vote_time_")) {
+              continue;
+            }
+
+            const legacyTimestamp = Number(localStorage.getItem(key));
+            const legacyElapsed = Date.now() - legacyTimestamp;
+
+            if (
+              Number.isFinite(legacyTimestamp) &&
+              legacyElapsed >= 0 &&
+              legacyElapsed < oneDay
+            ) {
+              alreadyVoted = true;
+              localStorage.setItem(VOTE_STORAGE_KEY, String(legacyTimestamp));
+              break;
+            }
           }
         }
       } catch {
@@ -166,7 +187,7 @@ class Quest extends React.Component {
 
     if (hasVoted) {
       this.setState({
-        errorMessage: "You have already voted on this question.",
+        errorMessage: "You can vote again 24 hours after your last vote.",
         successMessage: "",
       });
       return;
@@ -249,7 +270,7 @@ class Quest extends React.Component {
 
       try {
         localStorage.setItem(
-          `vote_time_${currentQuestion.id}`,
+          VOTE_STORAGE_KEY,
           String(Date.now()),
         );
       } catch {
