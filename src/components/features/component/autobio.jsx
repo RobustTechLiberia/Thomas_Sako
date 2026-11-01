@@ -1,5 +1,5 @@
 import React from "react";
-// import image from "../../../images/617521616_1984950405787294_11200720191272892_n.jpg";
+import image from "../../../images/1793551783406.jpg";
 
 class AutoBio extends React.Component {
   render() {
@@ -12,8 +12,8 @@ class AutoBio extends React.Component {
           {/* Left column: image */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-start">
             <img
-              src="#"
-              alt="Speaker at event"
+              src={image}
+              alt="testimonal"
               className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover rounded-none shadow-none"
             />
           </div>
