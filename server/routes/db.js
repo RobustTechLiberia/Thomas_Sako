@@ -132,9 +132,13 @@ router.get("/db", async (req, res) => {
   } catch (error) {
     console.error("Google Sheets connection failed:", error.message);
 
-    return res.status(500).json({
+    const authenticationError = error.message?.includes("Invalid JWT Signature")
+      ? "Google Sheets authentication failed. Update GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY from the same service-account key, then redeploy."
+      : "Google Sheets connection failed.";
+
+    return res.status(error.message?.includes("Invalid JWT Signature") ? 503 : 500).json({
       success: false,
-      error: "Google Sheets connection failed.",
+      error: authenticationError,
       message: error.message,
     });
   }

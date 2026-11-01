@@ -135,6 +135,15 @@ router.post("/vote", async (req, res) => {
     return res.status(201).json({ success: true, message: "Your vote has been recorded." });
   } catch (error) {
     console.error("Unable to record vote:", error.message);
+
+    if (error.message?.includes("Invalid JWT Signature")) {
+      return res.status(503).json({
+        success: false,
+        error:
+          "Google Sheets authentication failed. Update GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY in Vercel from the same service-account key, then redeploy.",
+      });
+    }
+
     return res.status(502).json({ success: false, error: "Unable to record your vote. Please try again later." });
   }
 });
