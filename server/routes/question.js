@@ -1,11 +1,35 @@
 "use strict";
 
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const { google } = require("googleapis");
 
 const router = express.Router();
 const VOTE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function loadServiceAccountJson() {
+  const serviceAccountPath = path.resolve(__dirname, "liberty-510919-a2f801783f8d.json");
+
+  if (!fs.existsSync(serviceAccountPath)) {
+    return;
+  }
+
+  try {
+    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+
+    process.env.GOOGLE_PROJECT_ID = (process.env.GOOGLE_PROJECT_ID || serviceAccount.project_id || "").trim();
+    process.env.GOOGLE_CLIENT_EMAIL = (process.env.GOOGLE_CLIENT_EMAIL || serviceAccount.client_email || "").trim();
+    process.env.GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || serviceAccount.client_id || "").trim();
+    process.env.GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || serviceAccount.private_key || "").trim();
+    process.env.GOOGLE_TOKEN_URI = (process.env.GOOGLE_TOKEN_URI || serviceAccount.token_uri || "https://oauth2.googleapis.com/token").trim();
+  } catch {
+    // Ignore JSON parse issues and let environment variables drive the config.
+  }
+}
+
+loadServiceAccountJson();
 
 function getConfiguration() {
   const configuration = {
@@ -17,6 +41,7 @@ function getConfiguration() {
     sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
     tokenUri: (process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token").trim(),
   };
+
   const required = [
     ["GOOGLE_PROJECT_ID", configuration.projectId],
     ["GOOGLE_CLIENT_EMAIL", configuration.clientEmail],
@@ -24,6 +49,7 @@ function getConfiguration() {
     ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
     ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET)", configuration.spreadsheetId],
   ];
+
   const missing = required.filter(([, value]) => !value).map(([name]) => name);
 
   if (configuration.privateKey && !isValidPrivateKey(configuration.privateKey)) {
@@ -96,24 +122,36 @@ router.post("/vote", async (req, res) => {
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
-        type: "service_account", project_id: configuration.projectId,
-        private_key: configuration.privateKey, client_email: configuration.clientEmail,
-        client_id: configuration.clientId, token_uri: configuration.tokenUri,
+        type: "service_account",
+        project_id: configuration.projectId,
+        private_key: configuration.privateKey,
+        client_email: configuration.clientEmail,
+        client_id: configuration.clientId,
+        token_uri: configuration.tokenUri,
       },
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
+
     const sheets = google.sheets({ version: "v4", auth });
     const timestamp = new Date().toISOString();
     const range = `'${configuration.sheetName.replace(/'/g, "''")}'!A:E`;
+
     await sheets.spreadsheets.values.append({
-      spreadsheetId: configuration.spreadsheetId, range, valueInputOption: "RAW",
+      spreadsheetId: configuration.spreadsheetId,
+      range,
+      valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       requestBody: { values: [[timestamp, question, answer, 1, timestamp.slice(0, 10)]] },
     });
+
     res.cookie(cookieName, "1", {
-      maxAge: VOTE_WINDOW_MS, httpOnly: true, sameSite: "lax",
-      secure: process.env.NODE_ENV === "production", path: "/",
+      maxAge: VOTE_WINDOW_MS,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
     });
+
     return res.status(201).json({ success: true, message: "Your vote has been recorded." });
   } catch (error) {
     console.error("Unable to record vote:", error.message);

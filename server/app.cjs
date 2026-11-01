@@ -4,6 +4,23 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
+const fs = require("fs");
+
+const serviceAccountPath = path.resolve(__dirname, "liberty-510919-a2f801783f8d.json");
+
+if (fs.existsSync(serviceAccountPath)) {
+  try {
+    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+
+    process.env.GOOGLE_PROJECT_ID = (process.env.GOOGLE_PROJECT_ID || serviceAccount.project_id || "").trim();
+    process.env.GOOGLE_CLIENT_EMAIL = (process.env.GOOGLE_CLIENT_EMAIL || serviceAccount.client_email || "").trim();
+    process.env.GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || serviceAccount.client_id || "").trim();
+    process.env.GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || serviceAccount.private_key || "").trim();
+    process.env.GOOGLE_TOKEN_URI = (process.env.GOOGLE_TOKEN_URI || serviceAccount.token_uri || "https://oauth2.googleapis.com/token").trim();
+  } catch (error) {
+    console.warn("Failed to load Google service account JSON. Falling back to environment variables.", error.message);
+  }
+}
 
 require("dotenv").config({
   path: path.resolve(__dirname, ".env"),
@@ -21,9 +38,6 @@ app.use(
 
 app.use(
   cors({
-    // These endpoints are public and do not use browser sessions or cookies.
-    // Reflecting the caller's origin allows the site to be hosted on GitHub
-    // Pages, Vercel, or a custom domain without an origin-specific redeploy.
     origin: true,
     credentials: false,
     optionsSuccessStatus: 200,
@@ -33,19 +47,16 @@ app.use(
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 
-// Import routers.
 const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
 const socialRouter = require("./routes/socialmedia");
 
-// Register routes.
 app.use("/question", questionRouter);
 app.use(socialRouter);
 app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
 
-// Health check.
 app.get("/home", (req, res) => {
   return res.status(200).send("");
 });
@@ -57,7 +68,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Handle unknown routes.
 app.use((req, res) => {
   return res.status(404).json({
     success: false,
@@ -66,7 +76,6 @@ app.use((req, res) => {
   });
 });
 
-// Central error handler.
 app.use((err, req, res, next) => {
   console.error("Unhandled API error:", {
     message: err.message,

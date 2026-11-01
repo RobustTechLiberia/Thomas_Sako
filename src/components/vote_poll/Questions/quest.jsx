@@ -28,13 +28,10 @@ class Quest extends React.Component {
 
   loadQuestions = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.BASE_URL}questions.json`,
-        {
-          method: "GET",
-          cache: "no-cache",
-        },
-      );
+      const response = await fetch(`${import.meta.env.BASE_URL}questions.json`, {
+        method: "GET",
+        cache: "no-cache",
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to load questions. HTTP ${response.status}`);
@@ -47,7 +44,6 @@ class Quest extends React.Component {
       }
 
       const dayIndex = Math.floor(Date.now() / (24 * 60 * 60 * 1000));
-
       const activeQuestion = data[dayIndex % data.length];
 
       if (
@@ -58,9 +54,7 @@ class Quest extends React.Component {
         !Array.isArray(activeQuestion.options) ||
         activeQuestion.options.length === 0
       ) {
-        throw new Error(
-          "Today's question does not contain valid question data.",
-        );
+        throw new Error("Today's question does not contain valid question data.");
       }
 
       const validOptions = activeQuestion.options
@@ -82,11 +76,7 @@ class Quest extends React.Component {
           const elapsed = Date.now() - parsedTimestamp;
           const oneDay = 24 * 60 * 60 * 1000;
 
-          if (
-            Number.isFinite(parsedTimestamp) &&
-            elapsed >= 0 &&
-            elapsed < oneDay
-          ) {
+          if (Number.isFinite(parsedTimestamp) && elapsed >= 0 && elapsed < oneDay) {
             alreadyVoted = true;
           } else {
             localStorage.removeItem(storageKey);
@@ -108,8 +98,7 @@ class Quest extends React.Component {
       this.setState({
         currentQuestion: null,
         isLoading: false,
-        errorMessage:
-          error?.message || "Unable to load today's poll. Please try again.",
+        errorMessage: error?.message || "Unable to load today's poll. Please try again.",
       });
     }
   };
@@ -173,14 +162,9 @@ class Quest extends React.Component {
       return;
     }
 
-    if (
-      !currentQuestion ||
-      currentQuestion.id == null ||
-      !currentQuestion.question
-    ) {
+    if (!currentQuestion || currentQuestion.id == null || !currentQuestion.question) {
       this.setState({
-        errorMessage:
-          "The current question is invalid. Please reload the page.",
+        errorMessage: "The current question is invalid. Please reload the page.",
         successMessage: "",
       });
       return;
@@ -259,21 +243,24 @@ class Quest extends React.Component {
       }
 
       try {
-        localStorage.setItem(
-          `vote_time_${currentQuestion.id}`,
-          String(Date.now()),
-        );
+        localStorage.setItem(`vote_time_${currentQuestion.id}`, String(Date.now()));
       } catch {
         // Voting still succeeds when browser storage is unavailable.
       }
+
+      const successMessage = responseData.message || "Your vote has been recorded.";
 
       this.setState({
         hasVoted: true,
         isSubmitting: false,
         shouldRedirectToResults: true,
-        successMessage: responseData.message || "Your vote has been recorded.",
+        successMessage,
         errorMessage: "",
       });
+
+      if (typeof window !== "undefined") {
+        window.location.assign("/results");
+      }
     } catch (error) {
       this.setState({
         isSubmitting: false,
@@ -309,10 +296,7 @@ class Quest extends React.Component {
     }
 
     const options = currentQuestion?.options || [];
-
-    const isSubmitDisabled =
-      isLoading || isSubmitting || !selectedOption || hasVoted;
-
+    const isSubmitDisabled = isLoading || isSubmitting || !selectedOption || hasVoted;
     const isInteractionDisabled = isLoading || isSubmitting || hasVoted;
 
     return (
@@ -348,7 +332,9 @@ class Quest extends React.Component {
                   {currentQuestion.question}
                 </h3>
 
-                <form action="/results" method="post"
+                <form
+                  action="/results"
+                  method="post"
                   className="w-auto"
                   onSubmit={this.handleSubmit}
                   aria-busy={isSubmitting}
@@ -363,10 +349,7 @@ class Quest extends React.Component {
                     const isChecked = selectedOption === optionText;
 
                     return (
-                      <div
-                        key={`${currentQuestion.id}-${index}`}
-                        className="md:my-3 lg:my-3"
-                      >
+                      <div key={`${currentQuestion.id}-${index}`} className="md:my-3 lg:my-3">
                         <label
                           className={`md:mx-20 lg:mx-20 mx-4 capitalize md:text-2xl lg:text-2xl text-2xl font-semibold font-sans flex items-center gap-2 ${
                             isInteractionDisabled
@@ -399,11 +382,7 @@ class Quest extends React.Component {
                           : "bg-[#830000] cursor-pointer"
                       }`}
                     >
-                      {isSubmitting
-                        ? "submitting..."
-                        : hasVoted
-                          ? "voted"
-                          : "vote"}
+                      {isSubmitting ? "submitting..." : hasVoted ? "voted" : "vote"}
                     </button>
                   </div>
                 </form>
