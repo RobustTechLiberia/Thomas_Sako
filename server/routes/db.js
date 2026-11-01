@@ -18,15 +18,13 @@ const GOOGLE_TOKEN_URI = (
 ).trim();
 
 const SPREADSHEET_ID = (
-  process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET || ""
+  process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEET || ""
 ).trim();
 const SHEET_NAME = (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim();
 
 function normalizePrivateKey(value) {
   let key = String(value || "").trim();
 
-  // Deployment dashboards commonly store newlines either literally or as \n.
-  // They also sometimes retain a pair of wrapping quotes when copied from JSON.
   if (
     key.length >= 2 &&
     ((key.startsWith('"') && key.endsWith('"')) ||
@@ -72,7 +70,7 @@ function getSheetsClient() {
   if (!GOOGLE_PROJECT_ID) missing.push("GOOGLE_PROJECT_ID");
   if (!GOOGLE_CLIENT_EMAIL) missing.push("GOOGLE_CLIENT_EMAIL");
   if (!GOOGLE_CLIENT_ID) missing.push("GOOGLE_CLIENT_ID");
-  if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID (or GOOGLE_SHEET)");
+  if (!SPREADSHEET_ID) missing.push("GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)");
   const privateKeyError = getPrivateKeyError();
   if (privateKeyError) missing.push(privateKeyError);
 
@@ -143,7 +141,6 @@ router.post("/db", async (req, res) => {
     const sheets = getSheetsClient();
 
     const question = cleanText(req.body?.question ?? req.body?.questions);
-
     const answer = cleanText(req.body?.answer ?? req.body?.answers);
 
     if (!question || !answer) {

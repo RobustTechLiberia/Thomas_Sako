@@ -24,6 +24,7 @@ function loadServiceAccountJson() {
     process.env.GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || serviceAccount.client_id || "").trim();
     process.env.GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || serviceAccount.private_key || "").trim();
     process.env.GOOGLE_TOKEN_URI = (process.env.GOOGLE_TOKEN_URI || serviceAccount.token_uri || "https://oauth2.googleapis.com/token").trim();
+    process.env.GOOGLE_SHEET_ID = (process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEETS_ID || "").trim();
   } catch {
     // Ignore JSON parse issues and let environment variables drive the config.
   }
@@ -37,7 +38,7 @@ function getConfiguration() {
     clientEmail: (process.env.GOOGLE_CLIENT_EMAIL || "").trim(),
     clientId: (process.env.GOOGLE_CLIENT_ID || "").trim(),
     privateKey: normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
-    spreadsheetId: (process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET || "").trim(),
+    spreadsheetId: (process.env.GOOGLE_SHEETS_ID || process.env.GOOGLE_SHEET_ID || process.env.GOOGLE_SHEET || "").trim(),
     sheetName: (process.env.GOOGLE_SHEET_NAME || "Sheet1").trim(),
     tokenUri: (process.env.GOOGLE_TOKEN_URI || "https://oauth2.googleapis.com/token").trim(),
   };
@@ -47,7 +48,7 @@ function getConfiguration() {
     ["GOOGLE_CLIENT_EMAIL", configuration.clientEmail],
     ["GOOGLE_CLIENT_ID", configuration.clientId],
     ["GOOGLE_PRIVATE_KEY", configuration.privateKey],
-    ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET)", configuration.spreadsheetId],
+    ["GOOGLE_SHEETS_ID (or GOOGLE_SHEET_ID or GOOGLE_SHEET)", configuration.spreadsheetId],
   ];
 
   const missing = required.filter(([, value]) => !value).map(([name]) => name);
