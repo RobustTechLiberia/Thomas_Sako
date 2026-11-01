@@ -33,7 +33,8 @@ class AutoBio extends React.Component {
               esse amet vitae necessitatibus obcaecati dolorem earum explicabo
               tempore nam, praesentium maiores ad.
             </p>
-            <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg text-gray-700">
+            <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg capitalize text-gray-700">
+              ahamadu sirleaf <br />
               The Developer Of <br />
               Chip Chat{" "}
             </p>
