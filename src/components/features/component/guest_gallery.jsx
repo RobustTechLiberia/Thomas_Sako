@@ -12,7 +12,7 @@ class GuestGallery extends React.Component {
               src={guest_1}
               alt="Guest 1"
               srcset=""
-              className="h-52 object-cover w-full"
+              className="md:h-52 object-cover w-full"
             />
             <div className="md:mt-0 lg:mt-0 mt-20 h-28 bg-[#830000]  text-white text-lg text-center capitalize">
               ahamadu sirleaf
