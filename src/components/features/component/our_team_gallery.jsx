@@ -29,8 +29,7 @@ class OurTeamGallery extends React.Component {
               className="h-52 object-cover w-full"
             />
             <div className="md:mt-0 mt-0 lg:mt-0 text-white text-lg text-center capitalize py-3 bg-[#BC0202]">
-              joseph arhin <br />{" "}
-              <span className="font-bold">communication officer</span>
+              joseph arhin <br /> <span className="font-bold">co-host</span>
             </div>
           </div>
           <div className="w-80 bg-gray-200 h-auto">
@@ -41,8 +40,7 @@ class OurTeamGallery extends React.Component {
               className="h-52 object-cover w-full"
             />
             <div className="md:mt-0 mt-0 lg:mt-0 text-white text-lg text-center capitalize py-3 bg-[#830000]">
-              thomas m sarko <br />{" "}
-              <span className="font-bold">chief executive officer</span>
+              thomas m sarko <br /> <span className="font-bold">host</span>
             </div>
           </div>
           <div className="w-80 bg-gray-100 h-auto">

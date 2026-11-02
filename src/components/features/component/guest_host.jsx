@@ -7,7 +7,7 @@ class GuestHost extends React.Component {
       <>
         <div className="md:h-200 lg:h-200 bg-white">
           <h1 className="md:text-5xl lg:text-5xl md:mx-32 lg:mx-32 mx-10 md:mt-20 lg:mt-20 mt-10 text-4xl font-black text-[#830000] uppercase">
-            guest host
+            contributors
           </h1>
           <GuestGallery />
         </div>
