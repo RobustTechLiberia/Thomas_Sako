@@ -4,7 +4,7 @@ import img2 from "../../../images/WhatsApp Image 2026-09-27 at 3.31.01 AM.jpeg";
 import img3 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.42 PM.jpeg";
 import img4 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.54 PM.jpeg";
 import img5 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.59 PM.jpeg";
-import img6 from "../../../images/WhatsApp Image 2026-09-28 at 2.19.59 PM (1).jpeg";
+import img6 from "../../../images/WhatsApp Image 2026-09-27 at 3.31.01 AM (7).jpeg";
 import Poem from "../component/poem";
 
 class Portfolio extends React.Component {

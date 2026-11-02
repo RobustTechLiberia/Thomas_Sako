@@ -1,6 +1,6 @@
 import React from "react";
 import heading from "./../images/header.png";
-import img from "./../images/Copilot_20260816_124134.png";
+import img from "./../images/1793551736652.jpg";
 
 class Header extends React.Component {
   render() {

@@ -1,6 +1,7 @@
 import React from "react";
 import guest_1 from "../../../images/1793551783406.jpg";
 import guest_2 from "../../../images/1793555053400.jpg";
+import guest_3 from "../../../images/Reflective Liberty Portrait.png";
 class GuestGallery extends React.Component {
   render() {
     return (
@@ -30,21 +31,23 @@ class GuestGallery extends React.Component {
               className="h-52 object-cover w-full"
             />
             <div className="md:mt-0 mt-0 lg:mt-0 h-28 bg-[#BC0202]  text-white text-lg text-center capitalize">
+              enid mai jones king <br />
               <span className="font-bold capitalize">
-                enid mai jones king <br />
                 entrepreneur
                 <br /> <span className="uppercase">ai</span>-strategist
               </span>
             </div>
           </div>
-          <div className="w-80 bg-gray-200 h-80">
+          <div className="w-80 bg-gray-200 h-auto">
             <img
-              src="path/to/image1.jpg"
+              src={guest_3}
               alt="Guest 3"
               srcset=""
-              className="h-32 object-cover w-full"
+              className="h-52 object-cover w-full"
             />
-            <div className="md:mt-20 lg:mt-20 mt-20 h-28 bg-[#830000]"></div>
+            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-[#830000] text-white text-lg text-center capitalize">
+              mr. j. mawolo
+            </div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
             <img

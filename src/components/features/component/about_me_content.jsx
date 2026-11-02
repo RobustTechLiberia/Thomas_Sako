@@ -1,5 +1,5 @@
 import React from "react";
-import profile from "../../../images/Copilot_20260816_124134.png";
+import profile from "../../../images/1793551736652.jpg";
 import OurTeam from "../../../components/features/component/our_team";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import GuestHost from "./guest_host";
