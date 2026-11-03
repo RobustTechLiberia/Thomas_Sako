@@ -14,7 +14,7 @@ class AutoBio extends React.Component {
             <img
               src={image}
               alt="testimonal"
-              className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover rounded-none shadow-none"
+              className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover brightness-100 rounded-none shadow-none"
             />
           </div>
 
@@ -37,7 +37,7 @@ class AutoBio extends React.Component {
               is why I remain interested in the Liberty Show.
             </p>
             <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg capitalize text-[#830000]">
-              mr. j. mawolo
+              mr. john. mawolo
             </p>
           </div>
         </div>
