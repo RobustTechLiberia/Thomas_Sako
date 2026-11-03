@@ -24,6 +24,7 @@ class GuestGallery extends React.Component {
                 <span className="uppercase">ceo</span> &amp; developer
                 <br /> chatwallet chip chat
               </span>
+               <br />[guest]
             </div>
           </div>
           <div className="w-80 bg-gray-50 h-auto">
@@ -39,6 +40,8 @@ class GuestGallery extends React.Component {
                 entrepreneur
                 <br /> <span className="uppercase">ai</span>-strategist
               </span>
+              <br />
+              [senior contributor]
             </div>
           </div>
           <div className="w-80 bg-gray-200 h-auto">
@@ -53,6 +56,8 @@ class GuestGallery extends React.Component {
               <span className="font-bold capitalize">
                 senior. national security <br /> &amp; foreign affairs analyst
               </span>
+              <br />
+              [senior contributor]
             </div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
@@ -67,6 +72,7 @@ class GuestGallery extends React.Component {
               <span className="font-bold capitalize">
                 senior. criminal justice <br /> &amp; law enforcement analyst
               </span>
+               <br />[guest]
             </div>
           </div>
           <div className="w-80 bg-gray-100 h-80">
@@ -76,12 +82,13 @@ class GuestGallery extends React.Component {
               srcset=""
               className="h-52 object-cover w-full"
             />
-            <div className="md:mt-0 lg:mt-0 mt-0 h-28 bg-[#830000] text-white text-lg text-center capitalize">
+            <div className="md:mt-0 lg:mt-0 mt-0 h-36 bg-[#830000] text-white text-lg text-center capitalize">
               matthew nyanplu <br />
               <span className="font-bold capitalize">
                 former assistant minister of information <br /> republic of
                 liberia
               </span>
+               <br />[guest]
             </div>{" "}
           </div>
           <div className="w-80 bg-gray-50 h-auto">
@@ -91,7 +98,7 @@ class GuestGallery extends React.Component {
               srcset=""
               className="h-52 object-cover w-full"
             />
-            <div className="md:mt-0 mt-0 lg:mt-0 h-28 bg-[#BC0202]  text-white text-lg text-center capitalize">
+            <div className="md:mt-0 mt-0 lg:mt-0 h-36 bg-[#BC0202]  text-white text-lg text-center capitalize">
               randall m. dobayou{" "}
               <span className="font-serif uppercase">ii</span> <br />
               <span className="font-bold capitalize">
@@ -99,6 +106,7 @@ class GuestGallery extends React.Component {
                 <br /> <span className="uppercase">epa</span> republic of
                 liberia
               </span>
+               <br />[guest]
             </div>
           </div>
         </div>
