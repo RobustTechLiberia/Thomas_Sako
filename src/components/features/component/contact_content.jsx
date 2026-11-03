@@ -6,7 +6,7 @@ import icon3 from "../../../images/Gemini_Generated_Image_gggh65gggh65gggh.jpeg"
 class Content extends React.Component {
   handleEmailClick = (e, subject) => {
     e.preventDefault();
-    const email = "gabrielwkun@gmail.com";
+    const email = "libertymediagp@gmail.com";
 
     // Programmatically encode parameters to guarantee full compatibility on all mobile & desktop viewports
     const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
