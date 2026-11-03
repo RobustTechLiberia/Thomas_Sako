@@ -2,6 +2,9 @@ import React from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome CSS
 import { apiUrl } from "../../../lib/api";
 
+
+// social media icons & URLs
+
 class SocialIcons extends React.Component {
   constructor(props) {
     super(props);
@@ -41,6 +44,7 @@ class SocialIcons extends React.Component {
             gmail: data.gmail || data.GMAIL_ACCOUNT || "",
           },
           loading: false,
+
         });
       })
       .catch((error) => {
