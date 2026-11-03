@@ -4,17 +4,25 @@ import icon2 from "../../../images/Gemini_Generated_Image_a55va1a55va1a55v.jpeg"
 import icon3 from "../../../images/Gemini_Generated_Image_gggh65gggh65gggh.jpeg";
 
 class Content extends React.Component {
+  handleEmailClick = (e, subject) => {
+    e.preventDefault();
+    const email = "gabrielwkun@gmail.com";
+
+    // Programmatically encode parameters to guarantee full compatibility on all mobile & desktop viewports
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+
+    // Safely hand over data to the browser engine without resetting or shifting layout states
+    window.location.href = mailtoUrl;
+  };
+
   render() {
     return (
       <>
-        {/* Changed from flex-wrap to an adaptive grid layout and removed rigid h-132 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center items-stretch md:gap-10 lg:gap-10 gap-8 md:my-20 lg:my-20 mt-10 md:mx-auto  md:w-auto px-4 bg-white">
+        {/* Adaptive grid layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center items-stretch md:gap-10 lg:gap-10 gap-8 md:my-20 lg:my-20 mt-10 md:mx-auto md:w-auto px-4 bg-white">
           {/* card 1 */}
-          {/* Removed fixed h-120 and h-80, changed border-b-10 to border-b-8 to fit standard Tailwind */}
           <div className="w-full max-w-sm border-b-[#830000] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
             <div>
-              {/* font-awesome icon */}
-              {/* Fixed invalid w-19 to w-20 */}
               <div className="flex flex-col justify-center items-center mt-5">
                 <img
                   src={icon1}
@@ -36,6 +44,12 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
+                onClick={(e) =>
+                  this.handleEmailClick(
+                    e,
+                    "Advertising Inquiry - 47liberty.com",
+                  )
+                }
                 className="bg-[#830000] capitalize hover:bg-[#830000] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 get started
@@ -44,11 +58,8 @@ class Content extends React.Component {
           </div>
 
           {/* card 2 */}
-          {/* Removed fixed h-120 and h-96, changed border-b-10 to border-b-8 */}
           <div className="w-full max-w-sm border-b-[#830000] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
             <div>
-              {/* font-awesome icon */}
-              {/* Fixed invalid w-19 to w-20 */}
               <div className="flex flex-col justify-center items-center mt-5">
                 <img src={icon2} className="w-20" alt="Write for Us Icon" />
               </div>
@@ -66,6 +77,9 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
+                onClick={(e) =>
+                  this.handleEmailClick(e, "Writer Application - 47liberty.com")
+                }
                 className="bg-[#830000] capitalize hover:bg-[#830000] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 apply today
@@ -74,12 +88,8 @@ class Content extends React.Component {
           </div>
 
           {/* card 3 */}
-          {/* Removed fixed h-120 and h-96, changed border-b-10 to border-b-8 */}
-          {/* Added md:col-span-2 lg:col-span-1 to cleanly center the third card if layout breaks into 2 columns on tablet viewports */}
           <div className="w-full max-w-sm md:col-span-2 lg:col-span-1 border-b-[#830000] border-b-8 flex flex-col justify-between pb-8 md:shadow-xl lg:shadow-xl shadow-2xs bg-white">
             <div>
-              {/* font-awesome icon */}
-              {/* Fixed invalid w-19 to w-20 */}
               <div className="flex flex-col justify-center items-center mt-5">
                 <img
                   src={icon3}
@@ -101,6 +111,9 @@ class Content extends React.Component {
             <div className="flex flex-col justify-start items-start mx-10 mt-10">
               <a
                 href="#"
+                onClick={(e) =>
+                  this.handleEmailClick(e, "Speaking Engagement Booking")
+                }
                 className="bg-[#830000] hover:bg-[#830000] transition-colors duration-1000 cursor-pointer text-white font-semibold text-lg py-3 px-10 rounded inline-block text-center"
               >
                 Book now
