@@ -5,130 +5,64 @@ class PlayListContent extends React.Component {
     return (
       <>
         {/* heading */}
-        <div className=" bg-[#F67D31] md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
-          <div className="h-auto md:h-10 lg:h-10"></div>
-
-          <div className="flex flex-col md:flex-row justify-evenly md:pt-8 lg:pt-8 mx-0 md:mx-5 lg:mx-5 mt-32 pt-0 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
-            {/* pod 1 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full aspect-video rounded-none shadow-none"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/v031MdJSWqY?si=Bjn2F_cvufBeiIA-"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-              <br />
-              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
-                A Message to the President of the Republic of Liberia, Joseph
-                Nyuma Boakai, Sr.
-              </h3>
-            </div>
-
-            {/* pod 2 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full aspect-video rounded-none shadow-none"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/_fGnJJ6BZbg?si=-6K7UTVDo111faQV"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-              <br />
-              <h3 className="text-left font-sans text-[#830000] font-semibold text-2xl py-5">
-                Discover the story behind J. Mawolo’s decision to join the
-                Liberty Show.
-              </h3>
-            </div>
-
-            {/* pod 3 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full aspect-video rounded-none shadow-none"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/W-o_9744KQg?si=gCswT5_unyKzu3hb"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-              <br />
-              <h3 className="text-left font-sans text-[#830000] font-semibold text-2xl py-5">
-                Tackling Liberia's Challenges
-              </h3>
-            </div>
+        <div className="flex flex-col md:flex-row justify-evenly md:mt-10 lg:mt-10 mt-10 items-stretch bg-[#F67D31] h-auto gap-6 px-4 md:px-20">
+          {/* pod 1 */}
+          <div className="w-full md:flex-1 bg-[#F67D31]">
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/Qq_AMq4OxIg?si=9Zy3J_xPBUiiAU2k"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+            <br />
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl py-5">
+              Meet Ahamadu Sirleaf, <br /> Creator of ChipChat: <br /> Smarter
+              Group Fundraising
+            </h3>
           </div>
 
-          {/* watch previous podcast */}
-          <div className="flex flex-col md:flex-row justify-evenly md:pt-20 lg:pt-20 mx-0 mt-28 items-stretch bg-white h-auto gap-6 px-4 md:px-20">
-            {/* pod 1 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full aspect-video rounded-none shadow-none"
-                src="https://www.youtube.com/embed/JlEipMTo-jQ?si=Ro7LE8lykFgAWNWS"
-                title="YouTube video player 1"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
-              <br />
-              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
-                Liberia: Uniting Against Deep-Rooted Corruption and Government
-                Dysfunction
-              </h3>
-            </div>
-
-            {/* pod 2 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/YXfC-F7ZfG4?si=2LVTliNbZ-E51yUh"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-              <br />
-              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
-                Rethinking Progress: Why Liberia’s Future Depends on
-                People-Centered Priorities
-              </h3>
-            </div>
-
-            {/* pod 3 */}
-            <div className="w-full md:flex-1 bg-white">
-              <iframe
-                className="w-full h-58 aspect-video rounded-none shadow-none"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/UduTppjIzqY?si=neU0HXWtqAqGw4Bk"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen
-              ></iframe>
-              <br />
-              <h3 className="text-left text-[#830000] font-sans font-semibold text-2xl py-5">
-                Why don't heritage travelers with ties to Liberia, such as
-                notable Black Americans, visit Liberia?
-              </h3>
-            </div>
+          {/* pod 2 */}
+          <div className="w-full md:flex-1 bg-[#F67D31]">
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/pW3S1U1XGH0?si=c1cq3a-eQl-xd3-u"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+            <br />
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl py-5">
+              The Stories That Inspire: <br /> Enid-Mai Jones King on her <br />
+              courageous life journey & <br /> empowering women
+            </h3>
           </div>
-        </div>
+
+          {/* pod 3 */}
+          {/* <div className="w-full md:flex-1 bg-[#F67D31]">
+            <iframe
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/_fGnJJ6BZbg?si=vPNIB5pypOLaYgF0"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+            <br />
+            <h3 className="text-left font-sans font-semibold text-[#830000] text-2xl md:py-5 lg:py-5">
+              Discover the story behind J. Mawolo’s decision to join the Liberty
+              Show.
+            </h3>
+          </div> */}
+        </div>{" "}
       </>
     );
   }
