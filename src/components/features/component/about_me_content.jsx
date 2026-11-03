@@ -56,19 +56,19 @@ class AboutContent extends React.Component {
                   aria-label="YouTube Channel"
                   className="p-3 rounded-full hover:bg-white/10 transition"
                 >
-                  <i className="fa-brands fa-linkedin text-2xl"></i>
+                  <i className="fa-brands fa-youtube text-2xl"></i>
                 </a>
 
-                <a
+                {/* <a
                   href="#x"
                   aria-label="X (Twitter)"
                   className="p-3 rounded-full hover:bg-white/10 transition"
                 >
                   <i className="fa-brands fa-x-twitter text-2xl"></i>
-                </a>
+                </a> */}
 
                 <a
-                  href="#facebook"
+                  href="https://web.facebook.com/share/p/1CLSS7NWxp/"
                   aria-label="Facebook"
                   className="p-3 rounded-full hover:bg-white/10 transition"
                 >
@@ -85,7 +85,7 @@ class AboutContent extends React.Component {
               </div>
 
               {/* Biography */}
-              <div className="text-base md:text-lg leading-relaxed text-white/95 mt-4">
+              <div className="text-base md:text-lg md:mx-3 leading-relaxed text-white/95 mt-4">
                 <p className="block">
                   Thomas M. Sarko is a Liberian peace advocate committed to
                   promoting sustainable stability in his home country. A

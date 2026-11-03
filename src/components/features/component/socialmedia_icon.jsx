@@ -126,14 +126,14 @@ class SocialIcons extends React.Component {
             </a> */}
 
             {/* WhatsApp */}
-            <a
+            {/* <a
               id="whatsapp-link"
               href={links.whatsapp || "#"}
               onClick={(e) => this.handleIconClick(e, links.whatsapp)}
               className="cursor-pointer"
             >
               <i className="fa-brands fa-whatsapp text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
-            </a>
+            </a> */}
           </div>
         </div>
       </>
