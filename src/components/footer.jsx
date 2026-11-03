@@ -25,7 +25,10 @@ class Footer extends React.Component {
             </a>
 
             {/* Facebook */}
-            <a href="#" className="cursor-pointer">
+            <a
+              href="https://web.facebook.com/share/p/1CLSS7NWxp/"
+              className="cursor-pointer"
+            >
               <i className="fa-brands fa-facebook-f text-[#830000] md:text-xl lg:text-xl text-2xl"></i>
             </a>
           </div>
