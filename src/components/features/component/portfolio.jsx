@@ -16,9 +16,9 @@ class Portfolio extends React.Component {
           gallery
         </h1> */}
         {/* Main Gallery Container */}
-        <div className="md:bg-[#F67D31] bg-white md:h-150 h-auto">
-          <div className="md:bg-[#F67D31] bg-white md:my-0 md:mx-32">
-            <div className="flex flex-wrap justify-center items-center md:gap-0 gap-3 max-w-7xl mx-auto px-4">
+        <div className="md:bg-[#F67D31] bg-white md:h-150  h-auto">
+          <div className="md:bg-[#F67D31] bg-white md:pt-10 md:mx-32">
+            <div className="flex flex-wrap justify-center  items-center md:gap-0 gap-3 max-w-7xl mx-auto px-4">
               {/* Gallery Image Item 1 */}
               <div className="w-full sm:w-80 h-64 bg-[#830000] rounded-none overflow-hidden">
                 <img
