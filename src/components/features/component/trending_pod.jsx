@@ -53,7 +53,7 @@ class TrendPod extends React.Component {
           <div className="w-full md:flex-1 bg-[#F67D31]">
             <iframe
               width="380"
-              height="200"
+              height="250"
               src="https://www.youtube.com/embed/W-o_9744KQg?si=5tld1EDrXQgi_XCR"
               title="YouTube video player"
               frameborder="0"
