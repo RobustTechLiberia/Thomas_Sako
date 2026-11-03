@@ -20,9 +20,9 @@ class Footer extends React.Component {
             </a>
 
             {/* X (Twitter) */}
-            <a href="#" className="cursor-pointer">
+            {/* <a href="#" className="cursor-pointer">
               <i className="fa-brands fa-x-twitter text-[#830000] md:text-xl lg:text-xl text-2xl"></i>
-            </a>
+            </a> */}
 
             {/* Facebook */}
             <a

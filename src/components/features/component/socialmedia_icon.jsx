@@ -2,7 +2,6 @@ import React from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome CSS
 import { apiUrl } from "../../../lib/api";
 
-
 // social media icons & URLs
 
 class SocialIcons extends React.Component {
@@ -44,7 +43,6 @@ class SocialIcons extends React.Component {
             gmail: data.gmail || data.GMAIL_ACCOUNT || "",
           },
           loading: false,
-
         });
       })
       .catch((error) => {
@@ -88,14 +86,14 @@ class SocialIcons extends React.Component {
             </a>
 
             {/* X (Twitter) */}
-            <a
+            {/* <a
               id="x-link"
               href={links.x || ""}
               onClick={(e) => this.handleIconClick(e, links.x)}
               className="cursor-pointer"
             >
               <i className="fa-brands fa-x-twitter text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
-            </a>
+            </a> */}
 
             {/* Facebook */}
             <a
@@ -108,24 +106,24 @@ class SocialIcons extends React.Component {
             </a>
 
             {/* Instagram */}
-            <a
+            {/* <a
               id="insta-link"
               href={links.instagram || ""}
               onClick={(e) => this.handleIconClick(e, links.instagram)}
               className="cursor-pointer"
             >
               <i className="fa-brands fa-instagram text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
-            </a>
+            </a> */}
 
             {/* TikTok */}
-            <a
+            {/* <a
               id="tiktok-link"
               href={links.tiktok || ""}
               onClick={(e) => this.handleIconClick(e, links.tiktok)}
               className="cursor-pointer"
             >
               <i className="fa-brands fa-tiktok text-[#830000] md:text-3xl lg:text-3xl text-2xl"></i>
-            </a>
+            </a> */}
 
             {/* WhatsApp */}
             <a
