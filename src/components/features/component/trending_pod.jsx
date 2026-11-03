@@ -48,7 +48,6 @@ class TrendPod extends React.Component {
               People-Centered Priorities
             </h3>
           </div>
-
           {/* pod 3 */}
           <div className="w-full md:flex-1 bg-[#F67D31]">
             <iframe
