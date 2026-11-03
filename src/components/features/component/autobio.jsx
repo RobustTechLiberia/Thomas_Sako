@@ -14,7 +14,7 @@ class AutoBio extends React.Component {
             <img
               src={image}
               alt="testimonal"
-              className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover brightness-100 rounded-none shadow-none"
+              className="w-md h-128 md:w-120 md:h-136 lg:w-lg lg:h-144 object-cover brightness-105 rounded-none shadow-none"
             />
           </div>
 
