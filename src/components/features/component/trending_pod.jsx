@@ -68,7 +68,7 @@ class TrendPod extends React.Component {
         </div>
         {/* second podcasts */}
         <h1 className="text-center md:text-left lg:text-left md:mx-20 text-[#830000] lg:mx-20 font-sans font-semibold md:text-5xl lg:text-5xl text-4xl md:my-10 lg:my-10 py-8 capitalize">
-          stories that inspire
+         the stories that inspire
         </h1>
         <div className="flex flex-col md:flex-row justify-evenly md:mt-10 lg:mt-10 mt-10 items-stretch bg-[#F67D31] h-auto gap-6 px-4 md:px-20">
           {/* pod 1 */}
