@@ -8,7 +8,7 @@ class Pod extends React.Component {
         <div className=" bg-[#F67D31] md:h-full lg:h-full h-auto border-b-none border-b-gray-200">
           <div className="h-auto md:h-10 lg:h-10">
             <h1 className="text-left text-[#830000] font-sans font-bold capitalize md:mx-20 lg:mx-20 mx-5 text-3xl md:mt-0 lg:pt-10 pt-10 md:text-4xl lg:text-4xl">
-              stories that inspire
+             the stories that inspire
             </h1>
           </div>
 
