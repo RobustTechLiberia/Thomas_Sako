@@ -4,16 +4,13 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
-const dotenv = require("dotenv");
+// const dotenv = require("dotenv");
 
-function loadLocalEnvironment() {
-  // Vercel supplies these values through its environment.  Locally, load the
-  // untracked server/.env file before the route modules read their settings.
-  // dotenv does not replace values already supplied by the host.
-  dotenv.config({ path: path.resolve(__dirname, ".env") });
-}
+// function loadLocalEnvironment() {
+//   dotenv.config({ path: path.resolve(__dirname, ".env") });
+// }
 
-loadLocalEnvironment();
+// loadLocalEnvironment();
 
 const app = express();
 
@@ -40,11 +37,17 @@ const subscribeRouter = require("./routes/subscribe");
 const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
 const socialRouter = require("./routes/socialmedia");
+const cmsRouter = require("./routes/cms/cms");
+const cmsLogin = require("./routes/cms/Auth/login");
 
+// mounted routes
 app.use("/question", questionRouter);
 app.use(socialRouter);
 app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
+// cms routes mounting
+app.use("/cms", cmsRouter);
+app.use("/cms/login", cmsLogin);
 
 app.get("/home", (req, res) => {
   return res.status(200).send("");
