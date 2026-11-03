@@ -1,5 +1,5 @@
 import React from "react";
-import image from "../../../images/Reflective Liberty Portrait.png";
+import image from "../../../images/IMG-20261102-WA0049.jpg";
 
 class AutoBio extends React.Component {
   render() {
@@ -37,7 +37,7 @@ class AutoBio extends React.Component {
               is why I remain interested in the Liberty Show.
             </p>
             <p className="mt-6 font-semibold md:text-lg lg:text-lg text-lg capitalize text-[#830000]">
-              mr. john. mawolo
+              john. mawolo
             </p>
           </div>
         </div>
