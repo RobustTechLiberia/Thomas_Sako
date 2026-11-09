@@ -37,6 +37,7 @@ async function ensureCmsSheets(sheets) {
   if (!names.has("CMS_Content")) requests.push({ addSheet: { properties: { title: "CMS_Content" } } });
   if (!names.has("CMS_Pages")) requests.push({ addSheet: { properties: { title: "CMS_Pages" } } });
   if (!names.has("CMS_Settings")) requests.push({ addSheet: { properties: { title: "CMS_Settings" } } });
+  if (!names.has("CMS_Media")) requests.push({ addSheet: { properties: { title: "CMS_Media" } } });
   if (requests.length) await sheets.spreadsheets.batchUpdate({ spreadsheetId, requestBody: { requests } });
 
   const users = await getSheetRows(sheets, "CMS_Users!A1:G");
@@ -61,6 +62,8 @@ async function ensureCmsSheets(sheets) {
   if (!pages.length) await sheets.spreadsheets.values.append({ spreadsheetId, range: "CMS_Pages!A:H", valueInputOption: "RAW", requestBody: { values: [["id", "title", "slug", "body", "show_navigation", "show_feature", "status", "updated_at"]] } });
   const settings = await getSheetRows(sheets, "CMS_Settings!A1:B");
   if (!settings.length) await sheets.spreadsheets.values.append({ spreadsheetId, range: "CMS_Settings!A:B", valueInputOption: "RAW", requestBody: { values: [["key", "value"], ["primary_color", "#830000"], ["accent_color", "#F67D31"], ["text_color", "#1c1917"], ["font_family", "Arimo"], ["base_font_size", "16"], ["theme", "light"]] } });
+  const media = await getSheetRows(sheets, "CMS_Media!A1:F");
+  if (!media.length) await sheets.spreadsheets.values.append({ spreadsheetId, range: "CMS_Media!A:F", valueInputOption: "RAW", requestBody: { values: [["id", "collection", "title", "youtube_url", "status", "updated_at"]] } });
 }
 
 module.exports = { spreadsheetId, getCmsSheetClient, ensureCmsSheets, getSheetRows };

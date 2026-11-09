@@ -42,6 +42,7 @@ const cmsRouter = require("./routes/cms/cms");
 const { router: cmsLogin } = require("./routes/cms/Auth/login");
 const cmsContents = require("./routes/cms/content");
 const cmsSite = require("./routes/cms/site");
+const cmsAnalytics = require("./routes/cms/analytics");
 
 // mounted routes
 app.use("/question", questionRouter);
@@ -56,6 +57,7 @@ app.use("/api/cms", cmsRouter);
 app.use("/api/cms/auth", cmsLogin);
 app.use("/api/cms/contents", cmsContents);
 app.use("/api/cms/site", cmsSite);
+app.use("/api/cms/analytics", cmsAnalytics);
 
 app.get("/home", (req, res) => {
   return res.status(200).send("");
