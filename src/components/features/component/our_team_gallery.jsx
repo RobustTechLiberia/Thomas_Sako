@@ -1,7 +1,7 @@
 import React from "react";
 // import team_member_1 from "../../../images/617521616_1984950405787294_11200720191272892_n.jpg";
-import team_member_2 from "../../../images/Gemini_Generated_Image_61sds061sds061sd.jpeg";
-import team_member_3 from "../../../images/1793551736652.jpg";
+// import team_member_2 from "../../../images/Gemini_Generated_Image_61sds061sds061sd.jpeg";
+// import team_member_3 from "../../../images/1793551736652.jpg";
 
 class OurTeamGallery extends React.Component {
   render() {
@@ -34,7 +34,7 @@ class OurTeamGallery extends React.Component {
           </div>
           <div className="w-80 bg-gray-200 h-auto">
             <img
-              src={team_member_3}
+              src="{team_member_3}"
               alt="Team mate 3"
               srcset=""
               className="h-52 object-cover w-full"
@@ -45,14 +45,14 @@ class OurTeamGallery extends React.Component {
           </div>
           <div className="w-80 bg-gray-100 h-auto">
             <img
-              src={team_member_2}
+              src="{team_member_2}"
               alt="Team mate 2"
               srcset=""
               className="h-52 object-cover w-full"
             />
             <div className="md:mt-0 mt-0 lg:mt-0 text-white text-lg text-center capitalize py-3 bg-[#BC0202]">
-              gabriel w kun <br />{" "}
-              <span className="font-bold">senior software developer</span>
+              {/* gabriel w kun <br />{" "}
+              <span className="font-bold">senior software developer</span> */}
             </div>{" "}
           </div>
           {/* <div className="w-80 md:mt-5 lg:mt-4 mt-0 bg-gray-100 h-80">

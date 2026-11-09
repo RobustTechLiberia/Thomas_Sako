@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import flowbiteReact from "flowbite-react/plugin/vite";
 
 
 export default defineConfig(({ mode }) => {
@@ -24,6 +23,26 @@ export default defineConfig(({ mode }) => {
           secure: false,
         },
         "/question": {
+          target: "http://localhost:8080",
+          changeOrigin: true,
+          secure: false,
+        },
+        "/cms/auth": {
+          target: "http://localhost:8080",
+          changeOrigin: true,
+          secure: false,
+        },
+        "/cms/contents": {
+          target: "http://localhost:8080",
+          changeOrigin: true,
+          secure: false,
+        },
+        "/cms/images": {
+          target: "http://localhost:8080",
+          changeOrigin: true,
+          secure: false,
+        },
+        "/cms/site": {
           target: "http://localhost:8080",
           changeOrigin: true,
           secure: false,

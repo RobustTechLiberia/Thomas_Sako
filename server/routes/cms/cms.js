@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/cms", (req, res) => {
-  res.send("1847 liberty show CMS");
+router.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "1847 Liberty CMS API is available.",
+  });
 });
 
 module.exports = router;

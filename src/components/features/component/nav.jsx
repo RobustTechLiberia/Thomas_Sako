@@ -5,7 +5,20 @@ import logo from "../../../images/Gemini_Generated_Image_5isb0t5isb0t5isb.jpeg";
 class Nav extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { isOpen: false };
+    this.state = { isOpen: false, pages: [] };
+  }
+
+  componentDidMount() {
+    fetch("/cms/site/public").then((response) => response.ok ? response.json() : null).then((data) => {
+      if (!data) return;
+      const settings = data.settings || {};
+      document.documentElement.style.setProperty("--site-primary", settings.primary_color || "#830000");
+      document.documentElement.style.setProperty("--site-text", settings.text_color || "#1c1917");
+      document.documentElement.style.setProperty("--site-font", settings.font_family || "Arimo");
+      document.documentElement.style.fontSize = `${Number(settings.base_font_size) || 16}px`;
+      document.documentElement.dataset.theme = settings.theme || "light";
+      this.setState({ pages: (data.pages || []).filter((page) => page.showNavigation) });
+    }).catch(() => {});
   }
 
   toggleMenu = () => {
@@ -90,6 +103,11 @@ class Nav extends React.Component {
                       Podcasts
                     </Link>
                   </li>
+                  {this.state.pages.map((page) => (
+                    <li key={page.id}>
+                      <Link to={`/${page.slug}`} className="block py-2 px-3 text-[#830000] hover:text-[#830000] md:p-0">{page.title}</Link>
+                    </li>
+                  ))}
                   <li>
                     <Link
                       to="/advertising"

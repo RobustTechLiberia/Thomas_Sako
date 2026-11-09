@@ -19,7 +19,7 @@
       "handle": "filesystem"
     },
     {
-      "src": "/(question|home|db|subscribe|api|health)(/.*)?",
+      "src": "/(question|home|db|subscribe|api|health|cms)(/.*)?",
       "dest": "server/app.cjs"
     },
     {

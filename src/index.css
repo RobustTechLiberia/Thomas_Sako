@@ -1,1 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--site-text, #1c1917);
+  font-family: var(--site-font, Arimo), sans-serif;
+}
+
+:root[data-theme="dark"] body { background: #1c1917; color: #f5f5f4; }
+
+img, video, iframe {
+  max-width: 100%;
+}

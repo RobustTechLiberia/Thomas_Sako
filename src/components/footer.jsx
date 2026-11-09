@@ -6,9 +6,9 @@ class Footer extends React.Component {
   render() {
     return (
       <>
-        <div className="flex flex-col justify center items-center md:h-96 lg:h-96 h-80 bg-[#F67D31] md:mt-0 lg:mt-0 mt-0">
+        <div className="flex min-h-80 flex-col items-center justify-center bg-[#F67D31] px-4 py-12">
           <div className="w-auto md:mt-20 lg:mt-20 mt-20">
-            <img src={logo} alt="" srcset="" className="md:w-80 lg:w-80 w-50" />
+            <img src={logo} alt="" className="w-52 sm:w-64 md:w-80" />
           </div>
           <div className="w-auto flex gap-6">
             {/* YouTube */}

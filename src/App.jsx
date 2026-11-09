@@ -13,6 +13,8 @@ import Advert from "./components/features/pages/advertising";
 import "./App.css";
 import PlayList from "./components/features/pages/playlist_page";
 import Results from "./components/vote_poll/Questions/Result/results";
+import CmsPage from "./pages/cms";
+import CmsDynamicPage from "./pages/cms_dynamic_page";
 
 class App extends React.Component {
   render() {
@@ -33,6 +35,8 @@ class App extends React.Component {
           <Route path="/book" element={<BookMe />} />
           <Route path="/advertising" element={<Advert />} />
           <Route path="/results" element={<Results />} />
+          <Route path="/cms" element={<CmsPage />} />
+          <Route path="/:slug" element={<CmsDynamicPage />} />
         </Routes>
         <Analytics />
       </>

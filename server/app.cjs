@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const path = require("path");
+const fs = require("fs");
 // const dotenv = require("dotenv");
 
 // function loadLocalEnvironment() {
@@ -18,19 +19,24 @@ app.set("trust proxy", 1);
 
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
+    hsts: process.env.NODE_ENV === "production" ? undefined : false,
   }),
 );
 
 app.use(
   cors({
-    origin: true,
+    origin(origin, callback) {
+      const allowed = (process.env.CORS_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
+      if (!origin || allowed.includes(origin)) return callback(null, true);
+      return callback(new Error("Origin is not allowed."));
+    },
     credentials: false,
     optionsSuccessStatus: 200,
   }),
 );
 
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
 
 const subscribeRouter = require("./routes/subscribe");
@@ -38,7 +44,9 @@ const databaseRouter = require("./routes/db");
 const questionRouter = require("./routes/question");
 const socialRouter = require("./routes/socialmedia");
 const cmsRouter = require("./routes/cms/cms");
-const cmsLogin = require("./routes/cms/Auth/login");
+const { router: cmsLogin } = require("./routes/cms/Auth/login");
+const cmsContents = require("./routes/cms/content");
+const cmsSite = require("./routes/cms/site");
 
 // mounted routes
 app.use("/question", questionRouter);
@@ -46,8 +54,13 @@ app.use(socialRouter);
 app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
 // cms routes mounting
+const cmsImagesDirectory = path.join(__dirname, "cms", "images");
+fs.mkdirSync(cmsImagesDirectory, { recursive: true });
+app.use("/cms/images", express.static(cmsImagesDirectory, { maxAge: "7d" }));
 app.use("/cms", cmsRouter);
-app.use("/cms/login", cmsLogin);
+app.use("/cms/auth", cmsLogin);
+app.use("/cms/contents", cmsContents);
+app.use("/cms/site", cmsSite);
 
 app.get("/home", (req, res) => {
   return res.status(200).send("");
