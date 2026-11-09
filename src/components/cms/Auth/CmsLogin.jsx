@@ -7,7 +7,7 @@ class CmsLogin extends React.Component {
     event.preventDefault();
     this.setState({ loading: true, error: "" });
     try {
-      const response = await fetch("/cms/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: this.state.username, password: this.state.password }) });
+      const response = await fetch("/api/cms/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: this.state.username, password: this.state.password }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to sign in.");
       this.props.onLogin(data);
@@ -20,7 +20,7 @@ class CmsLogin extends React.Component {
     if (!username) return;
     this.setState({ loading: true, error: "" });
     try {
-      const response = await fetch("/cms/auth/password-reset/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) });
+      const response = await fetch("/api/cms/auth/password-reset/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not request a password change.");
       this.setState({ error: data.message });

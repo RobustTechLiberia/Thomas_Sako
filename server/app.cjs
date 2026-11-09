@@ -24,17 +24,12 @@ app.use(
   }),
 );
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      const allowed = (process.env.CORS_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
-      if (!origin || allowed.includes(origin)) return callback(null, true);
-      return callback(new Error("Origin is not allowed."));
-    },
-    credentials: false,
-    optionsSuccessStatus: 200,
-  }),
-);
+const corsOrigins = (process.env.CORS_ORIGINS || "").split(",").map((value) => value.trim()).filter(Boolean);
+app.use(cors({
+  origin: corsOrigins.length ? corsOrigins : false,
+  credentials: false,
+  optionsSuccessStatus: 200,
+}));
 
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: false, limit: "10kb" }));
@@ -55,12 +50,12 @@ app.use("/", subscribeRouter);
 app.use("/", databaseRouter);
 // cms routes mounting
 const cmsImagesDirectory = path.join(__dirname, "cms", "images");
-fs.mkdirSync(cmsImagesDirectory, { recursive: true });
-app.use("/cms/images", express.static(cmsImagesDirectory, { maxAge: "7d" }));
-app.use("/cms", cmsRouter);
-app.use("/cms/auth", cmsLogin);
-app.use("/cms/contents", cmsContents);
-app.use("/cms/site", cmsSite);
+try { fs.mkdirSync(cmsImagesDirectory, { recursive: true }); } catch (error) { console.warn("CMS local image storage is unavailable:", error.message); }
+app.use("/api/cms/images", express.static(cmsImagesDirectory, { maxAge: "7d", index: false, fallthrough: true }));
+app.use("/api/cms", cmsRouter);
+app.use("/api/cms/auth", cmsLogin);
+app.use("/api/cms/contents", cmsContents);
+app.use("/api/cms/site", cmsSite);
 
 app.get("/home", (req, res) => {
   return res.status(200).send("");

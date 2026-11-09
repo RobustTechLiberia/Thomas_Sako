@@ -9,7 +9,8 @@ const { requireCmsAuth } = require("./Auth/login");
 
 const router = express.Router();
 const imageDirectory = path.resolve(__dirname, "../../cms/images");
-fs.mkdirSync(imageDirectory, { recursive: true });
+let imageStorageAvailable = true;
+try { fs.mkdirSync(imageDirectory, { recursive: true }); } catch (error) { imageStorageAvailable = false; console.warn("CMS local image storage is unavailable:", error.message); }
 
 const clean = (value, max = 10000) => String(value || "").trim().slice(0, max);
 const slugify = (value) => clean(value, 180).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "untitled";
@@ -67,6 +68,7 @@ router.delete("/:id", requireCmsAuth, async (req, res, next) => {
 });
 
 router.post("/image", requireCmsAuth, (req, res) => {
+  if (!imageStorageAvailable || process.env.VERCEL) return res.status(503).json({ success: false, error: "Image storage is not configured for this deployment." });
   const dataUrl = clean(req.body?.image, 7 * 1024 * 1024);
   const match = dataUrl.match(/^data:image\/(png|jpe?g|webp|gif);base64,([a-zA-Z0-9+/=]+)$/);
   if (!match) return res.status(400).json({ success: false, error: "Upload a PNG, JPG, WEBP, or GIF image smaller than 5 MB." });
@@ -75,7 +77,7 @@ router.post("/image", requireCmsAuth, (req, res) => {
   const extension = match[1] === "jpeg" ? "jpg" : match[1];
   const filename = `${Date.now()}-${crypto.randomBytes(5).toString("hex")}.${extension}`;
   fs.writeFileSync(path.join(imageDirectory, filename), buffer, { flag: "wx" });
-  return res.status(201).json({ success: true, image: `/cms/images/${filename}` });
+  return res.status(201).json({ success: true, image: `/api/cms/images/${filename}` });
 });
 
 module.exports = router;

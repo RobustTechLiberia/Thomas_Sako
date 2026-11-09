@@ -27,22 +27,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
-        "/cms/auth": {
-          target: "http://localhost:8080",
-          changeOrigin: true,
-          secure: false,
-        },
-        "/cms/contents": {
-          target: "http://localhost:8080",
-          changeOrigin: true,
-          secure: false,
-        },
-        "/cms/images": {
-          target: "http://localhost:8080",
-          changeOrigin: true,
-          secure: false,
-        },
-        "/cms/site": {
+        "/api/cms": {
           target: "http://localhost:8080",
           changeOrigin: true,
           secure: false,

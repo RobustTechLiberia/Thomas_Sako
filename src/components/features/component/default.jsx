@@ -8,6 +8,15 @@ import Contact from "../../../images/Gemini_Generated_Image_dor3swdor3swdor3.jpe
 import BookMe from "../../../images/Gemini_Generated_Image_vzxbvsvzxbvsvzxb.jpeg";
 
 class Features extends React.Component {
+  state = { featurePages: [] };
+
+  componentDidMount() {
+    fetch("/api/cms/site/public")
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => this.setState({ featurePages: (data?.pages || []).filter((page) => page.showFeature) }))
+      .catch(() => {});
+  }
+
   render() {
     return (
       <>
@@ -98,6 +107,14 @@ class Features extends React.Component {
               Book Thomas
             </p>
           </div>
+          {this.state.featurePages.map((page) => (
+            <div key={page.id} className="w-full max-w-80 bg-white">
+              <Link to={`/${page.slug}`} className="block border border-[#830000] p-6 text-center hover:bg-[#830000] hover:text-white">
+                <p className="font-serif text-xl">{page.title}</p>
+                <p className="mt-2 text-sm">View feature</p>
+              </Link>
+            </div>
+          ))}
         </div>
       </>
     );

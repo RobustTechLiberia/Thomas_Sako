@@ -9,7 +9,7 @@ class Nav extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/cms/site/public").then((response) => response.ok ? response.json() : null).then((data) => {
+    fetch("/api/cms/site/public").then((response) => response.ok ? response.json() : null).then((data) => {
       if (!data) return;
       const settings = data.settings || {};
       document.documentElement.style.setProperty("--site-primary", settings.primary_color || "#830000");

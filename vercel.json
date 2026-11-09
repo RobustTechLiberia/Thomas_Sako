@@ -16,11 +16,15 @@
   ],
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "/(question|home|db|subscribe|api|health)(/.*)?",
+      "dest": "server/app.cjs"
     },
     {
-      "src": "/(question|home|db|subscribe|api|health|cms)(/.*)?",
-      "dest": "server/app.cjs"
+      "src": "/cms/?",
+      "dest": "/index.html"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
